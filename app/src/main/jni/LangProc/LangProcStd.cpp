@@ -40,12 +40,6 @@ TLangProcStd::TLangProcStd()
 }
 TLangProcStd::~TLangProcStd()
 {
-#if USE_WEBSRCH
-	for(wst_map::iterator it=mapWebSrchTh.begin();it!=mapWebSrchTh.end();it++){
-		it->second->KillThread();
-		it->second->SetOwner(NULL);
-	}
-#endif
 }
 
 bool TLangProcStd::Open()
@@ -99,6 +93,22 @@ bool TLangProcStd::CompareStd( COMPARE_STRUCT &cs, const int _flags )
 		*dp++ = '~';
 		*dp = '\0';
 		convf |= SLW_REPLACEANY;
+		goto jsrch;
+	}
+
+	if ( _flags & SLW_REPLACEANY3 ){
+		if ( _flags != SLW_REPLACEANY3 )
+			return true;
+		// ~による置換
+		dp = cs.dp;
+		if ( *(dp-2) == '_' )
+			return true;
+		if (cs.str == dp)	// no string
+			return true;
+		*dp++ = '_';
+		*dp++ = '_';
+		*dp = '\0';
+		convf |= SLW_REPLACEANY3;
 		goto jsrch;
 	}
 
@@ -1057,7 +1067,12 @@ int TLangProcStd::SearchStd( COMPARE_STRUCT &cs, const tchar *words, tchar *str,
 int TLangProcStd::FindLoop(COMPARE_STRUCT &cs)
 {
 	if ( cs.flags & SLW_REPLACEANY ){
-		if ( !Compare( cs, SLW_REPLACEANY ) ){
+		if ( !CompareStd( cs, SLW_REPLACEANY ) ){
+			return -1;
+		}
+	}
+	if ( cs.flags & SLW_REPLACEANY3 ){
+		if ( !CompareStd( cs, SLW_REPLACEANY3 ) ){
 			return -1;
 		}
 	}
@@ -1183,19 +1198,7 @@ int TLangProcStd::SearchLongestWord( class MultiPdic *dic, const tchar *words, c
 int TLangProcStd::SearchLongestWordExt(class MultiPdic *dic, const tchar *words, const tchar *prevwords, class MatchArray *hitwords, int &thread_key, FNLPSLWExtCallback callback, int user)
 {
 #if USE_WEBSRCH
-	TWebSearchThread *th = new TWebSearchThread(this, words, hitwords, dic, callback, user);
-	if (!th->Start()){
-		delete th;
-		return 0;	// thread creation failed.
-	}
-
-	thread_key = th->GetThreadId();
-	mutex.Lock();
-	__assert(mapWebSrchTh.count(thread_key)==0);
-	mapWebSrchTh[thread_key] = th;
-	mutex.Unlock();
-
-	return 1;	// thread started.
+	return searchLongestWordExt.SearchLongestWordExt(dic, words, prevwords, hitwords, thread_key, callback, user);
 #else
 	return 0;
 #endif
@@ -1204,14 +1207,10 @@ int TLangProcStd::SearchLongestWordExt(class MultiPdic *dic, const tchar *words,
 int TLangProcStd::SearchLongestWordExtCmd(int cmd, int thread_key)
 {
 #if USE_WEBSRCH
-	switch (cmd){
-		case LPSLW_CANCEL:
-			// Cancel thread from application
-			SLWCancelExt(thread_key);
-			break;
-	}
-#endif
+	return searchLongestWordExt.SearchLongestWordExtCmd(cmd, thread_key);
+#else
 	return 0;
+#endif
 }
 
 tnstr TLangProcStd::MakeMorphKeyword(const tchar *word)
@@ -1314,13 +1313,20 @@ int TLangProcStd::SearchLongestWord( MultiPdic &dic, const tchar *words, const t
 		for (;;){
 			if ( prevwords == words )
 				break;
-			// 前置単語処理 //
+			// 前置単語処理(複数語に対応) //
 			tchar *dp = str;
+			const tchar *nextword = NULL;
 			while ( prevwords < words ){
 				if ( !IsWordChar( *prevwords ) ){
-					while ( !IsWordChar( *prevwords ) && (prevwords < words) )
+					while ( !IsWordChar( *prevwords ) && (prevwords < words) ){
 						prevwords++;
-					break;
+					}
+					if (!nextword)
+						nextword = prevwords;
+					if (prevwords == words)
+						break;
+					*dp++ = ' ';
+					continue;
 				}
 				*dp++ = *prevwords++;
 			}
@@ -1334,6 +1340,8 @@ int TLangProcStd::SearchLongestWord( MultiPdic &dic, const tchar *words, const t
 				maxlen = r;
 			// with abandon でabandonをclick
 			InsertHitWords2( *HitWords, hits );
+			if (nextword)
+				prevwords = nextword;
 		}
 	}
 	SortHitWords( *HitWords );
@@ -1704,31 +1712,6 @@ exit:
 	return maxlen;
 }
 
-#if USE_WEBSRCH
-//
-// Web Search Thread
-//
-void TLangProcStd::SLWCancelExt(int thread_key)
-{
-	mutex.Lock();
-	if (mapWebSrchTh.count(thread_key)){
-		mapWebSrchTh[thread_key]->Cancel();
-		mapWebSrchTh.erase(thread_key);
-	}
-	mutex.Unlock();
-}
-
-void TLangProcStd::DeleteWebSearchThread(TWebSearchThread *thread)
-{
-	int thread_key = thread->GetThreadId();
-	mutex.Lock();
-	if (mapWebSrchTh.count(thread_key)){
-		mapWebSrchTh.erase(thread_key);
-	}
-	mutex.Unlock();
-}
-#endif
-
 //---------------------------------------------------------------------------
 //	TLangProcStd0
 //---------------------------------------------------------------------------
@@ -1736,22 +1719,5 @@ TLangProcStd0::TLangProcStd0()
 {
 	KCodeTranslate.encodeKT = ::encodeKT;
 	KCodeTranslate.decodeKT = ::decodeKT;
-}
-
-// Helpers
-//TODO: move to common
-void trimright(tnstr &s)
-{
-	unsigned i;
-	unsigned lastpos = -1;
-	int l = s.length();
-	for (i=0;i<l;i++){
-		if ((tuchar)s[i]<=' ')
-			lastpos = i;
-		else
-			lastpos = -1;
-	}
-	if (lastpos!=-1)
-		s[lastpos] = '\0';
 }
 

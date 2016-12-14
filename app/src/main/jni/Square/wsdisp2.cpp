@@ -82,7 +82,7 @@ int Squre::DispWord( RECT &rc, const tchar *word, int dispf, CharHT *cht, THyper
 	const int GAP_WORD = 2;
 	{
 #if USE_DT2
-		if (hls && (hls->req_parse&HLI_WORD)){
+		if (hls && (hls->req_parse & HLI_WORD)){
 			hls->curitem = HLI_WORD;
 			ParseHtmlHitPosition(*hwFont, word, &rc, *hls);
 			hwFont->Select();	// 上記関数でhwFontが他のfontに使用された後、元のfontに戻すときにSystemFontに戻すTNFONTの（まずい）仕様のため必要
@@ -418,7 +418,7 @@ int Squre::DispPron( RECT &rc, const tchar *pron, int dispf, CharHT *cht, THyper
 	}
 #if USE_DT2
 	if (GetDefDrawSetting().HtmlParse){
-		if (hls && (hls->req_parse&HLI_PRON)){
+		if (hls && (hls->req_parse & HLI_PRON)){
 			hls->curitem = HLI_PRON;
 			ParseHtmlHitPosition(*hpFont, pron, &rc, *hls);
 			hpFont->Select();	// 上記関数でhwFontが他のfontに使用された後、元のfontに戻すときにSystemFontに戻すTNFONTの（まずい）仕様のため必要
@@ -457,7 +457,7 @@ int Squre::DispJapa( RECT &rc, const tchar *japa, int dispf, CharHT *cht, THyper
 		}
 	}
 #if USE_DT2
-	if (hls && (hls->req_parse&HLI_JAPA)){
+	if (hls && (hls->req_parse & HLI_JAPA)){
 		hls->curitem = HLI_JAPA;
 		ParseHtmlHitPosition(*hjFont, japa, &rc, *hls);
 		hjFont->Select();	// 上記関数でhwFontが他のfontに使用された後、元のfontに戻すときにSystemFontに戻すTNFONTの（まずい）仕様のため必要
@@ -501,7 +501,7 @@ int Squre::DispExp( RECT &rc, const tchar *exp, int dispf,
 		}
 	}
 #if USE_DT2
-	if (hls && (hls->req_parse&HLI_EXP)){
+	if (hls && (hls->req_parse & HLI_EXP)){
 		hls->curitem = HLI_EXP;
 		ParseHtmlHitPosition(*heFont, exp, &rc, *hls);
 		heFont->Select();	// 上記関数でhwFontが他のfontに使用された後、元のfontに戻すときにSystemFontに戻すTNFONTの（まずい）仕様のため必要

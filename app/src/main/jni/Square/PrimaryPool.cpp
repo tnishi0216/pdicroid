@@ -11,6 +11,7 @@ PrimaryPool::PrimaryPool( int preallocSize )
 	KCodeTrans = &KCodeTranslateSetN;
 	fw.allocate(preallocSize);
 }
+#if 0	// BSearchExactÇ∆ìØÇ∂Ç»ÇÃÇ≈ìùçá (2015.5.26)
 int PrimaryPool::BSearch( const tchar *str )
 {
 	int left = 0;
@@ -35,6 +36,7 @@ int PrimaryPool::BSearch( const tchar *str )
 	} while (left < right);
 	return left;
 }
+#endif
 
 int PrimaryPool::BSearchExact( const tchar *str )
 {

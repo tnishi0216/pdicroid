@@ -56,8 +56,8 @@ public:
 	// これを呼んだ後、Compare( const tchar *str )を呼ぶ場合は
 	// jre2.nStart を0にしなければならない（改良必要）
 	BOOL Compare( const tchar *str, int startpos );
-	virtual BOOL Compare( const tchar *str, TMatchInfos *matches=NULL )
-		{ return super::Compare(str, matches); }
+	virtual BOOL Compare( const tchar *str, TMatchInfos *matches=NULL, int user=0 )
+		{ return super::Compare(str, matches, user); }
 	
 
 	BOOL GetMatchImpl( int &len, int &loc );	// len : マッチ長 loc : マッチ位置

@@ -57,7 +57,7 @@ void TOFileBase::seek( long l, int dir )
 }
 #endif
 
-long TOFileBase::tell(void)
+__off_t TOFileBase::tell()
 {
 	return _ttell(fd) + curp;
 }
@@ -167,12 +167,38 @@ int TOFileW::put(const wchar_t *s, int length)
 				length -= cpylen;
 				s += cpylen;
 			} while (length>0);
-			if (curp >= BUFFSIZE){
+			if (curp >= BUFFSIZE*2){
 				if ( flush( ) ){
 					return -1;
 				}
 			}
 			break;
+#ifdef _Windows
+		case TFM_ANSI:
+			do {
+				cpylen = min((BUFFSIZE*2-curp)/2, length);
+				if (cpylen==0){
+					if (flush()){
+						curp -= cpylen;
+						return -1;
+					}
+					continue;
+				}
+				int rlen = WideCharToMultiByte(CP_ACP, 0, s, cpylen, &((char*)writebuff)[curp], cpylen*2, NULL, NULL );
+				if (rlen<=0){
+					return -1;
+				}
+				curp += rlen;
+				length -= cpylen;
+				s += cpylen;
+			} while (length>0);
+			if (curp >= BUFFSIZE*2){
+				if ( flush( ) ){
+					return -1;
+				}
+			}
+			break;
+#endif
 		case TFM_UTF16BE:
 #if wchar_size==4
 			DBW("not supported");
@@ -221,7 +247,7 @@ int TOFileW::put(const wchar_t *s, int length)
 							c = (uint16_t)((c & 0x3FF) + 0xDC00);
 						}
 					}
-					*dp++ = (uint16_t)c;
+					*dp++ = (uint16_t)((c>>8) | (c<<8));
 				}
 				curp += cpylen;
 				if (curp>=BUFFSIZE){

@@ -163,10 +163,10 @@ THyperLink *Squre::GetHyperLink(int wordIndex, int itemIndex)
 {
 	if (wordIndex+IndexOffset>=pool.get_num())
 		return NULL;
-	THyperLinks &hl = pool.GetHL(wordIndex+IndexOffset);
-	if (itemIndex>=hl.get_num())
+	THyperLinks &hls = pool.GetHL(wordIndex+IndexOffset);
+	if (itemIndex>=hls.get_num())
 		return NULL;
-	return &hl[itemIndex];
+	return &hls[itemIndex];
 }
 
 THyperLink &Squre::_GetHyperLink(int wordIndex, int itemIndex)
@@ -182,9 +182,16 @@ int Squre::HitTestHyperLink(int index, POINT pt)
 	POINT _pt = pt;
 	_pt.y -= GetOffsY(index) - IndexMiOffset;
 	THyperLinks &hls = pool.GetHL(index+IndexOffset);
-	for ( int i=0;i<hls.get_num();i++ ){
+#if 0	// 正順
+	for ( int i=0;i<hls.get_num();i++ )
+#else	// 逆順 <bx>タグの多重展開対応のため逆順(ParseHtmlHitPosition()注釈参照)
+		// TJapaFrame::HitTestHL()も変更必要
+	for ( int i=hls.get_num()-1;i>=0;i-- )
+#endif
+	{
 		THyperLink &hl = hls[i];
 		if ( hl.HitTest( _pt ) ){
+			//dbw("HitTestHL: %d", i);
 			return i;
 		}
 	}
@@ -195,8 +202,8 @@ tnstr Squre::GetHyperLinkText(int index, POINT pt)
 {
 	if (index<0){
 		int ht = HitTest( pt );
-		if ((ht&~0xff) == HT_WORDITEM){
-			index = ht & 0xff;
+		if ((ht & HT_MASK) == HT_WORDITEM){
+			index = ht & HT_MASK_INDEX;
 		}
 	}
 	tnstr key;
@@ -226,14 +233,16 @@ bool Squre::ReverseAutoLink(POINT *pt==NULL)
 }
 #endif
 
+#define	HLPL	1	//TODO: poup&linkとhyperlinkを両立する(debugが完了したら削除)
+
 // autolink : popup&linkをするか？
 bool Squre::ReverseAutoLink( POINT *pt, bool popup, bool autolink )
 {
 	__assert(pt);
 	int r;
 	int ht = HitTest( *pt );
-	int hitno = ht & 0xff;
-	if ( (ht&~0xff) == HT_WORDITEM ){
+	int hitno = ht & HT_MASK_INDEX;
+	if ( (ht & HT_MASK) == HT_WORDITEM ){
 		GetDC();
 		CreateTextFonts();
 		CharHT cht( -1, pt );
@@ -243,11 +252,14 @@ bool Squre::ReverseAutoLink( POINT *pt, bool popup, bool autolink )
 				// HyperLinkヒット！！
 				TAutoLink &al = MouseCap->al;
 				THyperLink &hl = pool.GetHL(hitno+IndexOffset)[hl_index];
+				//dbw("hitno=%d, cht.item=%d, hl_index=%d, hl.loc=%d, hl.loc+hl.length=%d %d %d", hitno, cht.item, hl_index, hl.loc, hl.loc+hl.length, al.GetItemIndex(), al.CompIndex(hitno, cht.item, -2, hl.loc));
 				if ( al.GetItemIndex() != -1){
 					if ( al.CompIndex(hitno, cht.item, -2, hl.loc) &&
 						((hl.item < HLI_EPWING) || (hl.wordcount == al.GetWordCount())) ){
-						DeleteTextFonts();
-						ReleaseDC();
+						if (!hl.bxtag){
+							DeleteTextFonts();
+							ReleaseDC();
+						}
 						if (
 #if !VIEWCLICKONLY
 							HyperClickPopup &&
@@ -255,7 +267,11 @@ bool Squre::ReverseAutoLink( POINT *pt, bool popup, bool autolink )
 							popup && !IsAutoLinkPopupOpened() ){
 							StartHypPopup( hl, *pt, false );
 						}
-						return popup;
+						if (hl.bxtag){
+							goto jpopuplink;
+						} else {
+							return popup;
+						}
 					}
 					CloseAutoLink();
 				}
@@ -269,9 +285,16 @@ bool Squre::ReverseAutoLink( POINT *pt, bool popup, bool autolink )
 					al.DrawUnderline( );
 				}
 #endif
+#if !HLPL
 				DeleteTextFonts();
 				ReleaseDC();
+#endif
+
 				if ( popup ){
+#if HLPL
+					DeleteTextFonts();
+					ReleaseDC();
+#endif
 					StartHypPopup( hl, *pt,
 #if !VIEWCLICKONLY
 						!HyperClickPopup
@@ -281,9 +304,16 @@ bool Squre::ReverseAutoLink( POINT *pt, bool popup, bool autolink )
 						);
 					return true;
 				} else {
-					return false;
+					if (!hl.bxtag){
+#if HLPL
+						DeleteTextFonts();
+						ReleaseDC();
+#endif
+						return false;
+					}
 				}
 			}
+jpopuplink:
 #ifndef SMALL
 			// マウスの下にある単語を検索する //
 			// 単語の取得
@@ -401,10 +431,17 @@ bool Squre::ReverseAutoLink( POINT *pt, bool popup, bool autolink )
 								}
 							}
 						} else {
-							if ( al.IsIndexValid() ){
-								// erase previous underline.
-								al.DrawUnderline();
-								al.InvalidateIndex();
+							// 該当なし
+#if HLPL
+							if (hl_index<0)
+#endif
+							{
+								// hyper linkがないときのみ
+								if ( al.IsIndexValid() ){
+									// erase previous underline.
+									al.DrawUnderline();
+									al.InvalidateIndex();
+								}
 							}
 						}
 					}
@@ -480,6 +517,9 @@ void Squre::HypLinkJump( THyperLink &hl, POINT &pt, int poolindex )
 			// WORDへ転送する
 			hl.GetKeyWord( key, pool.GetText( IndexOffset + poolindex, hl.item ) );
 			LinkJump( key );
+			break;
+		case HLT_HTML_BXTAG:
+			// nothing to do
 			break;
 		default:
 			hl.GetKeyWord( key, pool.GetText( IndexOffset + poolindex, hl.item ) );
@@ -650,6 +690,17 @@ bool Squre::CanMoveHistory( bool forward )
 		}
 	}
 	return true;
+}
+
+bool Squre::BxTagExists(int relIndex)
+{
+	if (!IsValidHitno(relIndex))
+		return false;
+	THyperLinks &hls = pool.GetHL(relIndex+IndexOffset);
+	for (int i=0;i<hls.size();i++){
+		if (hls[i].bxtag) return true;
+	}
+	return false;
 }
 
 #include "filestr.h"

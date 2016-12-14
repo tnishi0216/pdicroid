@@ -11,7 +11,8 @@ public:
 	virtual ~PrimaryPool(){}
 	int get_num()
 		{ return fw.get_num(); }
-	virtual int BSearch( const tchar *str );
+	virtual int BSearch( const tchar *str )
+		{ return BSearchExact( str ); }
 	int BSearchExact( const tchar *str );
 	int Find( const tchar *str );
 	void  SetKCodeTrans(const TKCodeTranslateSet *trans)

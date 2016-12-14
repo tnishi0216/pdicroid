@@ -262,8 +262,9 @@ bocu_t *DEF_NAME(bocu1Decode)( const unsigned char **_src, const unsigned char *
 	Bocu1Rx Rx;
 	const unsigned char *src = *_src;
 	if (!outbuffer)
-		outbuffer = new bocu_t[ outmaxlength ];
+		outbuffer = new bocu_t[ outmaxlength + 1 ];
 	bocu_t *dst = outbuffer;
+	bocu_t *dstend = outbuffer + outmaxlength;
 	if (!pretrans)
 		pretrans = NoCodeTranslate;
 
@@ -286,6 +287,8 @@ bocu_t *DEF_NAME(bocu1Decode)( const unsigned char **_src, const unsigned char *
 					Rx.prev=BOCU1_ASCII_PREV;
 				}
 				*dst++ = b;
+				if (dst>=dstend)
+					break;
 				continue;
 			}
 
@@ -306,6 +309,8 @@ bocu_t *DEF_NAME(bocu1Decode)( const unsigned char **_src, const unsigned char *
 				c=prev+((int32_t)b-BOCU1_MIDDLE);
 				Rx.prev=bocu1Prev(c);
 				*dst++ = (bocu_t)pretrans(c);
+				if (dst>=dstend)
+					break;
 				continue;
 			} else
 			if(b==BOCU1_RESET){
@@ -416,6 +421,8 @@ bocu_t *DEF_NAME(bocu1Decode)( const unsigned char **_src, const unsigned char *
 						*dst++ = (byte)((c&0x3F)+0x80);
 					}
 #endif	// BOCU_UTF8
+					if (dst>=dstend)
+						break;
 					continue;
 				} else {
 					/* illegal code point result */

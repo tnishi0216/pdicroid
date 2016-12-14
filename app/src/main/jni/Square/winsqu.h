@@ -142,7 +142,7 @@ protected:
 public:
 	HWND GetWHandle()
 		{ return HWindow; }	//TODO: ç≈èIìIÇ…ÇÕçÌèú
-	void SetHWindow(HWND hwnd)
+    void SetHWindow(HWND hwnd)
 		{ HWindow = hwnd; }
 	TWinControl *GetControl()
 		{ return (TWinControl*)Frame; }
@@ -1057,7 +1057,7 @@ public:
 	// External Search //
 protected:
 	int ExtSrchThreadKey;
-	static int cbExtSearch(int type, int param, int user);
+	static int cbExtSearch(class TWebSearchThread *th, int type, int param, int user);
 	int ExtSrchCallback(int type, int param);
 public:
 	void StartExtSearch();

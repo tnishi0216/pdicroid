@@ -21,6 +21,7 @@ protected:
 	static bool DicBackup;
 //	static bool DicCheck;
 	static int MaxDicCheckSize;
+	static bool InProgress;
 
 	DWORD LastUpdateTime;
 	bool DicChecking;
@@ -28,6 +29,7 @@ public:
 	TDicBackup();
 	virtual ~TDicBackup();
 	void Initialize();
+	void Clear();
 	__override void NotifyMod(PdicBase *dic);
 	bool IsBackupNeeded(Pdic *dic);
 	int IdleProc();

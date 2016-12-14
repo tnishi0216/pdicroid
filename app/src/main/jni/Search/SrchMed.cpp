@@ -220,7 +220,7 @@ const tchar *TSearchMediator::GetWord()
 		if (SubWordsIndex<0)
 			return (const tchar *)AS_CONTINUE;	// 2009.5.26 added. 
 		if (SubWordsIndex>=sub_words.get_num()
-			|| SubWordsIndex>=TopOffset+pool.get_num()){
+			/*|| SubWordsIndex>=TopOffset+pool.get_num()*/){	// 2015.10.10 条件を外した(全文検索でscrollされない不具合対策)
 			if (sub_ss.IsSearching()){
 				return (const tchar*)AS_CONTINUE;
 			} else {
@@ -521,9 +521,14 @@ int TSearchMediator::AddSubWord2(tnstr *word, bool no_level)
 	return AddSubWordX(word, no_level ? NOLEV : SLEV2);
 }
 
+//Note:
+// return valueは負の数になるときがある。
+//	INT_MINのときがsub_wordsに追加できず、wordをdeleteする必要がある
 int TSearchMediator::AddSubWordX(tnstr *word, unsigned char level_base)
 {
 	int addedIndex = sub_words.add(word, level_base==NOLEV ? 0 : level_base+CountLevel(word->c_str()));
+	if (addedIndex < 0) return INT_MIN;
+
 	LastFoundWordIndex = addedIndex;
 	if (addedIndex<TopOffset){
 		TopOffset++;

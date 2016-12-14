@@ -33,6 +33,7 @@ unsigned TDicBackup::Interval = 3;	// 最小バックアップ間隔[sec]
 bool TDicBackup::DicBackup = false;
 //bool TDicBackup::DicCheck = true;	// 辞書チェック機能
 int TDicBackup::MaxDicCheckSize = 10;	// 最大辞書チェックサイズ[MB]
+bool TDicBackup::InProgress = false;
 
 TDicBackup *DicBackup = NULL;
 
@@ -53,6 +54,7 @@ TDicBackup::TDicBackup()
 
 TDicBackup::~TDicBackup()
 {
+	Clear();
 }
 
 void TDicBackup::Initialize()
@@ -68,6 +70,13 @@ void TDicBackup::Initialize()
 
 	LastUpdateTime = GetTickCount();
 }
+void TDicBackup::Clear()
+{
+	for (mod_counter_t::iterator it = LastBackupModCounter.begin();it!=LastBackupModCounter.end();){
+		it->first->Release();
+		LastBackupModCounter.erase(it++);
+	}
+}
 
 // 辞書更新時に呼ばれる
 // dic can be NULL to update 'LastUpdateTime'.
@@ -75,10 +84,12 @@ void TDicBackup::NotifyMod(PdicBase *_dic)
 {
 	if (_dic){
 		Pdic *dic = dynamic_cast<Pdic*>(_dic);
-		if (LastBackupModCounter.count(dic)==0){
-			dic->AddRef();
+		if (dic){
+			if (LastBackupModCounter.count(dic)==0){
+				dic->AddRef();
+			}
+			LastBackupModCounter[dic] = dic->ModifyCounter();	//TODO: ++でなくて大丈夫？
 		}
-		LastBackupModCounter[dic] = dic->ModifyCounter();	//TODO: ++でなくて大丈夫？
 	}
 	LastUpdateTime = GetTickCount();
 }
@@ -119,11 +130,10 @@ int TDicBackup::IdleProc()
 
 void TDicBackup::TimerExpired()
 {
-	if (LastBackupModCounter.size()==0)
+	if (LastBackupModCounter.size()==0
+		|| GetTickCount()-LastUpdateTime<Interval*1000
+		|| InProgress)
 		return;
-	if (GetTickCount()-LastUpdateTime<Interval*1000){
-		return;
-	}
 
 	DoBackup();
 
@@ -150,19 +160,19 @@ void TDicBackup::SetDicFixed(const tchar *filename)
 
 void TDicBackup::DoBackup()
 {
-	while (1){
-		for (mod_counter_t::iterator it = LastBackupModCounter.begin();it!=LastBackupModCounter.end();){
-			// mod counterに関係なく強制的にbackup
-			if (DoBackup(it->first
-			)){
-				it->first->Release();
-				LastBackupModCounter.erase(it++);
-			} else {
-				it++;
-			}
-		}
-		break;
+	if (InProgress) return;
+
+	InProgress = true;
+
+	for (mod_counter_t::iterator it = LastBackupModCounter.begin();it!=LastBackupModCounter.end();){
+		// mod counterに関係なく強制的にbackup
+		if (DoBackup(it->first)){
+			it->first->Release();
+			LastBackupModCounter.erase(it++);
+		} else it++;
 	}
+
+	InProgress = false;
 }
 
 bool TDicBackup::DoBackup(Pdic *dic)
@@ -186,13 +196,16 @@ bool TDicBackup::DoBackup(Pdic *dic)
 		if (broken_dics.count(filename)==0){
 			if (filesize(filename) / 0x100000 < MaxDicCheckSize){
 		dbw("Dicchecking:%ws", filename);
+				alog("start dic check");
 				if (CheckDictionary(filename)==0){
 					broken_dics[filename] = BRS_FOUND;
 					NotifyError(dic);
 					DicChecking = false;
 					dbw("DicCheck-failed");
+					alog("dic check failed");
 					return false;
 				}
+				alog("dic check done");
 #ifdef _DEBUG
 				if (_tcsstr(filename, _t("broken"))){
 					broken_dics[filename] = BRS_FOUND;
@@ -292,6 +305,16 @@ int TDicBackup::GetBackupBaseName(const tchar *filename, tnstrbuf &basename)
 }
 
 #include "utydic.h"
+
+class PdicUNoUI : public PdicU {
+typedef PdicU super;
+public:
+	virtual bool ProcessUI(PDDICCHECKPARAM *dcp)
+	{
+		return false;
+	}
+};
+
 // 1:OK
 // -1:not checked (open error)
 // 0:NG
@@ -305,7 +328,7 @@ int TDicBackup::CheckDictionary(const tchar *dicname)
 	int r = -1;
 
 	try {
-		autoptr<PdicU> dic(new PdicU);
+		autoptr<PdicU> dic(new PdicUNoUI);
 
 		if ( dic->OpenRetry( dicname, readonly ) == -1){
 			return -1;
@@ -317,9 +340,9 @@ int TDicBackup::CheckDictionary(const tchar *dicname)
 
 		int emptyblock;
 		if ( dic->checkindex( NULL ) != -1 ){
-			DBW("in:%ws", dicname);
+			dbw("in:%ws", dicname);
 			r = dic->chk_lostlink( NULL, fix, &emptyblock );
-			DBW("out:%d:%ws", r, dicname);
+			dbw("out:%d:%ws", r, dicname);
 			if (r==0){
 				r = dic->checkdata( NULL, emptyblock );
 			}

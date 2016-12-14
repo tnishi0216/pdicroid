@@ -98,10 +98,11 @@ public:
 	bool IsFirstPhaseUsed() const
 		{ return UseFirstPhase; }
 
-//	int GetSubWordsIndex() const
-//		{ return SubWordsIndex; }
-//	int GetTopOffset() const
-//		{ return TopOffset; }
+	// for debug
+	inline  int GetSubWordsIndex() const
+		{ return SubWordsIndex; }
+	inline int GetTopOffset() const
+		{ return TopOffset; }
 		
 	void ClearSubWords();
 	int SetupPhase(int phase, int state);

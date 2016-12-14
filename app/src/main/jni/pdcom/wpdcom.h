@@ -78,6 +78,7 @@ HFONT SelectSystemFont( HDC hdc );
 void DeleteSystemFont( HDC hdc, HFONT hOldFont );
 int GetSystemFontWidth();
 int GetSystemFontHeight();
+int GetTextHeight(HWND hwnd, HFONT hFont);
 
 void SetWindowPosBySip( HWND hwnd );
 

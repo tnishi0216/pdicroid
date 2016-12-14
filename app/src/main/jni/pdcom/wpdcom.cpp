@@ -167,12 +167,12 @@ unsigned long GetFileSizeFileName( const tchar *filename )
 #ifdef GUI
 bool write_bom(TOFile &tof)
 {
-	long l = tof.tell();
 #ifdef _UNICODE
+	long l = tof.tell();
 	if ( l == 0 ){
+		tof.settextmode(prof.GetTextFileCode());
 		if (prof.IsTextFileBOM())
 			tof.bom();
-		tof.settextmode(prof.GetTextFileCode());
 	}
 #endif
 	return true;
@@ -719,6 +719,19 @@ int GetSystemFontWidth()
 		GetSystemFontMetrics();
 	}
 	return cxSystem;
+}
+
+int GetTextHeight(HWND hwnd, HFONT hFont)
+{
+	HDC hdc = GetDC(hwnd);
+	HFONT oldFont = (HFONT)SelectObject( hdc, hFont );
+	TEXTMETRIC tm;
+	GetTextMetrics( hdc, &tm );
+	int cyText = tm.tmHeight + tm.tmExternalLeading;
+	//cxText = tm.tmAveCharWidth;
+	SelectObject( hdc, oldFont );
+	ReleaseDC(hwnd, hdc);
+	return cyText;
 }
 
 ///////////////////////////////////////////////////////////////

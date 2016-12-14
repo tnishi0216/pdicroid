@@ -19,6 +19,8 @@
 #define	_ScrollWindowR(hwnd, dx, dy, repaint)	View->Scroll(dx, dy, true)
 #endif
 
+#define	SCROLL_UNIT	4	// cyTextの倍数
+
 #undef DBX
 #if 0
 #define	DBX	DBW
@@ -113,7 +115,7 @@ void Squre::SetUpDown(bool f)
 //	false - no search
 bool Squre::Request( int reqoffs, bool fBack )
 {
-	DBW("Request: %d,%d,%d", fBack, reqoffs, get_num());
+	//DBW("Request: %d,%d,%d", fBack, reqoffs, get_num());
 	if ( fBack ){
 		// 後方検索
 		if ( ( ss.GetSearchState() & SS_BWD ) && reqoffs <= get_num()/2 ){
@@ -234,7 +236,7 @@ void Squre::NextPage( )
 			for ( i=0;i<get_num()-IndexOffset;i++ ){
 				if ( i >= cury ) break;
 				RecalcLine( i + IndexOffset );
-				l += GetLines(i) + LineInterval;
+				l += GetLines(i) + ItemView.LineInterval;
 				if ( l >= MaxLines ){
 					if ( cury >= i ){
 						if ( i == 0 )
@@ -361,7 +363,8 @@ void Squre::KeyScrollUp( )
 	if ( cury == -1){
 		ClsRegion( );
 		int n = GetNextPage( );
-		if ( !n ){
+		if ( n == 0 ){
+			if (LastIndex<0) goto jexit;	// no data in square
 			n = LastIndex;
 //			IndexOffset = 0;
 			Request( IndexOffset, true );
@@ -383,7 +386,8 @@ jexit:;
 
 int Squre::LineScrollUp()
 {
-	int offs = cyText * 2;
+	//DBW("cury=%d %d %d %d", cury, LastIndex, IndexOffset, IndexMiOffset);
+	int offs = cyText * SCROLL_UNIT;
 	if (MicroScrollUp(offs)==0){
 		GetDC();
 		CloseAutoLink();
@@ -398,12 +402,13 @@ int Squre::LineScrollUp()
 				star_erased = true;
 #endif
 				IndexOffset--;
-				//cury++;
 #if USE_FASTDISP
 				// wsdisp2.cppで画面の最終行に一度でも描画されたことのある見出し語は、表示行数が正しくない場合がある
-				RecalcLineForce(IndexOffset+(cury>=0?cury:0));
+				if (cury>0)
+					RecalcLineForce(IndexOffset+cury);
 #endif
-				IndexMiOffset += GetLines(0);
+				RecalcLineForce(IndexOffset);
+				IndexMiOffset += GetLines(0) + ItemView.LineInterval;
 				Request( IndexOffset, true );
 				SetVPos( IndexOffset );
 			}
@@ -416,6 +421,7 @@ int Squre::LineScrollUp()
 		ReleaseDC();
 		SetUpDown(true);
 	}
+	//DBW("cury=%d %d %d %d", cury, LastIndex, IndexOffset, IndexMiOffset);
 	return 1;
 }
 int Squre::LineScrollDown()
@@ -423,7 +429,8 @@ int Squre::LineScrollDown()
 	if (get_num()==0)
 		return 0;
 
-	int offs = cyText * 2;
+	//DBW("cury=%d %d %d %d", cury, LastIndex, IndexOffset, IndexMiOffset);
+	int offs = cyText * SCROLL_UNIT;
 	if (MicroScrollDown(offs)==0){
 		// 補正
 #if 0	// すぐにcursorを移動するversion
@@ -439,10 +446,10 @@ int Squre::LineScrollDown()
 		// - cury直前までの表示行数を求める
 		int cury_lines = 0;
 		for (int i=0;i<cury;i++){
-			int l = GetLines(i);
+			int l = GetLines(i) + ItemView.LineInterval;
 			if (l==0){
 				RecalcLine(i+IndexOffset);
-				l = GetLines(i);
+				l = GetLines(i) + ItemView.LineInterval;
 			}
 			cury_lines += l;
 		}
@@ -476,7 +483,7 @@ int Squre::LineScrollDown()
 			_dispStar(cury, 0);
 #endif
 			//do {
-				IndexMiOffset -= GetLines(0);
+				IndexMiOffset -= GetLines(0) + ItemView.LineInterval;
 				IndexOffset++;
 				//cury--;
 			//} while (IndexMiOffset>=GetLines(0));
@@ -491,6 +498,7 @@ int Squre::LineScrollDown()
 		_MicroScrollDown(offs);
 		SetUpDown(true);
 	}
+	//DBW("cury=%d %d %d %d", cury, LastIndex, IndexOffset, IndexMiOffset);
 	return 1;
 }
 
@@ -520,6 +528,7 @@ int Squre::_MicroScrollUp(int offs)
 	if (abs>=get_num())
 		abs--;
 	LastIndex = abs-IndexOffset;
+	if (LastIndex<cury) LastIndex = cury;	// 2015.10.24 帳尻あわせ
 
 	// scroll window
 	_ScrollWindow(HWindow, 0, diff);
@@ -606,8 +615,14 @@ int Squre::MicroScrollDown( int offs )
 {
 	//dbw("MiOffset=%d %d : %d %d %d", IndexMiOffset, GetLY(), IndexOffset, LinesList[ IndexOffset ].NumLines, cury);
 	//Note: cury==0 を前提にしてある。もしcury!=0である場合、IndexOffsetからcuryまでのライン数を計算しなければならない。
+	//TODO: 見出し語が変わってもcuryを変更せずにscrollさせるため、poolの一番下の見出し語以降が取得されず、空白がscrollされ続けてしまう
+	//      本来この条件文は不要のはず？
+	//      cury+1のtopが表示エリアのtop座標より上(minus)に行ったらcuryを更新してはどうだろうか？
+#if 0	// 2015.10.15 新方式
+#else
 	if ( IndexMiOffset + GetLY() >= LinesList[ IndexOffset + (cury>=0?cury:0) ].NumLines )
 		return 0;	// IndexOffsetの項目は十分表示可能領域にある
+#endif
 	return _MicroScrollDown(offs);
 }
 int Squre::_MicroScrollDown(int offs, bool repaint)
@@ -693,6 +708,7 @@ int Squre::ScrollDown(bool fClsRegion, int down )
 	else return 0;	// 1998.7.11
 	int l = LinesList[ IndexOffset + cury + 1 ].NumLines;	// 次に表示するデータのドット数
 
+	GetDC();
 	if ( fClsRegion )
 		ClsRegion( );
 	_dispStar( cury, 0 );
@@ -744,6 +760,7 @@ int Squre::ScrollDown(bool fClsRegion, int down )
 	SetVPos( IndexOffset );
 	SetUpDown(true);
 	ScrolledWindow();
+	ReleaseDC();
 	return i+1;
 }
 

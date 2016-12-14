@@ -7,6 +7,7 @@ THyperLink::THyperLink()
 {
 	type = HLT_NONE;
 	item = 0;
+	unnamed = 0;
 	SetRect( &area.rect, 0, 0, 0, 0 );
 	area.cy = 0;
 	length = 0;
@@ -18,6 +19,7 @@ void THyperLink::Clear()
 {
 	type = HLT_NONE;
 	item = 0;
+	state = 0;
 	key.clear();
 	SetRect( &area.rect, 0, 0, 0, 0 );
 	area.cy = 0;
@@ -92,6 +94,8 @@ THyperLinks::THyperLinks( )
 {
 	done = false;
 	req_parse = 0;
+	nextIndex = ~0;
+	tag = NULL;
 }
 //TODO: Ç¢Ç∏ÇÍdraw4Ç…ìùçá
 int THyperLinks::ExtractStaticWords( byte _item, const tchar *text )
@@ -176,5 +180,21 @@ int THyperLinks::ExtractStaticWords( byte _item, const tchar *text )
 #endif
 	}
 	return n;
+}
+
+void THyperLinks::StartEnum()
+{
+	nextIndex = 0;
+}
+THyperLink *THyperLinks::Next(byte type)
+{
+	for (;nextIndex<size();nextIndex++){
+		THyperLink &hl = (*this)[nextIndex];
+		if (hl.type == type){
+			nextIndex++;
+			return &hl;
+		}
+	}
+	return NULL;
 }
 

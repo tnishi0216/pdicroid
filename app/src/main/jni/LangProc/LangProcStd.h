@@ -50,12 +50,7 @@ protected:
 	int mbSearchLongestWordOptional( MultiPdic &dic, const tchar *words, int curpos, int flags, MatchArray *found );
 #if USE_WEBSRCH
 	// web search thread //
-	typedef map<int, class TWebSearchThread *> wst_map;
-	wst_map mapWebSrchTh;
-	TMutex mutex;
-	void SLWCancelExt(int thread_key);
-public:
-	void DeleteWebSearchThread(TWebSearchThread *thread);
+	TSearchLongestWordExt searchLongestWordExt;
 #endif
 };
 

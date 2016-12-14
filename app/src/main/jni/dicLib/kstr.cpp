@@ -26,10 +26,12 @@ static TSlab kslab( 4 );
 
 TKCodeTranslateSet KCodeTranslateSetN = { NULL, NULL };
 
+static const char *StrNull = "";
+
 __kstr::__kstr(const TKCodeTranslateSet *trans)
 	:Translator(trans)
 {
-	buffer = (void*)"";
+	buffer = (void*)StrNull;
 	length = 0;
 	type = 1;
 	newbuffer = NULL;
@@ -65,7 +67,7 @@ __kstr::~__kstr()
 }
 void __kstr::clear()
 {
-	buffer = (void*)"";
+	buffer = (void*)StrNull;
 	length = 0;
 	if (newbuffer){
 		newbuffer[0] = '\0';

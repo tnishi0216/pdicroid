@@ -401,7 +401,6 @@ public:
 
 class ExtPdicText : public Perd12 {
 protected:
-//		GenericRexp *grexp;
 	tnstr *fbuf;
 public:
 	ExtPdicText( );

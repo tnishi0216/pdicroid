@@ -5,35 +5,36 @@
 //---------------------------------------------------------------------------
 
 // 以下のビットを増やしたとき、cutword2.cppのBITCOUNT()のBitCount()のnbitsにも注意！！（現在32bitsに固定）
-#define	SLW_ELIMHYPHEN		0x000000F
-#define	SLW_ELIMHYPHEN1		0x0000001	// ハイフンを削除して単語を結合
-#define	SLW_ELIMHYPHEN2		0x0000002	// ハイフン以降を削除
-#define	SLW_ELIMHYPHEN3		0x0000004	// ハイフン前半の単語を削除
-#define	SLW_ELIMHYPHEN4		0x0000008	// ハイフンを半角スペースに変換
+#define	SLW_ELIMHYPHEN		0x0000000F
+#define	SLW_ELIMHYPHEN1		0x00000001	// ハイフンを削除して単語を結合
+#define	SLW_ELIMHYPHEN2		0x00000002	// ハイフン以降を削除
+#define	SLW_ELIMHYPHEN3		0x00000004	// ハイフン前半の単語を削除
+#define	SLW_ELIMHYPHEN4		0x00000008	// ハイフンを半角スペースに変換
 
-#define	SLW_REPLACE			0x00000F0
-#define	SLW_REPLACEANY		0x0000010	// 置換チルダに対応
-#define	SLW_REPLACEANY2		0x0000020	// 追加チルダに対応
-#define	SLW_REPLACEIRREG	0x0000040	// 不規則変化辞書
-#define	SLW_REPLACEDEL		0x0000080	// 一般的な単語を削除（a,anなど）
+#define	SLW_REPLACE			0x000001F0
+#define	SLW_REPLACEANY		0x00000010	// 置換チルダに対応
+#define	SLW_REPLACEANY2		0x00000020	// 追加チルダに対応
+#define	SLW_REPLACEIRREG	0x00000040	// 不規則変化辞書
+#define	SLW_REPLACEDEL		0x00000080	// 一般的な単語を削除（a,anなど）
+#define	SLW_REPLACEANY3		0x00000100	// __に対応
 
-#define	SLW_CASEIGNORE		0x0000F00
-#define	SLW_CASEIGNORE1		0x0000100	// 全文字小文字(内部処理用)
-#define	SLW_CASEIGNORE2		0x0000200	// 先頭文字case反転(内部処理用)
-#define	SLW_CASEIGNORE3		0x0000400	// 先頭以外全小文字
-#define	SLW_CASEIGNORE4		0x0000800	// 全大文字
+#define	SLW_CASEIGNORE		0x00000E00
+//#define	SLW_CASEIGNORE1		0x00000100	// 全文字小文字(内部処理用)
+#define	SLW_CASEIGNORE2		0x00000200	// 先頭文字case反転(内部処理用)
+#define	SLW_CASEIGNORE3		0x00000400	// 先頭以外全小文字
+#define	SLW_CASEIGNORE4		0x00000800	// 全大文字
 
-#define	SLW_ENGLISH			0x000F000	// 英語の活用形処理
-#define	SLW_DESINENCE1		0x0001000	// 語尾変化
-#define	SLW_DESINENCE2		0x0002000	// 語尾変化2 (-dのみ) SLW_DESINECEと一緒に指定しないほうがbetter
-#define	SLW_DESINENCE3		0x0004000	// -red,-led
-#define	SLW_APOSTROPHE		0x0008000	// 省略形、所有形の'を削除(語尾変化とは両立しない)
+#define	SLW_ENGLISH			0x0000F000	// 英語の活用形処理
+#define	SLW_DESINENCE1		0x00001000	// 語尾変化
+#define	SLW_DESINENCE2		0x00002000	// 語尾変化2 (-dのみ) SLW_DESINECEと一緒に指定しないほうがbetter
+#define	SLW_DESINENCE3		0x00004000	// -red,-led
+#define	SLW_APOSTROPHE		0x00008000	// 省略形、所有形の'を削除(語尾変化とは両立しない)
 
-#define	SLW_UK				0x0010000	// 英国式->米国式変換
+#define	SLW_UK				0x00010000	// 英国式->米国式変換
 
-#define	SLW_CONJUGATE		0x0020000	// 関連語
+#define	SLW_CONJUGATE		0x00020000	// 関連語
 
-#define	SLW_SYMBOLS			0x0040000	// !?. の記号を省略する
+#define	SLW_SYMBOLS			0x00040000	// !?. の記号を省略する
 
 #define	SLW_UMLAUT			0x00F00000	// UMLAUT1 + UMLAUT2 + UMLAUT3
 #define	SLW_UMLAUT1			0x00100000	// umlaut --> ae, ...
@@ -120,7 +121,7 @@ struct COMPARE_STRUCT {
 };
 
 // Search Longest Word external //
-typedef int (*FNLPSLWExtCallback)(int type, int param, int user);
+typedef int (*FNLPSLWExtCallback)(class TWebSearchThread *, int type, int param, int user);
 
 enum {
 	LPSLW_NONE = 0,
@@ -137,6 +138,7 @@ enum {
 };
 
 // Prototypes //
+int compSortHitWords( MATCHINFO **a, MATCHINFO **b );
 void SortHitWords( MatchArray &ma );
 //void InsertHitWords( MatchArray &dest, MatchArray &src );
 void InsertHitWords2( MatchArray &dest, MatchArray &src );

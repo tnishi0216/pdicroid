@@ -11,6 +11,8 @@
 
 #pragma package(smart_init)
 
+#define	USE_PREV2	1	// ÇQÇ¬ëOÇ©ÇÁÇÃíPåÍÇêÿÇËèoÇ∑
+
 #ifndef foreach
 #define	foreach(obj, it, type) \
 	for (type::iterator it=(obj).begin();it!=(obj).end();it++)
@@ -41,6 +43,7 @@ TLangProc::TLangProc()
 	Table = NULL;
 	LPMLoader = NULL;
 	IrregPool = NULL;
+	IrregCheckCase = false;
 	Buffer = NULL;
 	BufferSize = 0;
 	KCodeTranslate.encodeKT = NULL;
@@ -285,7 +288,6 @@ bool TLangProc::OpenIrreg()
 		IrregPool = new TBiPoolJ(MIN_WORDS);
 		if (IrregPool){
 			for (int i=0;i<IrregNames.size();i++){
-				__tnstrA s; s.setUTF8(IrregNames[i]);
 				if (Irregs.Read(i, IrregNames[i], line)){
 					do {
 						if (line[0] && line[0]!='#'){
@@ -293,7 +295,19 @@ bool TLangProc::OpenIrreg()
 							if (p && p[1]){
 								*p = '\0';
 								tnstr nw = Normalize(line);	// to ignore case sense.
-								IrregPool->AddSort(nw, p+1);
+								if (IrregCheckCase){
+									if (nw != line){
+										IrregPool->AddSort(line, p+1);
+										if (IrregPool->Find( nw )==-1){
+											// Ç»Ç¢èÍçáÇÃÇ›ìoò^
+											IrregPool->AddSort(nw, p+1);
+										}
+									} else {
+										IrregPool->AddSort(nw, p+1);
+									}
+								} else {
+									IrregPool->AddSort(nw, p+1);
+								}
 							}
 						}
 					} while (Irregs.Read(i, NULL, line));
@@ -322,13 +336,18 @@ bool TLangProc::SearchIrreg( const tchar *word, tnstr &trsword )
 	if (!IrregPool){
 		return false;
 	}
-	tnstr nw = Normalize(word);
-	int r = IrregPool->Find( nw );
-	if ( r != -1 ){
-		trsword = IrregPool->japa(r);
-		return true;
+	int r = -1;
+	if (IrregCheckCase){
+		r = IrregPool->Find( word );
 	}
-	return false;
+	if ( r == -1 ){
+		tnstr nw = Normalize(word);
+		r = IrregPool->Find( nw );
+		if ( r == -1)
+			return false;
+	}
+	trsword = IrregPool->japa(r);
+	return true;
 }
 
 #if 0	// defined in dicUtil.cpp
@@ -371,7 +390,7 @@ tnstr join_word(const tchar *cword, const tchar *kword)
 #endif
 }
 
-const tchar *FindWordTop(const tchar *word, int offset, const tchar **top2)
+const tchar *FindWordTop(const tchar *word, int offset, const tchar **_top2)
 {
 	const tchar *p;
 
@@ -392,8 +411,9 @@ const tchar *FindWordTop(const tchar *word, int offset, const tchar **top2)
 	}
 
 	//TODO: Ç±ÇÍÇÕlangprocÇ™Ç‚ÇÈÇ◊Ç´Ç±Ç∆
+	const tchar *top = NULL;
 	const tchar *top1 = NULL;
-	*top2 = NULL;
+	const tchar *top2 = NULL;
 	const tchar *offword = &word[offset];
 	p = word;
 	for (;p<=offword;){
@@ -405,29 +425,43 @@ const tchar *FindWordTop(const tchar *word, int offset, const tchar **top2)
 			continue;
 		}
 		// p : word top
-		*top2 = top1;
-		top1 = p;
+		top2 = top1;
+		top1 = top;
+		top = p;
 		p = nd;
 #else	// âpåÍÇÃÇ›
 		if (IsWordChar(*p)){
-			if (!top1)
-				top1 = p;
+			if (!top)
+				top = p;
 		} else {
-			if (top1){
-				*top2 = top1;
-				top1 = NULL;
+			if (top){
+				top2 = top1;
+				top1 = top;
+				top = NULL;
 			}
 		}
 		p++;
 #endif
 	}
 
+#if USE_PREV2
+	*_top2 = top2 ? top2 : top1;
+#else
+	*_top2 = top1;
+#endif
+
+	if (top){
+		return top;
+	} else
 	if (top1){
 		return top1;
-	} else
-	if (*top2){
-		return *top2;
 	}
+#if USE_PREV2
+	else
+	if (top2){
+		return top2;
+	}
+#endif
 	return word;
 }
 

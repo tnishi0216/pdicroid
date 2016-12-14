@@ -8,6 +8,8 @@
 #include "srchstat.h"
 #include "faststr.h"
 
+#include "SearchDefs.h"
+
 class TLangProc;
 
 // len,pos,error以外をセットし、検索終了まで保持しておく

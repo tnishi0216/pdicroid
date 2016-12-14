@@ -123,7 +123,7 @@ typedef	int				HFILE;
 
 #ifdef _UNICODE
 //#pragma	message( "UNICODE iskanji is not supported!!" );
-#define	_tiskanji(x)	(x >= 0x100)
+#define	_tiskanji(x)	(x >= 0x2000)	// 2016.3.17 0x100¨0x2000•ÏX
 #else
 #define	_tiskanji		_ismbblead
 #endif

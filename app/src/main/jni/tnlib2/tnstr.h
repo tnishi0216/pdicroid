@@ -243,9 +243,16 @@ public:
 			return ret;
 		}
 	}
+	// buf‚ª‚È‚¢ê‡‚ÍNULL‚ğ•Ô‚·
+	T *_discard()
+	{
+		T *ret = buf;
+		buf = NULL;
+		return ret;
+	}
 	void move(__tnstrT &src)
 	{
-		setBuf(src.discard());
+		setBuf(src._discard());
 	}
 
 	// STL compatibilities //

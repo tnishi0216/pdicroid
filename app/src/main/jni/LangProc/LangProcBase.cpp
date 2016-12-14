@@ -28,6 +28,8 @@ bool TLangProcBase::mbGetWord( const tchar *str, int pos, int &start, int &end, 
 
 #include "jtype.h"
 
+#define	USE_PREV2	1	// ２つ前からの単語を切り出す
+
 // posから単語を切り出す
 // posはstrからのオフセット
 // start,endはstrからのオフセットを返す
@@ -69,6 +71,7 @@ bool TLangProcBase::GetWordStd( const tchar *str, int pos, int &start, int &end,
 		wordtop = p; 
 	const tchar *wordtail = NULL;
 	const tchar *wordprev = NULL;
+	const tchar *wordprev2 = NULL;
 	bool fSpc = false;
 	// posにある単語のstartとendを求める
 	while ( *p ){
@@ -80,6 +83,9 @@ bool TLangProcBase::GetWordStd( const tchar *str, int pos, int &start, int &end,
 			fSpc = true;
 		} else {
 			if ( fSpc ){
+#if USE_PREV2
+				wordprev2 = wordprev;
+#endif
 				wordprev = wordtop;
 				wordtop = p;
 				fSpc = false;
@@ -119,7 +125,7 @@ bool TLangProcBase::GetWordStd( const tchar *str, int pos, int &start, int &end,
 	if ( start == end )
 		return false;
 	if ( wordprev ){
-		prevstart = STR_DIFF( wordprev, orgp );
+		prevstart = STR_DIFF( wordprev2 ? wordprev2 : wordprev, orgp );
 	} else {
 		prevstart = start;
 	}
@@ -195,4 +201,22 @@ bool TLangProcBase::mbGetWordStd( const tchar *str, int pos, int &start, int &en
 const tchar *TLangProcBase::GetConjugateWords()
 {
 	return _t("a;an;at;be;for;in;of;off;on;the;to;with");
+}
+
+
+// Helpers
+//TODO: move to common
+void trimright(tnstr &s)
+{
+	unsigned i;
+	unsigned lastpos = -1;
+	int l = s.length();
+	for (i=0;i<l;i++){
+		if ((tuchar)s[i]<=' ')
+			lastpos = i;
+		else
+			lastpos = -1;
+	}
+	if (lastpos!=-1)
+		s[lastpos] = '\0';
 }

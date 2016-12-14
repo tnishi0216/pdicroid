@@ -48,7 +48,7 @@ BOOL GenericRexp::Compile( )
 	}
 }
 // If matches is not null, get the full match info. (speed slower)
-BOOL GenericRexp::Compare( const tchar *str, TMatchInfos *matches )
+BOOL GenericRexp::Compare( const tchar *str, TMatchInfos *matches, int user )
 {
 	GenericRexp *rexp = this;
 	BOOL ret = FALSE;
@@ -73,10 +73,11 @@ BOOL GenericRexp::Compare( const tchar *str, TMatchInfos *matches )
 				} while (1);
 			}
 		}
-		if (!rexp->next){
+		GenericRexp *rexp_next = rexp->GetNextForComp(user);
+		if (!rexp_next){
 			return rexp->matched = (r || ret);
 		}
-		if (rexp->next->connection==0){
+		if (rexp_next->connection==0){
 			// AND
 			if (!r){
 				return FALSE;
@@ -91,10 +92,10 @@ BOOL GenericRexp::Compare( const tchar *str, TMatchInfos *matches )
 				ret = TRUE;
 			}
 		}
-		rexp = rexp->next;
+		rexp = rexp_next;
 	}
 }
-BOOL GenericRexp::GetMatch( int &len, int &loc )	// len : ƒ}ƒbƒ`’· loc : ƒ}ƒbƒ`ˆÊ’u
+BOOL GenericRexp::GetMatch( int &len, int &loc, int user )	// len : ƒ}ƒbƒ`’· loc : ƒ}ƒbƒ`ˆÊ’u
 {
 	GenericRexp *rexp = this;
 	for(;;){
@@ -103,10 +104,11 @@ BOOL GenericRexp::GetMatch( int &len, int &loc )	// len : ƒ}ƒbƒ`’· loc : ƒ}ƒbƒ`ˆ
 			if (r)
 				return TRUE;
 		}
-		if (!rexp->next){
+		GenericRexp *rexp_next = rexp->GetNextForComp(user);
+		if (!rexp_next){
 			return FALSE;
 		}
-		rexp = rexp->next;
+		rexp = rexp_next;
 	}
 }
 

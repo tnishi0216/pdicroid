@@ -71,8 +71,8 @@ public:
 
 	virtual BOOL Compile( );
 	virtual BOOL Compile(const tchar *str);
-	virtual BOOL Compare( const tchar *str, TMatchInfos *matches=0 );
-	virtual BOOL GetMatch( int &len, int &loc );	// len : マッチ長 loc : マッチ位置
+	virtual BOOL Compare( const tchar *str, TMatchInfos *matches=0, int user=0 );
+	virtual BOOL GetMatch( int &len, int &loc, int user=0 );	// len : マッチ長 loc : マッチ位置
 
 	virtual bool CompareEx(const tchar *pattern, const tchar *str, tnstr_vec &strs) = 0;
 
@@ -81,6 +81,7 @@ protected:
 	virtual BOOL CompareImpl( const tchar *str ) = 0;
 	virtual BOOL GetMatchImpl( int &len, int &loc ) = 0;	// len : マッチ長 loc : マッチ位置
 	virtual GenericRexp *Create() = 0;
+	virtual GenericRexp *GetNextForComp(int user) const { return next; }
 
 public:
 	virtual int GetErrorCode( ) = 0;
@@ -93,7 +94,7 @@ public:
 		{ pattern = _pattern; }
 	const tchar *GetPattern()
 		{ return pattern; }
-	GenericRexp *Duplicate();
+	virtual GenericRexp *Duplicate();
 
 	// 連結正規表現検索 //
 	GenericRexp *next;

@@ -650,3 +650,21 @@ int ReadDir(tnstr_vec &files, const tchar *dir, const tchar *ext)
 #endif
 }
 
+void SlashToBackSlash(tchar *name)
+{
+	while (*name){
+		if (*name == '/'){
+			*name = '\\';
+		}
+		name++;
+	}
+}
+void BackSlashToSlash(tchar *name)
+{
+	while (*name){
+		if (*name == '\\'){
+			*name = '/';
+		}
+		name++;
+	}
+}

@@ -1,6 +1,8 @@
 #ifndef __HYPLINK_H
 #define	__HYPLINK_H
 
+#include <stack>
+
 //#include "draw2.h"
 #include "CharHT.h"
 
@@ -23,6 +25,7 @@
 #define	HLT_TEXTFILE	9
 #define	HLT_EPWING		0x10
 #define	HLT_HTML_HREF	0x20	// <a href="url">...</a>
+#define	HLT_HTML_BXTAG	0x30	// <fd title="title">...</m>
 
 // SQM_...と同じ数値！
 #define	HLI_PRON	0x08
@@ -32,10 +35,17 @@
 #define	HLI_EPWING	0x40	// 0x10 -> 0x40 changed. (2012.8.12)
 
 struct THyperLink {
-	byte type;		// マウスクリック時の動作
-	byte item;		// 発音記号、日本語訳、用例・・・
-	byte bookno;	// EPWING用
-	tnstr key;		// 検索用の単語, URL for HLT_HTML_HREF
+	union {
+		unsigned int unnamed;
+		struct {
+			byte type;		// マウスクリック時の動作
+			byte item;		// 発音記号、日本語訳、用例・・・
+			byte bookno;	// EPWING用
+			byte bxtag : 1;	// HTML Tag(bx)
+			byte state : 7;	// 1:BoxOpen/0:Close for HLT_HTML_BXTAG
+		};
+	};
+	tnstr key;		// 検索用の単語, URL for HLT_HTML_HREF, title for HLT_HTML_BXTAG
 	THitArea area;	// マウスのヒットエリア
 	int loc;		// 単語位置
 	int length;		// 単語長さ
@@ -52,6 +62,15 @@ struct THyperLink {
 	tchar *GetLink(const tchar *p, const tchar *_text, const tchar *text);
 };
 
+struct THyperLinkInfo {
+	THyperLink *hl;
+	const tchar *left;
+	THyperLinkInfo(THyperLink *_hl, const tchar *_left)
+		:hl(_hl)
+		,left(_left)
+	{}
+};
+
 class THyperLinks : public FlexObjectArray<THyperLink> {
 public:
 	bool done;
@@ -62,9 +81,17 @@ public:
 	const tchar *left;
 	THyperLink *tag;
 	int curitem;
+	stack<THyperLinkInfo> hliStack;
+
+protected:
+	int nextIndex;
+
 public:
 	THyperLinks( );
 	int ExtractStaticWords( byte item, const tchar *text );
+
+	void StartEnum();
+	THyperLink *Next(byte type);
 };
 
 extern "C" {

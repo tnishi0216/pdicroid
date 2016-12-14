@@ -69,6 +69,8 @@ HWND IPopupSearchImpl::GetChildHandle() const
 
 TPopupSearch *TPopupSearch::Root = NULL;
 int TPopupSearch::MsgLoop = 0;
+bool TPopupSearch::DoingPreSearch = false;
+
 
 // TPopupSearch class
 TPopupSearch::TPopupSearch()
@@ -139,6 +141,7 @@ void TPopupSearch::AssignParameters(IPopupSearch *_ps)
 	this->MaxWordNum = ps->MaxWordNum;
 	this->Receiver = ps->Receiver;
 	this->Flags = ps->Flags;
+	this->ViewFlags = ps->ViewFlags;
 }
 // hwndが自分のpopup or menuか？
 // recurがtrueである場合は自分の子も調べる
@@ -405,15 +408,6 @@ void TPopupSearch::SearchHitWords( const tchar *_word, const tchar *_prevword, t
 void TPopupSearch::PopupForWords( const tchar*__word, int click_pos, const tchar *__prevword, tnstr *foundword, bool tmp_clickpopup, const tchar *url )
 {
 	pfw.SetWord(__word, __prevword, click_pos);
-#if 0	// should be deleted
-	int offset = __prevword ? (int)(__word - __prevword) : 0;
-	pfw.wholeword = __prevword ? __prevword : __word;
-	pfw.prevword = __prevword ? (const tchar*)pfw.wholeword : (const tchar*)NULL;
-	pfw.word = &pfw.wholeword[offset];
-	pfw.click_pos = click_pos<=0 ? 0 : click_pos;
-	pfw.curp = pfw.word;
-	pfw.curi = 0;
-#endif
 	if ( Parent ){
 #if 0
 		int style;
@@ -628,6 +622,7 @@ void TPopupSearch::Open( TPopupSearch *parent, const tchar *word, bool tmp_fixed
 	HitWordIndex = HitWords->get_num()-1;
 
 	int AddStyle = GetBaseStyle();
+	int ExcViewFlags = 0;
 
 	MPdic *dic;
 	switch ( type ){
@@ -650,6 +645,7 @@ void TPopupSearch::Open( TPopupSearch *parent, const tchar *word, bool tmp_fixed
 		case HLT_EPWING:
 			japa->jlinks.add( new JLEPWing( epdic, 0, bookno, pos ) );
 			AddStyle = MWS_LINKOBJECT;
+			ExcViewFlags |= PSF_TTSPLAY;
 			break;
 #endif
 #ifdef USE_JLINK
@@ -663,6 +659,7 @@ void TPopupSearch::Open( TPopupSearch *parent, const tchar *word, bool tmp_fixed
 					japa->jlinks.add( new JLFile( i!=-1 ? &(*dic)[i] : NULL, i!=-1?fullpath.c_str():word, 0 ) );
 					AddStyle = MWS_LINKOBJECT;
 				}
+				ExcViewFlags |= PSF_TTSPLAY;
 			}
 			break;
 #endif
@@ -677,6 +674,7 @@ void TPopupSearch::Open( TPopupSearch *parent, const tchar *word, bool tmp_fixed
 //					return ;	// cannot read
 				}
 				AddStyle = MWS_LINKOBJECT;
+				ExcViewFlags |= PSF_TTSPLAY;
 			}
 			break;
 #endif
@@ -744,7 +742,7 @@ void TPopupSearch::Open( TPopupSearch *parent, const tchar *word, bool tmp_fixed
 //		AddStyle |= MWS_MULTIHIT;
 	Popup->SetMemory(japa->IsMemory());
 	Popup->SetStyle(Popup->GetStyle() | AddStyle);
-	Popup->SetViewFlag(ViewFlags);
+	Popup->SetViewFlag(ViewFlags & ~ExcViewFlags);
 #ifdef USE_POPUPHOOK
 	ExecPopup( word );
 #endif
@@ -838,6 +836,7 @@ void TPopupSearch::OpenAsMenu( const tchar *word )
 #ifndef LIGHT
 		MenuWin->AppendMenu( _LT( IDS_RECORDWORD ), CMW_RECORD, VK_RETURN+SK_CTRL, NULL, true );	// 単語登録
 #endif
+		MenuWin->AppendMenu( _LT( IDS_PSPLAYTTS ), CMW_PLAYTTS, 'R'+SK_CTRL, NULL, true );	// 単語登録
 		MenuWin->AppendMenu(_LT(IDS_PSCONFIG), CM_PSCONFIG, 'G'+SK_CTRL, NULL, true);
 #ifdef SMALL
 		MenuWin->AppendMenu( _LT( IDS_CLOSEMENU ), CMW_CLOSEMENU, 0, NULL, true );	// メニューを閉じる
@@ -1130,25 +1129,49 @@ int TPopupSearch::PrePopupSearch(const tchar *word, const tchar *prevword, int c
 
 	if (!dic->ThreadUp())
 		return 0;
+
+	int r = 0;
 		
+	try {		
 #if defined(USE_JLINK)
-	bool fLinkAttr;
-	if ( Flags & PSF_PLAY )
-		fLinkAttr = dic->SetLinkAttr( OLA_NOTREADOBJ & ~(OLA_NOTREADVOICE|OLA_NOTREADEPWING), true );	// 高速化のため
-	else
-		fLinkAttr = dic->SetLinkAttr( OLA_NOTREADOBJ & ~OLA_NOTREADEPWING, true );	// 高速化のため
+		bool fLinkAttr;
+		if ( Flags & PSF_PLAY )
+			fLinkAttr = dic->SetLinkAttr( OLA_NOTREADOBJ & ~(OLA_NOTREADVOICE|OLA_NOTREADEPWING), true );	// 高速化のため
+		else
+			fLinkAttr = dic->SetLinkAttr( OLA_NOTREADOBJ & ~OLA_NOTREADEPWING, true );	// 高速化のため
 #endif
 
-	HitWords->clear();
-	int r = dic->SearchLongestWord( word, prevword, curpos, option, HitWords );
+		HitWords->clear();
+		r = dic->SearchLongestWord( word, prevword, curpos, option, HitWords );
 #if defined(USE_JLINK)
-	dic->SetLinkAttr( OLA_NOTREADOBJ, fLinkAttr );
+		dic->SetLinkAttr( OLA_NOTREADOBJ, fLinkAttr );
 #endif
+	} catch(...){
+		DBW("catch the PrePopupSearch exception");
+	}
 
 	dic->ThreadDown();
 
 	return r;
 }
+
+#if 0
+//TODO: いずれ共通ライブラリへ
+class TMutexCounter {
+	LONG Counter;
+public:
+	TMutexCounter(int initial = 0)
+	{
+		Counter = initial;
+	}
+	inline TMutexCounter &operator ++ (){
+		InterlockedIncrement(&Counter);
+	}
+	inline TMutexCounter &operator -- (){
+		InterlockedDecrement(&Counter);
+	}
+};
+#endif
 
 class PrePopupSearchThread : public tnthread {
 typedef tnthread super;
@@ -1160,17 +1183,35 @@ public:
 	bool complete;
 	int option;
 	int result;
+
+	// mutex for another thread //
+	static TSem instSem;
+	bool locked;
 public:
 	PrePopupSearchThread()
 		:super(true)
 	{
 		result = 0;
+		locked = false;
 	}
 	virtual void Execute()
 	{
 		result = obj->PrePopupSearch(word, prevword, curpos, complete, option);
+		if (locked){ instSem.Unlock(); }
+	}
+	void wait_and_resume()
+	{
+		const int wait_time = 10000;	// 10sec?
+		if (instSem.Wait(wait_time)){
+			locked = true;
+		} else {
+			DBW("PrePopupSearchThread::wait_and_resume: timeout");
+		}
+		Resume();
 	}
 };
+
+TSem PrePopupSearchThread::instSem(1, 1);
 
 // sub threading
 PrePopupSearchThread *TPopupSearch::PrePopupSearchTH(const tchar *word, const tchar *prevword, int curpos, bool complete, int option)
@@ -1182,7 +1223,8 @@ PrePopupSearchThread *TPopupSearch::PrePopupSearchTH(const tchar *word, const tc
 	thread->curpos = curpos;
 	thread->complete = complete;
 	thread->option = option;
-	thread->Resume();
+	thread->wait_and_resume();
+	//thread->Resume();
 	return thread;
 }
 
@@ -1193,6 +1235,8 @@ int TPopupSearch::OpenPopupSearch(TComponent *owner, IPopupSearch *parent, const
 	MPdic *dic = GetActiveDic();
 	if (!dic)
 		return 0;
+
+	if (DoingPreSearch) return 0;	// これでstack overflowは避けられるが。。
 
 #if PSIMOPEN	// 検索前にウィンドウを表示
 	PrePopupSearchThread *th = PrePopupSearchTH( _word, _prevword, curpos, complete, option );
@@ -1227,15 +1271,17 @@ int TPopupSearch::OpenPopupSearch(TComponent *owner, IPopupSearch *parent, const
 	}
 
 	Hourglass(true);
+	DoingPreSearch = true;
 	int r = -1;
 	while (1){
-		Application->ProcessMessages();
+		Application->ProcessMessages();	//TODO: ここをwaitしているときに他のthreadが起動して別のPopupが開き、それが幾度も重なりstack overflowとなる
 		if (th->IsFinished()){
 			r = th->result;
 			break;
 		}
 	}
 	delete th;
+	DoingPreSearch = false;
 	Hourglass(false);
 	
 #else	// !PSIMOPEN
@@ -1292,7 +1338,7 @@ void TPopupSearch::SLWStop()
 	}
 }
 
-int TPopupSearch::SLWExtCallback(int type, int param, int user)
+int TPopupSearch::SLWExtCallback(class TWebSearchThread *, int type, int param, int user)
 {
 	return ((TPopupSearch*)user)->SLWExtCallback(type, param);
 }

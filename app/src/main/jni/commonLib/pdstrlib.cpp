@@ -191,6 +191,12 @@ const tchar *skiptospc(const tchar *str)
 	return str;
 }
 
+const char *skiptospc(const char *str)
+{
+	while (!(*(unsigned char*)str<=' ')) str++;
+	return str;
+}
+
 // 全角スペースを含めたskiptostr
 const tchar *skiptospcz(const tchar *str)
 {

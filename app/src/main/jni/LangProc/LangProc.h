@@ -130,6 +130,7 @@ protected:
 	tnstr_vec IrregNames;
 	TIrregDics Irregs;	// •s‹K‘¥•Ï‰»«‘
 	class TBiPoolJ *IrregPool;
+	bool IrregCheckCase;	// normalize‘O‚Ì’PŒê‚à”äŠr‚·‚é
 //	DWORD IrregLastCheck;
 public:
 //	void SetIrreg( const tchar *filename )

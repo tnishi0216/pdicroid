@@ -122,6 +122,13 @@ public:
 	{
 		cat(&c, 1);
 	}
+	void trim(int len)
+	{
+		if (strsize>len){
+			strsize = len;
+			buf[len] = '\0';
+		}
+	}
 	T *get(T *str, int len)
 	{
 		const T *src = buf;

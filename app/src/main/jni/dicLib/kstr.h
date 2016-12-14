@@ -15,6 +15,7 @@ extern TKCodeTranslateSet KCodeTranslateSetN;
 
 #ifdef DIC_BOCU
 #include "dicmix.h"
+// _kchar <=> wchar_t conversion class
 class __kstr {
 protected:
 	const struct TKCodeTranslateSet *Translator;

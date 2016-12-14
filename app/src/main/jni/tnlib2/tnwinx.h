@@ -37,6 +37,7 @@ void DBW( const char *format, ... );
 void D8( const void *data, int len );
 void D16( const void *data, int len );
 void D32( const void *data, int len );
+void DBW( const wchar_t *format, ... );
 #else
 inline void DBW( const char *, ... ){}
 inline void D8( const void *, int  ){}
@@ -44,9 +45,25 @@ inline void D16( const void *, int ){}
 inline void D32( const void *, int ){}
 inline void DFIN( const char * ){}
 inline void DFOUT( const char * ){}
+void DBW( const wchar_t *format, ... ){}
 #endif
 
+void dbwcls();
+
 #define	dbw	DBW
+
+void alog_filename(const char *filename, char *pathbuf);
+void alog_init(const char *filename);
+void alog_exit();
+void alog(const char *format, ...);
+void elog(const char *format, ...);		// alog+DBW
+
+bool tlog_init(const char *filename, int queSize, bool append);
+void tlog_filename(const char *filename, char *pathbuf);
+void tlog_exit();
+void tlog(const char *format, ...);
+void tlogs(const char *s, int len=-1);
+void tlog_flush();
 
 #ifdef	__cplusplus
 extern "C" {

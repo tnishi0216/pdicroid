@@ -37,11 +37,11 @@ struct EnphText {
 	int end;
 	int wordcount;	// for EPWING
 	THitArea *area;
-	int type;	// 0:under line 1:link color
+//	int type;	// 0:under line 1:link color
 
 //    COLORREF color;
 	EnphText()
-		{ area = NULL; type=0; }
+		{ area = NULL; /*type=0;*/ }
 
 	EnphText &operator = (const EnphText &o)
 		{ assign(o); return *this; }
@@ -51,8 +51,12 @@ struct EnphText {
 		end = o.end;
 		wordcount = o.wordcount;
 		area = o.area;
-		type = o.type;
+		//type = o.type;
 	}
+	//TODO: to be removed if type is no longer needed.
+	inline bool isUnderline() const { return true; }
+	inline int getType() const { return 0; }
+	inline void setType(int t){}
 };
 
 class EnphTextVec : public vector<EnphText> {
@@ -66,11 +70,16 @@ protected:
 	struct LocList {
 		int loc;
 		int index;
+		int seq;	// sequence number to sort
 	};
 	static int sortfunc( const void *a, const void *b );
-	static int sEnphSort( const EnphTextVec &enph, LocList *loclist );
+	static int sortloclist_by_loc( const void *a, const void *b );
+	static int sortloclist_by_seq( const void *a, const void *b );
+	int sEnphSort( const EnphTextVec &enph, LocList *loclist );
 	int EnphSort()
 		{ return sEnphSort(*et, ccLoc); }
+
+	bool mergeMode;
 
 	const EnphTextVec *et;	// ref. pointer
 
@@ -79,7 +88,7 @@ protected:
 	bool fCheckHit;
 
 	bool fOverLeft;
-	int *ccPoint;		// 反転部分座標配列
+	int *ccPoint;		// 反転部分X座標配列
 	int ccPointNum;			// 有効なccPoint[]要素の数
 
 	struct LocList *ccLoc;
@@ -91,32 +100,10 @@ protected:
 
 	// for DrawEnph //
 	int under_start;	// アンダーライン開始座標位置
-	RECT *under_rect;
-	int color_start;	// 色強調開始座標位置
-	RECT *color_rect;
-	COLORREF color_old;
-	RECT dummyrect;		//TODO: 何のため？
+	int area_start;	// area開始X座標位置
+	RECT *area_rect;
 public:
-	EnphTextWork(const EnphTextVec *_et)
-	{
-		et = _et;
-
-		fHit = false;
-		fCheckHit = false;
-		fOverLeft = false;
-		ccPoint = NULL;
-		ccPointNum = 0;
-
-		ccLocIndex = 0;
-		ccLocSize = 0;
-		ccLoc = NULL;
-
-		unredraw_start = -1;
-
-		under_start = -1;	// アンダーライン開始座標位置
-		color_start = -1;	// 色強調開始座標位置
-		color_old = 0;
-	}
+	EnphTextWork(const EnphTextVec *_et);
 	~EnphTextWork()
 	{
 		if ( ccLoc ){
@@ -126,6 +113,7 @@ public:
 			delete[] ccPoint;
 		}
 	}
+	bool MergeMode() const { return mergeMode; }
 	bool CheckHit() const { return fCheckHit; }
 	bool CheckHit2() const { return fCheckHit && ccPointNum; }
 	bool Hit() const { return fHit; }
@@ -135,11 +123,6 @@ public:
 	void AdjustEnph(class CharHT *cht, int flags, RECT *rc);
 	inline bool IsIncluded(int str_loc)
 	{
-	#if 0
-		if (etct < _etnum){
-			DBW("%d %d %d", etct, ccLoc[etct].loc, str_loc);
-		}
-	#endif
 		return ccLocIndex < ccLocSize && ccLoc[ccLocIndex].loc <= str_loc;
 	}
 	int GetNextLoc();
@@ -159,11 +142,75 @@ public:
 	//TODO: 引数を減らしたい
 	void DrawReverse(HDC hdc, int right, bool cr, RECT *rc, int top, int revh, int cy);
 	//void DrawEnph(TNFONT &tnfont, TDispLineInfo &linfo, int right, RECT *rc, int top, int revh, int cy, const tchar *leftp, const tchar *orgp, INT *tabstop, int n);
-	void DrawEnph(TNFONT &tnfont, class TDispLineInfo &linfo, int right, RECT *rc, int top, int revh, int cy);
+	void DrawEnph(TNFONT &tnfont, class TDispLineInfo &linfo, int right, int rc_left, int top, int revh, int cy);
 	void Next();
 };
 
-class TFontTagStack : public stack<TFontAttr> {};
+// Extra Attributes
+#define	TFAX_HIDDEN		0x01
+#define	TFAX_HIDDEN_NEXT 0x02	// 次の項目でTFAX_HIDDENになる
+//#define	TFAX_BOXOPEN	0x04
+//#define	TFAX_HYPLINK	0x08
+
+class TFontAttrEx : public TFontAttr {
+typedef TFontAttr super;
+public:
+	char AttrEx;	// HDCに影響を与えない(SelectFontする必要のない)属性
+	class THyperLink *HyperLink;
+public:
+	TFontAttrEx()
+	{
+		AttrEx = 0;
+		HyperLink = NULL;
+	}
+
+	TFontAttrEx &operator = (const TFontAttrEx &o)
+	{
+		super::operator = (o);
+		AttrEx = o.AttrEx;
+		HyperLink = o.HyperLink;
+		return *this;
+	}
+	TFontAttrEx &operator = (const TFontAttr &o)
+	{
+		return (TFontAttrEx&)super::operator = (o);
+	}
+
+	bool NeedFontSelect(const TFontAttrEx &o) const
+	{
+		return super::operator != (o);
+	}
+
+	bool operator != (const TFontAttrEx &o) const
+	{
+		return super::operator != (o) || AttrEx != o.AttrEx;
+	}
+	void AssignFontTag(const TFontAttrEx &fa)
+	{
+		super::AssignFontTag(fa);
+		AttrEx = fa.AttrEx;
+		HyperLink = fa.HyperLink;
+	}
+
+	void SetAttrEx(int flg, bool on)
+		{ if (on) AttrEx |= flg; else AttrEx &= ~flg; }
+
+	void SetHidden(bool on) { SetAttrEx(TFAX_HIDDEN, on); }
+	inline bool IsHidden() const { return AttrEx & TFAX_HIDDEN ? true : false; }
+
+	void SetHiddenNext(bool on) { SetAttrEx(TFAX_HIDDEN_NEXT, on); }
+	inline bool IsHiddenNext() const { return AttrEx & TFAX_HIDDEN_NEXT ? true : false; }
+	
+#if 0
+	void SetBoxOpen(bool on) { SetAttrEx(TFAX_BOXOPEN, on); }
+	inline bool IsBoxOpen() const { return AttrEx & TFAX_BOXOPEN ? true : false; }
+#endif
+
+	void SetHyperLink(THyperLink *hl) { HyperLink = hl; }
+	inline bool IsHyperLink() const { return HyperLink != NULL; }
+};
+
+class TFontTagStack : public stack<TFontAttrEx> {};
 
 #define	DMT_TERMINAL	0x0001	// 文字列終端
 #define	DMT_TAB			0x0002
@@ -173,6 +220,7 @@ class TFontTagStack : public stack<TFontAttr> {};
 #define	DMT_HTML		0x0020
 #define	DMT_HYPLINK1	0x0040	// PDIC hyper link text <> brancket
 #define	DMT_HYPLINK2	0x0080	// PDIC hyper link text no brancket
+#define	DMT_SPCCHAR		0x0100	// &#..;
 
 // Note:
 // OVERLINEとTAB/ILLEGALが一緒になることがある
@@ -192,12 +240,14 @@ public:
 #ifndef _UNICODE
 	bool single;	// single byte code? //TODO: 将来的に半角文字フォント指定ができる
 #endif
-	TFontAttr FontAttr;
+	TFontAttrEx FontAttr;
 	TNFONT *pfont;	// reference pointer to the font object.
+	//int flags;
 public:
 	TDispLineInfo()
 	{
 		// Should initialize the members after creation.
+		//flags = 0;
 	}
 	TDispLineInfo(int _loc, int _length, int _tlength, int pos_x, int pos_y, int cx, int _delimtype)
 		:loc(_loc)
@@ -212,6 +262,7 @@ public:
 		//TODO: size.cy = cy;
 		//TODO: color = _color;
 		//TODO: bgcolor = _bgcolor;
+		//flags = 0;
 	}
 	void set(int _loc, int _length, int _tlength, int pos_x, int pos_y, int cx, int _delimtype)
 	{
@@ -236,6 +287,9 @@ public:
 		{ FontAttr.ResetAttr(flag); }
 	inline void SetFontAttr(int flag, bool on)
 		{ if (on) SetFontAttr(flag); else ResetFontAttr(flag); }
+
+//	void SetFlags(int flg, bool on)
+//		{ if (on) flags |= flg; else flags &= ~flg; }
 };
 
 class TDispLinesInfo {
@@ -261,7 +315,7 @@ public:
 	TFontTagStack FAStack;		// Font attribute stack for <font>
 };
 
-typedef map<TFontAttr, TNFONT*> TFontAttrMap_t;
+typedef map<TFontAttr, TNFONT*> TFontAttrMap_t;	//Note: TFontAttrExではなくTFontAttr。AttrExはfont生成には関係ないため
 class TFontAttrMap : public TFontAttrMap_t {
 public:
 	~TFontAttrMap();
@@ -277,6 +331,9 @@ public:
 	int InitLeft;
 	bool WordBreak;		// word breakを有効にする
 	bool HtmlParse;
+	bool ExpVisible;	// 用例表示ON/OFF
+	bool BoxOpen;		// 常にopen
+
 	// Result status //
 	int LastRight;		// 最後に表示したテキストの右端座標
 	int LastTop;	// 最終行の高さ

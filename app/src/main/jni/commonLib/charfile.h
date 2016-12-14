@@ -11,7 +11,7 @@ protected:
 	virtual int get( );
 private:
 	void seek( long ){}		// cannot use
-	long tell( ){ return 0L; }	// cannot use
+	__off_t tell( ){ return 0L; }	// cannot use
 };
 
 class TCharOFile : public TOFile {
@@ -27,7 +27,7 @@ private:
 	virtual int open( const tchar */*filename*/, int /*trunc*/ )
 		{ return -1; }
 	virtual void seek(long ){}	// cannot use
-	virtual long tell( ){ return 0L; }	// cannot use
+	virtual __off_t tell( ){ return 0L; }	// cannot use
 	virtual void end( ){}	// cannot use
 };
 

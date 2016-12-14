@@ -151,6 +151,7 @@ protected:
 	void **migrate( );
 public:
 	void move(FlexObjectArrayBase &o);	// move o to this
+	int add(FlexObjectArrayBase &o);
 	bool allocate(int size);
 
 	// for debug

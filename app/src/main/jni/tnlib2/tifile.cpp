@@ -25,7 +25,7 @@ TIFile::~TIFile()
 	}
 }
 
-int TIFile::open( const tchar* _filename )
+int TIFile::open(const tchar* _filename, int defcharcode )
 {
 	filename = _filename;
 	text = 1;
@@ -41,6 +41,14 @@ int TIFile::open( const tchar* _filename )
 		delete readbuff;
 #ifdef _UNICODE
 	bom = skipmark();
+	if (!bom && defcharcode){
+		switch (defcharcode){
+			case TFM_UTF16LE: bom = 0xFEFF; break;
+			case TFM_UTF16BE: bom = 0xFFFE; break;
+			case TFM_UTF8: bom = 0xBF; break;
+			case TFM_ASCII: bom = 20127; break;
+		}
+	}
 	unicode = bom ? true : false;
 	switch (bom){
 		case 0xFEFF:
@@ -65,8 +73,11 @@ jascii:;
 			break;
 		default:
 			if (cc){
-				TCharCodeStreamFD stream(fd);
-				int code = cc->Detect(filename, &stream);
+				int code = cc->GetDetectedCode();
+				if (code == 0){
+					TCharCodeStreamFD stream(fd);
+					code = cc->Detect(filename, &stream);
+				}
 				switch (code){
 #if 0	//TODO: ‚Ç‚Á‚¿‚ª‘¬‚¢‚©Œã‚Å’²‚×‚é
 					case CP_UTF8:
@@ -151,7 +162,7 @@ void TIFile::seek(long l)
 	_tlseek(fd, l, SEEK_SET);
 }
 
-long TIFile::tell()
+__off_t TIFile::tell()
 {
 	return _ttell(fd) - (readbuff ? readbuff->remainBytes() : 0);
 }
@@ -300,7 +311,7 @@ int TIFile::skipline( )
 int TIFile::getA( )
 {
 	if (unicode){
-		long loc = tell();
+		__off_t loc = tell();
 		if (readbuff)
 			delete readbuff;
 		unicode = false;

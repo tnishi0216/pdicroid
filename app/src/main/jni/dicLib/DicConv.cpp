@@ -60,6 +60,7 @@ bool TDicConverter::ConvertToPdic(const tchar *textname, Pdic *dic, int dictype)
 	pDic = new Pdic2;
 	if (pDic){
 		dic->SetFastMode(true);
+		dic->SetRecordLock(false);	// 2016.4.15 ReadLock‚µ‚½ó‘Ô‚Å“ü‚Á‚Ä‚­‚éê‡‚ª‚ ‚é‚½‚ßArecord()Žž‚Ìlock‚Í‚µ‚È‚¢‚æ‚¤‚É‚·‚é•K—v‚ª‚ ‚é
 		if (pDic->Open(dic, FOM_WRITE)==0){
 			tnstr wd;
 			Japa jp;
@@ -77,6 +78,7 @@ bool TDicConverter::ConvertToPdic(const tchar *textname, Pdic *dic, int dictype)
 		delete pDic;
 		pDic = NULL;
 		dic->SetFastMode(false);
+		dic->SetRecordLock(true);
 	}
 	delete txDic;
 	txDic = NULL;

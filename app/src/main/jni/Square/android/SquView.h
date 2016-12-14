@@ -30,7 +30,7 @@ private:	// ユーザー宣言
 //	};
 	class TSquareIF *squi;
 	class TSquare *squ;
-	class TNPopupMenu *PopupMenu;
+//	class TNPopupMenu *PopupMenu;
 
 public:		// ユーザー宣言
 	TSquareView(/*TComponent* Owner,*/ TSquareIF *squ);

@@ -51,7 +51,11 @@ tnstr _GetFilePath( const tchar *filename );
 tnstr GetTempPath();
 tnstr MakePath(const tchar *path, const tchar *filename);
 bool MkDir(const tchar *dir);
+bool is_dir(const tchar *path);
 int ReadDir(tnstr_vec &files, const tchar *dir, const tchar *ext);
+
+void SlashToBackSlash(tchar *name);
+void BackSlashToSlash(tchar *name);
 
 #endif	// __FILESTR_H
 

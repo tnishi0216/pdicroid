@@ -6,9 +6,9 @@
 #include "hyplink.h"
 #include "wpdcom.h"
 
-const tchar *STR_HELPWEB_HOMEPAGE = _T("http://homepage3.nifty.com/TaN/");
-const tchar *STR_HELPWEB_QA = _T("http://homepage3.nifty.com/TaN/unicode/qa.html");
-const tchar *STR_HELPWEB_DOWNLOAD = _T("http://homepage3.nifty.com/TaN/unicode/");
+const tchar *STR_HELPWEB_HOMEPAGE = _T("http://pdic.la.coocan.jp/");
+const tchar *STR_HELPWEB_QA = _T("http://pdic.la.coocan.jp/unicode/qa.html");
+const tchar *STR_HELPWEB_DOWNLOAD = _T("http://pdic.la.coocan.jp/unicode/");
 
 const TCHAR *HHClassName = _T("HH Parent");
 const TCHAR *HelpWindowName = _T("Personal Dictionary Help");

@@ -19,6 +19,8 @@ SrchOutBase::SrchOutBase( )
 	out = NULL;
 	squ = NULL;
 	DelayedOutput = false;
+	NeedExtension = false;
+	NeedDeleteFile = false;
 }
 
 SrchOutBase::~SrchOutBase( )
@@ -35,6 +37,9 @@ int SrchOutBase::Open( TWinControl *parent )
 	if ( output & (OD_FILE|OD_BROWSER) ){
 		mode |= FOM_FILE;
 		fname = filename;
+		if (output & OD_FILE){
+			NeedExtension = true;
+		}
 	}
 	if ( output & OD_CLIPBD ){
 		mode |= FOM_CLIPBOARD;
@@ -106,6 +111,9 @@ void SrchOutBase::Close( )
 		out->Close( );
 		delete out;
 		out = NULL;
+		if (NeedDeleteFile){
+			DeleteFile(filename);
+		}
 	}
 }
 
@@ -179,4 +187,3 @@ int SrchOut::GetErrorCode( )
 #endif
 }
 
-

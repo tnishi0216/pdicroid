@@ -30,6 +30,7 @@ produced by Borland Resource Workshop
 #define	CMW_RECEXPHISTORY	137
 #define	CMW_TTS	140
 #define CMW_RECORD	168
+#define CMW_PLAYTTS	169
 #define	CMW_SEARCH	302
 #define	CMW_CLOSEMENU	303
 #define CM_FILESAVE	24333

@@ -47,6 +47,8 @@
 #include "getstr.h"
 #endif
 
+//#include "mutex.h"
+
 tchar *newstr( const tchar *str );
 tchar *newstr( const tchar *str, int len );
 
@@ -60,6 +62,21 @@ inline tchar *nstrcpy( tchar *buf, const tchar *src )
 }
 #ifdef CBUILDER
 //#pragma pack(pop)
+#endif
+
+#if 0
+inline void* operator new(size_t size){
+	void *ret = malloc(size);
+	if (ret)
+		DBW("new: %08X %08X %08X", ret, size, *(((unsigned*)&ret)+2));
+	return ret;
+}
+
+inline void operator delete(void* pv) {
+	if (pv)
+		DBW("del: %08X %08X", pv, *(((unsigned*)&pv)+2));
+	free(pv);
+}
 #endif
 
 #endif	// __TNLIB_H

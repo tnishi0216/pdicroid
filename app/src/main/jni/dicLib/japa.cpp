@@ -797,6 +797,7 @@ ulong Japa::_Get2( byte *buf, int
 	, ulong limitlen, ulong totallen, IndexData *dic ) const
 {
 	byte *p = (byte*)buf;
+	byte *orgp;
 //#if MIXDIC && !(defined(DIC_UTF8) && defined(USE_BOCU1))
 #if defined(MIXMJ) || defined(MIXJAPA)	// 2015.2.22 あまり自信が無いが、japaがtchar, _jcharがtcharなら不要のはずなので↑行の条件を変更した
 	_mstrdef( recjapa, (const tchar*)japa, _jSingleByte );
@@ -866,7 +867,11 @@ ulong Japa::_Get2( byte *buf, int
 				return (ulong)-1;
 			}
 #else
+			orgp = p;
 			__GetText1( dic, exp, p );
+			if ((int)(p-orgp)>LEXP){
+				return (ulong)-1;
+			}
 #if 0
 			_mcscpy( (_mchar*)p, (_mchar*)exp );
 			p += _jcsbyte1( exp );
@@ -895,7 +900,11 @@ ulong Japa::_Get2( byte *buf, int
 				return (ulong)-1;
 			}
 #else
+			orgp = p;
 			__GetText1( dic, pron, p );
+			if ((int)(p-orgp)>LPRON){
+				return (ulong)-1;
+			}
 #endif
 		}
 		if ( FP_DIFF( p, buf ) + 1 > limitlen ){

@@ -818,7 +818,7 @@ int PdicData::Open( const HEADER FAR *header )
 	nblock = header->nblock2;
 	DD( DD_SETNBLOCK, nblock );
 	nword = header->nword;
-	canGrow = TRUE;
+	canGrow = true;
 	if (!databuf.Open(blocksize)){
 		error = 2;		//ƒƒ‚ƒŠ•s‘«
 		return -1;

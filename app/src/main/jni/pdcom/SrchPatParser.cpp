@@ -1,6 +1,5 @@
 #include "tnlib.h"
 #pragma hdrstop
-#include <stack>
 #include "SrchPatParser.h"
 #include "pdconfig.h"
 #include "defs.h"
@@ -106,6 +105,7 @@ public:
 	tchar *setupWordTop(tchar *dp, class TWork &work);
 };
 
+#include <stack>
 using namespace std;
 
 typedef stack<TOpState> TOpStack;

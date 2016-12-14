@@ -60,7 +60,7 @@ void FlexObjectArrayBase::destructor()
 		array = NULL;
 	}
 }
-void FlexObjectArrayBase::clear( void )
+void FlexObjectArrayBase::clear( )
 {
 	if ( destruct ){
 		for (int i=0;i<num;i++){
@@ -237,6 +237,32 @@ void FlexObjectArrayBase::move(FlexObjectArrayBase &o)
 		}
 	}
 	slot_size = sz;
+}
+
+// max_num‚ð’´‚¦‚éê‡‚Ímax_num“à‚ÉŽû‚Ü‚é‚æ‚¤‚É’Ç‰Á
+// o‚É‚ ‚éobject‚Ídiscard‚³‚ê‚é(clone‚Å‚Í‚È‚­move)
+// return: ’Ç‰Á‚Å‚«‚½—v‘f”, -1=error
+// “®ì–¢ŒŸØ at 2016.8.5
+int FlexObjectArrayBase::add(FlexObjectArrayBase &o)
+{
+	int add_num = o.num;
+	if (max_num!=-1 && num+add_num>max_num){
+		add_num = max_num - num;
+	}
+
+	if (!allocate(num + add_num)) return -1;
+
+#if 1
+	memcpy(&array[num], &o.array[0], add_num * sizeof(void*));
+#else
+	for (int i=0;i<add_num;i++){
+		array[num++] = o[i];
+	}
+#endif
+
+	o.num = 0;
+
+	return add_num;
 }
 
 bool FlexObjectArrayBase::allocate(int size)

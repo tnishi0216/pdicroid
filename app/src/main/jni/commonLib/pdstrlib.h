@@ -27,6 +27,7 @@ int atoin(const tchar *str, int len);
 int atofp( const tchar *str, int digit );
 
 const tchar *skiptospc(const tchar *str);
+const char *skiptospc(const char *str);
 const tchar *skiptospcz(const tchar *str);
 
 tchar getlastchar(const tchar *str);

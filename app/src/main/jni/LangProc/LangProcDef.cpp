@@ -52,7 +52,7 @@ int MatchArray::FindWord(const tchar *word)
 	return -1;
 }
 
-static int compSortHitWords( MATCHINFO **a, MATCHINFO **b )
+int compSortHitWords( MATCHINFO **a, MATCHINFO **b )
 {
 	int ret = (*a)->point - (*b)->point;
 	if (ret)

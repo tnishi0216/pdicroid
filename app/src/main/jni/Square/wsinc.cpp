@@ -194,7 +194,12 @@ int Squre::incsearch( const tchar *str, diclist_t diclist )
 				if (KeepStarTop){
 					int y = GetStarLocAbs( str, 0, Dic.GetOrder() );
 					if (y>=0){
-						Request(y, false);
+						if (!Request(y, false)){
+							// 2016.7.9 restartできなかった場合out of rangeのため追加
+							if (y == pool.get_num()){
+								y = pool.get_num()-1;
+							}
+						}
 						if (IndexOffset!=y || cury!=0){
 							IndexOffset = y;
 							cury = 0;
@@ -727,7 +732,7 @@ int Squre::SearchOnWindow( )
 //
 // External Search
 //
-int Squre::cbExtSearch(int type, int param, int user)
+int Squre::cbExtSearch(TWebSearchThread *th, int type, int param, int user)
 {
 	return ((Squre*)user)->ExtSrchCallback(type, param);
 }
@@ -1177,6 +1182,7 @@ int Squre::CopyToPool(TSubWordItems &words, diclist_t uDicList, bool insert_top)
 		const tchar *word = words.GetWord(i);
 		int r = Dic.Read(word, japa, uDicList);
 		__EnableDDNEnd();
+		if (r<0) break;
 		if (r){
 			BM_JSetMark(find_cword_pos(word), *japa);
 #if USE_DISPLEVEL

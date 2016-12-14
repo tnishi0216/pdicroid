@@ -210,10 +210,9 @@ protected:
 	long nblock;				//空きブロックを含めた使用ブロック数
 	FileBuf &file;
 
-	int canGrow;				// ブロックサイズを大きくすることができる？
-
-	short version;
+	bool canGrow;				// ブロックサイズを大きくすることができる？
 	byte dictype;
+	short version;
 
 protected:
 	virtual int _write_databuf(t_pbn2 pbn) = 0;

@@ -317,9 +317,9 @@ bool TPSBookmark::Save(const tchar *filename, int position, const tchar *revisio
 			return false;
 		}
 
+		tof.settextmode(prof.GetTextFileCode());
 		if (prof.IsTextFileBOM())
 			tof.bom();
-		tof.settextmode(prof.GetTextFileCode());
 
 		tnstr line;
 		BuildFile(filename, position, revision, line);
@@ -333,9 +333,9 @@ bool TPSBookmark::Save(const tchar *filename, int position, const tchar *revisio
 	TOFile tmpf;
 	if (tmpf.create(tmpfile)){ return false; }
 
+	tmpf.settextmode(prof.GetTextFileCode());
 	if (prof.IsTextFileBOM())
 		tmpf.bom();
-	tmpf.settextmode(prof.GetTextFileCode());
 
 	bool found = false;
 	int last_position = 0;

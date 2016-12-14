@@ -30,5 +30,9 @@ public:
 	static bool mbGetWordStd( const tchar *str, int pos, int &start, int &end, bool fLongest, int wordcount=10 );
 };
 
+
+
+void trimright(tnstr &s);
+
 #endif
 

@@ -91,7 +91,7 @@ static bool WriteUniqData( DicGroup &dg, DicNames &dn, TRegKey *groupKey=NULL )
 	for ( int i=0;i<dn.get_num();i++ ){
 		comp[i] = dn[i].comp;
 	}
-	key->PutVarArray( PFS_COMPPOLICY, comp, MAX_MULTIDIC );
+	key->PutVarArray( PFS_COMPPOLICY, comp, dn.get_num() );
 #endif
 //	key->WriteString( PFS_LANGPROC, dn.LangProc );	//TODO: LangProc
 #if defined(EPWING) || defined(USE_FILELINK)
@@ -601,6 +601,8 @@ bool CopyUniqData(const tchar *sname, const tchar *dname)
 	if (!regDst)
 		return false;	// failed.
 	CopyRegistry(regSrc, regDst);
+	delete regSrc;
+	delete regDst;
 	return true;
 }
 

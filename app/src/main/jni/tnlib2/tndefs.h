@@ -623,6 +623,7 @@ inline char *NEXT_CHAR( const char *str ){ if ( _ismbblead( *str ) ) return (cha
 int __wcsicmp(const wchar_t *str1, const wchar_t *str2);
 int __wcsnicmp(const wchar_t *str1, const wchar_t *str2, int n);
 
+#if 1
 #ifndef _EXPLICIT
 #define	_EXPLICIT
 #endif
@@ -730,6 +731,7 @@ template<class X> class autoptr
 	private:
 	X* the_p;
 };
+#endif
 
 
 #endif	// __TNDEFS_H

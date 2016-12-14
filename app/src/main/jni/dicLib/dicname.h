@@ -13,6 +13,7 @@ enum eDicNameFlag {
 struct DICNAME {
 	tnstr name;
 	bool readonly;
+	bool nosearch;
 #ifdef USE_COMP
 	int comp;
 #endif
@@ -35,7 +36,7 @@ struct DICNAME {
 	int flags;
 
 	DICNAME( );
-	DICNAME( const tchar *name, bool readonly
+	DICNAME( const tchar *name, bool readonly, bool nosearch
 #ifdef USE_COMP
 		, int comp
 #endif
@@ -122,6 +123,8 @@ public:
 		{ inherited::move(src, dst); }
 	void SetReadOnly( diclist_t flags );	// ビットフラグからreadonlyをセット
 	diclist_t GetReadOnly( );				// readonlyをビットフラグへ
+	void SetNoSearch( diclist_t flags );
+	diclist_t GetNoSearch( );
 #if INETDIC
 	void SetInet( diclist_t flags );
 	diclist_t GetInet( );

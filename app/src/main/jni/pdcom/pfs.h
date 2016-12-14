@@ -10,6 +10,7 @@
 #endif
 
 DEF_PFS(DEBUG, "Debug");
+DEF_PFS(ALOG, "alog");
 
 DEF_PFS(CFLAGS2, "CFlags2");
 DEF_PFS(FASTDB, "FastDB");
@@ -85,6 +86,7 @@ DEF_PFS(LEVEL1, "Level1");
 DEF_PFS(LEVEL2, "Level2");
 DEF_PFS(ORDER, "Order");
 DEF_PFS(READONLY, "ReadOnly");
+DEF_PFS(NOSEARCH, "NoSearch");
 DEF_PFS(DELHIST, "DelHist");
 DEF_PFS(RANDOM, "Random");
 DEF_PFS(WTESTHIST, "WTestHist");

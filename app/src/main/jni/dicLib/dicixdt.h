@@ -260,8 +260,8 @@ public:
 	EVIRTUAL void getfjapa( Japa &j, AllSearchParam *all=NULL );
 	const _kchar *getfword()	{return all.fw.fword;}
 
-	virtual void SetAllSearch( const tchar * word, SrchMode mode, GENERICREXP *jre, AllSearchParam *all=NULL )
-		{ SetupAllSearch(word, mode, jre, all); }
+	virtual bool SetAllSearch( const tchar * word, SrchMode mode, GENERICREXP *jre, AllSearchParam *all=NULL )
+		{ return SetupAllSearch(word, mode, jre, all); }
 	bool SetupAllSearch(const tchar *word, SrchMode mode, GENERICREXP *jre, AllSearchParam *all=NULL);
 #if MIXDIC || defined(KMIXDIC)
 	virtual int NextAllSearch_( tnstr &word, Japa *japa, AllSearchParam *all=NULL);

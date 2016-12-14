@@ -13,6 +13,7 @@ enum eTEXTFILEMODE {
 	TFM_ANSI = 1,
 	TFM_ASCII = 20127,
 	TFM_UTF8 = 65001,	// Available when using unicode.
+	TFM_UTF16LE = 1200,	// UTF-16 little endian
 	TFM_UTF16BE = 1201,	// UTF-16 big-endian
 };
 
@@ -85,8 +86,9 @@ inline int _tcreat( const tchar *filename, int mode )
 #endif
 
 #define	_tread	read
+//TOOD: 64bit”ñ‘Î‰ž@C++Builder5
 inline __off_t _tlseek(int handle, __off_t offset, int fromwhere)
-	{ return _lseek( handle, offset, fromwhere ); }
+	{ return _lseek( handle, (long)offset, fromwhere ); }
 inline __off_t _ttell(int handle)
 	{ return tell( handle ); }
 inline int _tclose( int handle )
@@ -108,6 +110,7 @@ public:
 	virtual bool Valid() const { return false; }
 	virtual int Detect(const tchar *filename, TCharCodeStreamBase *stream){ return 0; }
 	virtual int Convert( int src_code, int dst_code, const char *src, int *srclen, utf16_t *outbuf, int bufsize ) { return 0; }
+	virtual int GetDetectedCode(){ return 0; }
 };
 
 class File {
@@ -135,7 +138,7 @@ public:
 		{ _tlseek( fd, l, SEEK_SET ); }
 //		virtual void seek( long l, int dir )
 //			{ _tlseek( fd, l, dir ); }
-	virtual long tell( void )
+	virtual __off_t tell( void )
 		{ return _ttell( fd ); }
 	int get_fd(void)
 		{return fd;}
@@ -180,7 +183,8 @@ public:
 	virtual ~TIFile();
 	int gettextmode() const
 		{ return textmode; }
-	virtual int open(const tchar* _filename );
+	virtual int open(const tchar* _filename ) { return open( _filename, 0 ); }
+	int open(const tchar* _filename, int defcharcode );
 	void flush( void );
 	int getline( tchar *buf, int maxlen );
 	int getline( tnstr &buf );
@@ -202,7 +206,7 @@ public:
 	int getword( tchar *buf, int maxlen );
 //	int getitem( __Char &buf, int delim );
 	void seek(long l);
-	long tell( );
+	__off_t tell( );
 	virtual int get( );
 #ifdef _UNICODE
 protected:
@@ -258,7 +262,7 @@ public:
 	virtual void close( );
 	virtual int flush( ) = 0;
 	virtual void seek(long l);
-	virtual long tell( );
+	virtual __off_t tell( );
 	virtual void end( );
 	void settextmode(int _textmode);
 	int bom();

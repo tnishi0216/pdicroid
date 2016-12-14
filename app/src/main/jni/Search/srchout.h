@@ -17,6 +17,8 @@ public:
 	// Delayed処理用 //
 	bool DelayedOutput;		// １単語分遅らせて出力する(for user templateの$$)
 							// copyする処理が増えるのでdefalutではfalseにする
+	bool NeedExtension;		// crypt辞書で制限される機能を利用している
+	bool NeedDeleteFile;	// 出力ファイルをclose後削除する必要がある
 protected:
 	tnstr DWord;
 	Japa DJapa;

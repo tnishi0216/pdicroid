@@ -139,7 +139,7 @@ void Squre::clsStar( )
 }
 
 // pool全体から探す
-// 返り値は絶対インデックス
+// 返り値は絶対インデックス、最大get_num()を返すので注意！
 // 並列モードは未サポート
 int Squre::GetStarLocAbs( const tchar *word, int , int order, int start )
 {
@@ -172,13 +172,19 @@ int Squre::GetStarLocAbs( const tchar *word, int , int order, int start )
 	}
 	if (curi<0){
 		curi = 0;	// 2014.10.16 -1は不都合？なので追加
-	} else
+	}
+#if 1	// 2016.7.9 curi = get_num() になるとこのメソッドを呼んでいる側で不具合が出るのでは？
+		// 2016.11.8 multithreadで検索するとrandom insertionが発生するが、追加する単語がget_num()-1より後ろのwordだと正しいcuriを返さなくなるため復活
+		//           ex."it"で終わる見出し語を検索してみる
+	else
 	// 一番最後なのか、それより１つ前なのかの判断がloopにはないため、一番最後かどうかの判断をする 2014.10.16
 	if (curi>0 && curi==get_num()-1){
-		if (cmpword( _kwstr(GetWordAbs(get_num()-1),Dic.GetKCodeTrans()), _kwstr(_word,Dic.GetKCodeTrans()) ) ){
+		if (cmpword( _kwstr(GetWordAbs(get_num()-1),Dic.GetKCodeTrans()), _kwstr(_word,Dic.GetKCodeTrans()) ) < 0 ){
+			// 2016.7.9 _wordのほうがword[get_num()-1]より前のorderの場合、curi=get_num()-1が正しいはずなので < 0 の条件を追加した
 			curi = get_num();
 		}
 	}
+#endif
 	return curi;
 }
 

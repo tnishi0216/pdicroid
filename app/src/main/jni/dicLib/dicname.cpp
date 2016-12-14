@@ -13,6 +13,8 @@
 
 DICNAME::DICNAME( )
 {
+	readonly = false;
+	nosearch = false;
 #ifdef USE_COMP
 	comp = CP_COMP;
 #endif
@@ -22,7 +24,7 @@ DICNAME::DICNAME( )
 	flags = 0;
 }
 
-DICNAME::DICNAME( const tchar *_name, bool _readonly
+DICNAME::DICNAME( const tchar *_name, bool _readonly, bool _nosearch
 #ifdef USE_COMP
 		, int _comp
 #endif
@@ -43,6 +45,7 @@ DICNAME::DICNAME( const tchar *_name, bool _readonly
 	// 絶対パス-->相対パス
 	AbsToRel( name );
 	readonly = _readonly;
+	nosearch = _nosearch;
 #ifdef USE_COMP
 	comp = _comp;
 #endif
@@ -197,6 +200,22 @@ diclist_t DicNames::GetReadOnly( )
 	}
 	return flags;
 }
+void DicNames::SetNoSearch( diclist_t flags )
+{
+	for ( int i=0;i<get_num();i++ ){
+		(*this)[i].nosearch = dl_check(flags, i);
+	}
+}
+diclist_t DicNames::GetNoSearch( )
+{
+	dl_def_empty(flags);
+	for ( int i=0;i<get_num();i++ ){
+		if ( (*this)[i].nosearch){
+			dl_set(flags, i);
+		}
+	}
+	return flags;
+}
 
 #endif
 #if INETDIC
@@ -234,7 +253,7 @@ void DicNames::SetNames( tnstr_vec &names )
 {
 	clear();
 	for ( int i=0;i<names.get_num();i++ ){
-		add( new DICNAME( names[i], 0,
+		add( new DICNAME( names[i], false, false,
 #ifdef USE_COMP
 			CP_COMP
 #endif

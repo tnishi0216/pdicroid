@@ -7,14 +7,14 @@ TSquareView::TSquareView(/*TComponent* Owner,*/ TSquareIF *squint)
 {
 	squi = squint;
 	squ = squint?squint->GetSquare():NULL;
-	PopupMenu = NULL;
+//	PopupMenu = NULL;
 	hdc = NULL;
 	hdcRef = 0;
 }
 TSquareView::~TSquareView()
 {
-	if (PopupMenu)
-		delete PopupMenu;
+//	if (PopupMenu)
+//		delete PopupMenu;
 }
 void TSquareView::SetInterface(TSquareIF *squi)
 {

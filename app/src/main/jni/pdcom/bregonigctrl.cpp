@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 // bregonig.dll control class
-//	http://homepage3.nifty.com/k-takata/mysoft/bregonig.html
+//	http://k-takata.o.oo7.jp/mysoft/bregonig.html
 
 #include "tnlib.h"
 #pragma hdrstop

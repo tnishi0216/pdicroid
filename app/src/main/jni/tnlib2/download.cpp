@@ -11,8 +11,13 @@ bool download_app(const tchar *appname)
 	tchar key[256];
 	tnstrbuf filename;
 
-	filename += _t("http://pdic.sakura.ne.jp/cgi-bin/download/download.cgi?file=");
-	filename += appname;
+	if ( !_tcsncmp(appname, _t("http:"), 5) ){
+		filename = appname;
+	} else {
+		filename += _t("http://pdic.sakura.ne.jp/cgi-bin/download/download.cgi?file=");
+		filename += appname;
+	}
+
 	int show = SW_SHOW;
 #ifdef WINCE
 	if ( !_ShellExecute( NULL, _T("open"), filename, NULL, NULL, show ) )
@@ -62,6 +67,26 @@ HANDLE WinExecEx( const tchar *cmd, int show, const tchar *dir, const tchar *tit
 	return pi.hProcess;
 #endif
 }
+
+#if 0
+// ì˙ñ{åÍÇÃparameterÇí Ç∑ÇΩÇﬂÇ…ópà”
+//Å®ä÷åWÇ»Ç≥ÇªÇ§Ç»ÇÃÇ≈é¿å±óp
+#ifdef UNICODE
+HANDLE WinExecEx( const char *cmd, int show, const char *dir, const char *title )
+{
+	STARTUPINFOA sui;
+	memset( &sui, 0, sizeof(STARTUPINFOA) );
+	sui.cb = sizeof(STARTUPINFOA);
+	sui.dwFlags = STARTF_USESHOWWINDOW;
+	sui.wShowWindow = (WORD)show;
+	sui.lpTitle = (LPSTR)(title ? title : "");
+	PROCESS_INFORMATION pi;
+	if ( !CreateProcessA( NULL, (LPSTR)cmd, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, dir, &sui, &pi ) )
+		return NULL;
+	return pi.hProcess;
+}
+#endif
+#endif
 
 static bool GetRegKey( HKEY Key, const tchar *SubKey, tchar *RetData, long maxlen )
 {

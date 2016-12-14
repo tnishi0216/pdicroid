@@ -68,18 +68,10 @@ int FileBuf::_open( const tchar * _filename, int mode)
 	filename.set( _filename );
 #if !defined(CPBTEST)
 	// 完全なファイル名の作成
-#if 0	//TODO: 必要？ 2015.4.6
-	try {
-#endif
 	if ( !makename( fullfilename, _filename, NULL ) ){
 		error = 16;
 		return -1;
 	}
-#if 0
-	} catch(...){
-		dbw("");
-	}
-#endif
 #else
 	fullfilename = _filename;	//** とりあえず？
 #endif

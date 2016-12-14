@@ -30,7 +30,7 @@
 #define	WebWindowDef		true
 #define	OldWheelScrollDef	false
 #define	OnDemandAccessDef	true
-#define	AutoDicCheckDef		true
+#define	AutoDicCheckDef		false
 
 #define	DELIM_GROUPNAME		':'		//TODO: 辞書グループ名レジストリ区切り文字
 
