@@ -318,6 +318,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             // load the latest opened file
             HistoryFilename histName = getLatestHistoryName();
             if (histName!=null){
+                fileEncoding = histName.encoding;
                 loadFile(histName.filename, histName.remoteName);
             }
         }
@@ -326,6 +327,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     class HistoryFilename {
         String filename;
         String remoteName;
+        String encoding;
     }
 
     HistoryFilename getLatestHistoryName(){
@@ -339,6 +341,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         } else {
             histName.filename = filename;
         }
+        histName.encoding = fileHistory.getEncoding(0);
         return histName;
     }
 
