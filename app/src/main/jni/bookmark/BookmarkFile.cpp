@@ -102,9 +102,8 @@ bool TBookmarkFile::Save(const tchar *filename)
 	if (file.create(filename)){
 		return false;
 	}
-#if 0	//TODO:
+	file.settextmode(prof.GetTextFileCode());
 	if (prof.IsTextFileBOM())
-#endif
 		file.bom();
 	if (!Root.Child)
 		return true;	// no data

@@ -101,7 +101,7 @@ jascii:;
 				}
 			}
 			readbuff = new TTextFileBufferAnsi(fd, BUFFSIZE);
-			textmode = TFM_ANSI;
+			textmode = !cc && defcharcode ? defcharcode : TFM_ANSI;
 			break;
 	}
 #else

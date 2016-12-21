@@ -37,6 +37,7 @@ THistoryFile::THistoryFile(const tchar *filename)
 	:FileName(filename)
 {
 	Thread = NULL;
+	LastCheckedTextMode = -1;
 }
 
 THistoryFile::~THistoryFile()
@@ -78,7 +79,7 @@ bool THistoryFile::Load(tnstr_vec &lines, map<tnstr, int> &strindex, vector<int>
 
 // 現在の履歴ファイルにsrcfileをmerge
 // convert_format==true
-//	srcfileがUTF-16でなければ変換して、original history fileと置き換える
+//	srcfileが現在のtextmodeでなければ変換して、original history fileと置き換える
 bool THistoryFile::Merge(const tchar *srcfile, bool convert_format)
 {
 	TAutoLock m(Mutex);
@@ -91,6 +92,7 @@ TOFile *THistoryFile::CreateOpen()
 	lock();
 	TOFile *tof = _Create(GetFileName());
 	if (tof){
+		LastCheckedTextMode = prof.GetTextFileCode();
 		return tof;	// return without unlock
 	}
 	unlock();
@@ -154,11 +156,13 @@ TOFile *THistoryFile::OpenForAppend()
 void THistoryFile::CheckFileFormat()
 {
 	tnstr filename = GetFileName();
-	if (!_tcscmp(filename, LastCheckedFile)){
+	if (!_tcscmp(filename, LastCheckedFile)
+		&& LastCheckedTextMode == prof.GetTextFileCode() ){
 		return;
 	}
 
 	LastCheckedFile = filename;
+	LastCheckedTextMode = prof.GetTextFileCode();
 
 	Merge(filename, true);
 }
@@ -218,7 +222,7 @@ bool THistoryFile::_Load( TWordHistory &WordHist, int sort, int offset, TWordUrl
 	for (;;){
 		if (ReadLine(tif, line)<0)
 			break;
-		if (!line[0])
+		if (!line[0] || line[0]=='\t')
 			continue;
 		if (alphasort){
 			WordHist.AddAlphaSorted( line );
@@ -267,13 +271,13 @@ bool THistoryFile::_Merge(const tchar *srcfile, bool convert_format)
 	}
 
 	if (convert_format){
-		if (src.gettextmode()==TFM_DEFAULT){
-			// OK, UTF-16
+		if (src.gettextmode()==prof.GetTextFileCode()){
+			// OK, same code
 			return false;
 		}
 	}
 	
-	tnstr histname = GetHistoryFileName();
+	tnstr histname = GetFileName();
 
 	tnstr tempname = histname;
 	tempname += _t(".___");
@@ -327,9 +331,9 @@ TOFile *THistoryFile::_Create(const tchar *filename)
 		return NULL;
 	}
 #ifdef _UNICODE
+	tof->settextmode(prof.GetTextFileCode());
 	if (prof.IsTextFileBOM())
 		tof->bom();
-	tof->settextmode(prof.GetTextFileCode());
 #endif
 	return tof;
 }
@@ -337,11 +341,12 @@ TOFile *THistoryFile::_Create(const tchar *filename)
 // 逐次処理法による削除
 int THistoryFile::_DeleteWords(CBDeleteWordsHistory cb, DELETEWORDPARAM *dwp)
 {
-	bool direct = (bool)prof.ReadInteger(PFS_HISTORY, PFS_DIRECTSAVE, false);
+	bool direct = (bool)prof.ReadInteger(PFS_HISTORY, PFS_DIRECTSAVE, true);
 
 	tnstr filename = GetFileName();
 	TIFile tif;
 	if ( tif.open(filename) == -1 ){
+		DBW("open failed - _DeleteWords");
 		return -1;
 	}
 	long filesize = tif.get_length();
@@ -359,6 +364,7 @@ int THistoryFile::_DeleteWords(CBDeleteWordsHistory cb, DELETEWORDPARAM *dwp)
 		c = ReadLine(tif, line);
 		if (c < 0)
 			break;
+		if (line.empty()) continue;
 		if ( cb ){
 			// 任意の処理
 			switch ( cb( line, *dwp ) ){
@@ -377,6 +383,7 @@ int THistoryFile::_DeleteWords(CBDeleteWordsHistory cb, DELETEWORDPARAM *dwp)
 	}
 	if (!tif.eof()){
 		// read error
+		DBW("read failed");
 		__assert__;
 		return -1;
 	}
@@ -387,10 +394,12 @@ int THistoryFile::_DeleteWords(CBDeleteWordsHistory cb, DELETEWORDPARAM *dwp)
 		dest.cat( _T(".tmp") );
 		autoptr<TOFile> tof(_Create(direct?filename:dest));
 		if (!tof){
+			DBW("tof failed!! Some changes have not been taken");
 			return -1;
 		}
 		foreach_tnstr_vec(lines, line){
 			if (WriteLine(*tof, *line)<0){
+				DBW("WriteLine failed");
 				return -1;	// write error
 			}
 		}
@@ -408,6 +417,7 @@ int THistoryFile::_DeleteWords(CBDeleteWordsHistory cb, DELETEWORDPARAM *dwp)
 		if (dwp && lines.size()>0){
 			dwp->lastline = lines[lines.size()-1];
 		}
+		LastCheckedTextMode = prof.GetTextFileCode();
 	}
 	return count;
 }
@@ -476,10 +486,14 @@ bool TQueHistory::SaveQueFile()
 	autoptr<TOFile> tof(File.OpenForAppend());
 	if (!tof){
 		HistoryQue.clear();
+		DBW("open failed - SaveQueFile");
 		return false;
 	}
 
+#ifdef _UNICODE
+	tof->settextmode(prof.GetTextFileCode());
 	write_bom(*tof);
+#endif
 
 	long l = tof->tell();
 	if ( IsLimitOver(l) ){
@@ -1004,7 +1018,7 @@ TOFile *CreateHistoryFile(const tchar *filename)
 
 // 現在の履歴ファイルにsrcfileをmerge
 // convert_format==true
-//	srcfileがUTF-16でなければ変換して、original history fileと置き換える
+//	srcfileが現在のtextmodeでなければ変換して、original history fileと置き換える
 bool MergeHistoryFile(const tchar *srcfile, bool convert_format)
 {
 	return PdicHistory.GetFile().Merge(srcfile, convert_format);
@@ -1073,3 +1087,5 @@ static void split(const tchar *line, tnstr *word, tnstr *url, timex_t *t)
 	word = line;
 #endif
 }
+
+

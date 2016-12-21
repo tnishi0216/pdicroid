@@ -177,9 +177,9 @@ bool write_bom(TOFile &tof)
 {
 	long l = tof.tell();
 	if ( l == 0 ){
+		tof.settextmode(prof.GetTextFileCode());
 		if (prof.IsTextFileBOM())
 			tof.bom();
-		tof.settextmode(prof.GetTextFileCode());
 	}
 	return true;
 }

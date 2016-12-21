@@ -34,6 +34,7 @@ protected:
 	TMutex Mutex;
 	tnstr FileName;
 	tnstr LastCheckedFile;	// last file format check filename.
+	int LastCheckedTextMode;
 
 public:
 	THistoryFile(const tchar *filename);

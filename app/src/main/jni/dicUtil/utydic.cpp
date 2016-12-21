@@ -593,7 +593,10 @@ jkeyword_exist:;
 #endif
 
 	if ( mergemode == MRG_LEVEL ){
-		pdic->BSearch(__word);
+		if (pdic->BSearch(__word) < 0){
+			setError( pdic->GetErrorCode() );
+			return -1;
+		}
 		if (_kcscmp( pdic->getfword(), __word ) ){
 			recj = &srcjp;	// newwordの場合
 			newrecmode = true;
@@ -622,7 +625,10 @@ jkeyword_exist:;
 			}
 		}
 	} else {
-		pdic->BSearch(__word);
+		if (pdic->BSearch(__word) < 0){
+			setError( pdic->GetErrorCode() );
+			return -1;
+		}
 		if (_kcscmp( pdic->getfword(), __word ) == 0){
 			// 日本語訳マージ //
 			pdic->getfjapa( destj );
@@ -1102,10 +1108,10 @@ int OtherDictionary::Open( const tchar *_filename, int mode )
 				// Unicode出力
 				if ((mode & FOM_FILE) || !(mode & (FOM_CLIPBOARD|FOM_EDITCONTROL|FOM_CHAR|FOM_RICHEDITCONTROL)))
 				{
-					if (bom)
-						((TOFile*)iof)->bom();
 					if (textmode>=0)
 						((TOFile*)iof)->settextmode(textmode);
+					if (bom)
+						((TOFile*)iof)->bom();
 				}
 			}
 #endif

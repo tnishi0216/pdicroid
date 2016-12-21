@@ -15,6 +15,8 @@ enum eTEXTFILEMODE {
 	TFM_UTF8 = 65001,	// Available when using unicode.
 	TFM_UTF16LE = 1200,	// UTF-16 little endian
 	TFM_UTF16BE = 1201,	// UTF-16 big-endian
+	TFM_EUCJP = 51932,
+	TFM_JIS = 50222,
 };
 
 #if !defined(WINCE) && !defined(UNIX) && !defined(__ANDROID__)
