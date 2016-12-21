@@ -7,6 +7,7 @@ import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.WriteMode;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +35,9 @@ public class Dropbox2UploadTask extends AsyncTask {
         try {
             FileInputStream inputStream = new FileInputStream(from);
             //final DropboxAPI.Entry entry = dbxFM.getApi().putFileOverwrite(to, inputStream, from.length(), null);
-            final FileMetadata metadata = dbxFM.getClient().files().uploadBuilder(to).uploadAndFinish(inputStream);
+            final FileMetadata metadata = dbxFM.getClient().files().uploadBuilder(to)
+                    .withMode(WriteMode.OVERWRITE)
+                    .uploadAndFinish(inputStream);
             revision = metadata.getRev();
             uploaded = true;
             Log.i("PDP", "The file's rev is: " + metadata.getRev());
