@@ -247,7 +247,7 @@ int TOFileW::put(const wchar_t *s, int length)
 							c = (uint16_t)((c & 0x3FF) + 0xDC00);
 						}
 					}
-					*dp++ = (uint16_t)((c>>8) | (c<<8));
+					*dp++ = (uint16_t)c;
 				}
 				curp += cpylen;
 				if (curp>=BUFFSIZE){
