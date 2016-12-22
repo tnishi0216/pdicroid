@@ -91,6 +91,7 @@
     <string name="title_activity_file_save">ファイルの保存</string>
     <string name="title_activity_file_selection">ファイルの選択</string>
     <string name="action_goto">カーソルの移動</string>
+    <string name="percent_btn">%</string>
     <string name="line_num_btn">行</string>
     <string name="move_cursor">カーソルの移動</string>
     <string name="msg_no_hit_word">該当単語はありません</string>
