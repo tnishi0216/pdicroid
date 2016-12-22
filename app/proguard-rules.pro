@@ -11,6 +11,7 @@
 
 -dontwarn com.dropbox.**
 -dontwarn okio.**
+-dontwarn okhttp3.**
 -keepattributes EnclosingMethod
 
 # If your project uses WebView with JS, uncomment the following
