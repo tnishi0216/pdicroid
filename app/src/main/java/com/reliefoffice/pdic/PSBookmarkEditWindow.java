@@ -154,7 +154,7 @@ abstract public class PSBookmarkEditWindow {
             style = PdicJni.STRIKEOUT;
         } else
         if (resource==R.id.tv_hilite1_text){
-            color = Color.RED;
+            color = Color.rgb(0xff, 0x80, 0x80);
         } else
         if (resource==R.id.tv_hilite2_text){
             color = Color.GREEN;
