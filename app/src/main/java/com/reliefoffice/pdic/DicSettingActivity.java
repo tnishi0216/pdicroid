@@ -47,16 +47,16 @@ public class DicSettingActivity extends Activity implements FileSelectionDialog.
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int num = adpDicList.getCount();
-                if (position == num - 4) {
+                if (position == num - 3) {
                     // download
                     actionDownload();
-                } else if (position == num - 3) {
+                } else if (position == num - 2) {
                     // add file
                     actionAddFile();
-                } else if (position == num - 2) {
+                } else if (position == num - 1) {
                     // add file from dropbox
                     actionAddFileFromDropbox();
-                } else if (position == num - 1) {
+                } else if (position == num - 0) {
                     // add file from Google Drive
                     actionAddFileFromGoogleDrive();
                 } else {
@@ -122,7 +122,7 @@ public class DicSettingActivity extends Activity implements FileSelectionDialog.
         adpDicList.add(getString(R.string.label_download));
         adpDicList.add(getString(R.string.label_add_file));
         adpDicList.add(getString(R.string.label_add_file_dropbox));
-        adpDicList.add(getString(R.string.label_add_file_googledrive));
+        //adpDicList.add(getString(R.string.label_add_file_googledrive));
     }
 
     void actionDownload(){
