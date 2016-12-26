@@ -13,7 +13,9 @@
 -dontwarn okio.**
 -dontwarn okhttp3.**
 -keepattributes EnclosingMethod
-
+-keepclassmembers class com.reliefoffice.pdic.JniCallback {
+	public *;
+}
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
