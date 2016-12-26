@@ -1,5 +1,6 @@
 
 build:
+	$(MAKE) copymk
 	ndk-build.cmd NDK_PROJECT_PATH=null APP_BUILD_SCRIPT=.\app\build\intermediates\ndk\debug\Android.mk APP_PLATFORM=android-21 NDK_OUT=.\app\build\intermediates\ndk\debug\obj NDK_LIBS_OUT=.\app\build\intermediates\ndk\debug\lib APP_STL=gnustl_shared APP_ABI=armeabi,mips,armeabi-v7a,x86
 	copy app\build\intermediates\ndk\debug\lib\armeabi\*.so app\src\main\jniLibs\armeabi\\
 	copy app\build\intermediates\ndk\debug\lib\armeabi-v7a\*.so app\src\main\jniLibs\armeabi-v7a\\
@@ -15,6 +16,11 @@ javah:
 # app/build/intermediates/ndk/debug/Android.mk‚ÌLOCAL_SRC_FILES‚ÌƒpƒX‚©‚ç\‚ð/‚É•ÏŠ·‚·‚é
 mkpath:
 	perl -S android.pl mkpath app/build/intermediates/ndk/debug/Android.mk
+
+copymk:
+	-mkdir app\build\intermediates\ndk
+	-mkdir app\build\intermediates\ndk\debug
+	copy Android-local.mk app\build\intermediates\ndk\debug\Android.mk
 
 zip:
 	zip -r src . -i *.java *.c *.cpp *.h *.xml *.png Makefile *.mk *.gradle *.properties *.bat

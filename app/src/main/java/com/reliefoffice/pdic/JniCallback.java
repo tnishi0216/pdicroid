@@ -69,7 +69,7 @@ public class JniCallback {
     }
     public void clearWords()
     {
-        Log.d("PDD", "clearWords\n");
+        //Log.d("PDD", "clearWords\n");
         wordListAdapter.clear();
         savedFirstItem = -1;
         updated = true;
