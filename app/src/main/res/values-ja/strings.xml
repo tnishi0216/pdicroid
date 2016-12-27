@@ -95,4 +95,11 @@
     <string name="line_num_btn">行</string>
     <string name="move_cursor">カーソルの移動</string>
     <string name="msg_no_hit_word">該当単語はありません</string>
+    <string name="label_auto">自動</string>
+    <string name="label_charcode">文字コード</string>
+    <string name="label_sort">並び順</string>
+    <string name="label_name">名前</string>
+    <string name="label_date">日付</string>
+    <string name="label_read">読込</string>
+    <string name="label_path">パス</string>
 </resources>

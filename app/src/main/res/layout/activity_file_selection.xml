@@ -12,7 +12,7 @@
     tools:context="com.reliefoffice.pdic.FileSelectionActivity">
 
     <TextView
-        android:text="PATH"
+        android:text="@string/label_path"
         android:id="@+id/text_path"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -27,32 +27,38 @@
         android:orientation="horizontal"
         >
         <TextView
-            android:text="Sort "
+            android:text="@string/label_sort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
         <Button
-            android:text="Name"
+            android:text="@string/label_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:id="@+id/btn_name" />
         <Button
-            android:text="Date"
+            android:text="@string/label_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:id="@+id/btn_date" />
         <Button
-            android:text="Read"
+            android:text="@string/label_read"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:id="@+id/btn_read" />
         <Button
-            android:text="Size"
+            android:text="@string/label_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -67,17 +73,22 @@
         android:orientation="horizontal"
         >
         <TextView
-            android:text="Encoding "
+            android:text="@string/label_charcode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
         <RadioGroup
             android:id="@+id/rg_encoding"
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <RadioButton
-                android:text="Auto"
+                android:text="@string/label_auto"
                 android:id="@+id/btn_auto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

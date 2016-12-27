@@ -96,4 +96,11 @@
     <string name="line_num_btn">Line Num</string>
     <string name="move_cursor">Move Cursor</string>
     <string name="msg_no_hit_word">No Hit Word.</string>
+    <string name="label_auto">Auto</string>
+    <string name="label_charcode">Encoding</string>
+    <string name="label_sort">Sort</string>
+    <string name="label_name">Name</string>
+    <string name="label_date">Date</string>
+    <string name="label_read">Read</string>
+    <string name="label_path">PATH</string>
 </resources>
