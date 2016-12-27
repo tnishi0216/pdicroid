@@ -2,7 +2,7 @@
     <string name="app_name">PDIC for Android</string>
     <string name="local_string">ja_JP</string>
     <string name="action_incsrch">検索画面</string>
-    <string name="action_pswin">タッチ検索画面</string>
+    <string name="action_pswin">タッチ検索</string>
     <string name="action_settings">設定</string>
     <string name="title_activity_pswin">タッチ検索</string>
     <string name="action_dictionary">辞書設定</string>
