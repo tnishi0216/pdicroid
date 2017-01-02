@@ -201,22 +201,23 @@ public:
 	{
 		if (!midInsert){
 			jclass jniCallbackClass = env->GetObjectClass(jniCallback);
-			midInsert = env->GetMethodID(jniCallbackClass, "insertWord", "(ILjava/lang/String;)I");
+			midInsert = env->GetMethodID(jniCallbackClass, "insertWord", "(ILjava/lang/String;Ljava/lang/String;)I");
 		}
-		tnstrbuf text(word);
+		tnstrbuf text;
 		if ((ViewFlags & VF_PRON) && pron && pron[0]){
 			text += pron;
 			text += _t(" ");
 		}
-		text += _t(" ");
 		text += japa;
 		if ((ViewFlags & VF_EXP) && exp && exp[0]){
 			text += _t(" / ");
 			text += exp;
 		}
-		jstring str = env->NewStringUTF(__cstr(text).utf8());
-		env->CallIntMethod(jniCallback, midInsert, index, str);
-		env->DeleteLocalRef(str);
+		jstring str1 = env->NewStringUTF(__cstr(word).utf8());
+		jstring str2 = env->NewStringUTF(__cstr(text).utf8());
+		env->CallIntMethod(jniCallback, midInsert, index, str1, str2);
+		env->DeleteLocalRef(str1);
+		env->DeleteLocalRef(str2);
 	}
 	virtual void Delete(int index)
 	{
