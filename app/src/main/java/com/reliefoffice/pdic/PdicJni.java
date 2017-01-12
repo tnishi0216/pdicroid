@@ -11,7 +11,7 @@ public class PdicJni {
     public static final int VF_EXP  = 0x20;
 
     // generic return value //
-    String retString;
+    public String retString;
 
     // call only once.
     public int init(int param1, AssetManager assetManager, String tempPath)
