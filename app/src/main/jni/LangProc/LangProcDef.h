@@ -5,11 +5,12 @@
 //---------------------------------------------------------------------------
 
 // 以下のビットを増やしたとき、cutword2.cppのBITCOUNT()のBitCount()のnbitsにも注意！！（現在32bitsに固定）
-#define	SLW_ELIMHYPHEN		0x0000000F
+#define	SLW_ELIMHYPHEN		0x0000020F
 #define	SLW_ELIMHYPHEN1		0x00000001	// ハイフンを削除して単語を結合
 #define	SLW_ELIMHYPHEN2		0x00000002	// ハイフン以降を削除
-#define	SLW_ELIMHYPHEN3		0x00000004	// ハイフン前半の単語を削除
+#define	SLW_ELIMHYPHEN3		0x00000004	// ハイフン前半の単語を削除(ハイフンを削除)
 #define	SLW_ELIMHYPHEN4		0x00000008	// ハイフンを半角スペースに変換
+#define	SLW_ELIMHYPHEN5		0x00000200	// ハイフン前半の単語を削除（ハイフンを残す）
 
 #define	SLW_REPLACE			0x000001F0
 #define	SLW_REPLACEANY		0x00000010	// 置換チルダに対応

@@ -59,7 +59,9 @@ int POPUPCONFIG::GetOption()
 	if ( fCaseSearch ) option |= (SLW_CASEIGNORE & ~SLW_CASEIGNORE4);
 	// WinCEでは、当面大文字への変換同一視はサポートしない(速度の面から)
 #else
+#if OLDCASE
 	if ( fCaseIgnore ) option |= SLW_CASEIGNORE;
+#endif
 #endif
 	if ( fSuffix ) option |= SLW_ENGLISH;
 //	if ( fReplaceOnes ) option |= SLW_REPLACE;

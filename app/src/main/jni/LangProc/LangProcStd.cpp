@@ -194,6 +194,14 @@ bool TLangProcStd::CompareStd( COMPARE_STRUCT &cs, const int _flags )
 				*dp++ = ' ';
 				sp++;
 				continue;
+			} else
+			if ( _flags & SLW_ELIMHYPHEN5 ){
+				convf |= SLW_ELIMHYPHEN5;
+				dp = tdp;
+				*dp++ = '-';
+				sp++;
+				while (*sp=='-') sp++;
+				continue;
 			}
 		}
 		if ( _flags & SLW_APOSTROPHE ){
@@ -1185,6 +1193,9 @@ int TLangProcStd::FindLoop(COMPARE_STRUCT &cs)
 											return -1;
 										}
 										if ( !Compare( cs, _flags | SLW_ELIMHYPHEN1 ) ){
+											return -1;
+										}
+										if ( !Compare( cs, _flags | SLW_ELIMHYPHEN5 ) ){
 											return -1;
 										}
 									}
