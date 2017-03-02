@@ -101,16 +101,24 @@ public class JniCallback {
     }
     public void deleteWord(int index)
     {
-        Log.d("PDD", "deleteWord: " + index);
+        Log.d("PDD", "deleteWord: " + index + " num="+wordListAdapter.getCount());
         if (!updated){
             saveOffset();
         }
-        WordItem item = wordListAdapter.getItem(index);
-        wordListAdapter.remove(item);
-        if (savedFirstItem>=0 && index<=savedFirstItem) {
-            savedFirstItem--;
+        if (index < wordListAdapter.getCount()) {
+            // 2017.3.2 はっきりとした原因は掴んでいないが、ヒットしない単語を連打していると、
+            // addWordでiwordListAdapter != nullのcaseが呼ばれ、JNI側の状態とJava側の状態が食い違い、
+            // JNI側がpool満杯状態、Java側はなしとなってしまい、wordListAdapter.getItem(index)で落ちる
+            // 対症療法として条件を追加した。
+            // 再現手順：
+            // この条件を外し、"ubernerd"などの辞書にない単語を連打する
+            WordItem item = wordListAdapter.getItem(index);
+            wordListAdapter.remove(item);
+            if (savedFirstItem >= 0 && index <= savedFirstItem) {
+                savedFirstItem--;
+            }
+            updated = true;
         }
-        updated = true;
     }
     public void select(int index, int rev)
     {
