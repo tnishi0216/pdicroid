@@ -491,6 +491,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
 
     private String getWordText(int start, int end) {
         String searchText;
+        String touchedText = null;
         int startPos = 0;
 
         if (start == end) {
@@ -520,6 +521,16 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
                 Log.d("PDP", "start=" + pdicJni.startPos + " end=" + pdicJni.endPos + " prevstart=" + pdicJni.prevStartPos);
                 searchText = picked_text.substring(pdicJni.prevStartPos, pdicJni.endPos);
                 startPos = pdicJni.startPos - pdicJni.prevStartPos;
+
+                // touchした単語のみを抽出
+                String s = picked_text.substring(pdicJni.startPos, pdicJni.endPos);
+                String[] words = s.split("[^\\w]", 1);
+                int index = s.indexOf(' ');
+                if (index>=0){
+                    touchedText = s.substring(0, index);
+                } else {
+                    touchedText = s;
+                }
             } else {
                 // Find the previous word that locates on the touched word.
                 int wordtop = -1;
@@ -581,7 +592,13 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         }
         showPopupList(ret>0);
         if (ret==0){
-            Toast.makeText(this, getString(R.string.msg_no_hit_word), Toast.LENGTH_SHORT).show();
+            String word;
+            if (Utility.isNotEmpty(touchedText)){
+                word = " - "+touchedText;
+            } else {
+                word = "";
+            }
+            Toast.makeText(this, getString(R.string.msg_no_hit_word) + word, Toast.LENGTH_SHORT).show();
         }
         return "";
     }
