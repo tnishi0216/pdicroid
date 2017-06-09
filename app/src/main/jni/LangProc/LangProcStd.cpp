@@ -934,12 +934,29 @@ int TLangProcStd::SearchStd( COMPARE_STRUCT &cs, const tchar *words, tchar *str,
 				// ヒット語の区切り文字以降を削除 //
 				if ( cs.flags & SLW_WORDDELIM ){
 					dp = str;
+					tchar *last_spc = NULL;
 					while ( *dp ){
-						if ( !IsWordChar(*dp) && *dp != ' ' ){
-							*dp = '\0';
-							break;
+						tchar c = *dp;
+						if (IsWordChar(c)){
+							last_spc = NULL;
+						} else {
+							if (c == ' '){
+								last_spc = dp;
+							} else {
+								if (last_spc)
+									*last_spc = '\0';
+								else
+									*dp = '\0';
+								break;
+							}
 						}
 						dp++;
+					}
+					// 区切り文字移行を削除するとすでにヒットしている文字と同じ場合が有り、無駄な検索となるため対象外とする
+					for (int j=0;j<srccomp->get_num();j++){
+						if (j==ci) continue;
+						if (_tcscmp(str, find_cword_pos((*srccomp)[j].word)) != 0) continue;
+						goto jnext;
 					}
 				}
 			}
@@ -983,6 +1000,7 @@ int TLangProcStd::SearchStd( COMPARE_STRUCT &cs, const tchar *words, tchar *str,
 		jloop:;
 			sp = cs.nextsp;
 			if ( cs.fComplete ) break;
+jnext:;
 		}
 
 		clicked_passed = false;
