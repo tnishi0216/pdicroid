@@ -657,7 +657,7 @@ BOOL JLink::UpdatePalette( HDC hdc )
 	SelectPalette( hdc, hPalette, FALSE );
 	if ( RealizePalette( hdc ) > 0 ){
 		if ( alwaysRepaint )
-			Invalidate( FALSE );
+			Invalidate( );
 		else
 			UpdateColors( hdc );
 	}

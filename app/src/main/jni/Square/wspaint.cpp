@@ -279,12 +279,22 @@ void Squre::DeleteTextFonts( )
 }
 
 
-void Squre::Invalidate( bool fErase )
+void Squre::Invalidate(bool resend)
 {
 	InvalidateLinks();
 	LastIndex = 0;
 	View->Invalidate();
-}                                                                           	
+#ifdef __ANDROID__
+	if (resend){
+		IPoolViewer *viewer = pool.GetViewer();
+		viewer->Clear();
+		DBW("IndexOffset=%d/%d", IndexOffset, get_num());
+		for (int i=IndexOffset+cury;i<get_num();i++){
+			viewer->Add(&pool.fw[i], &pool.GetJapaObj(i), pool.GetFDN(i), pool.GetDispLevel(i));
+		}
+	}
+#endif
+}
 
 void Squre::InvalidateLinks()
 {

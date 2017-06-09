@@ -660,11 +660,7 @@ protected:
 	// •`‰æˆ—
 public:
 	void cls( );
-#if USE_BMP
-	void Invalidate(bool fErase=false);
-#else
-	void Invalidate(bool fErase=true);
-#endif
+	void Invalidate(bool resend=false);
 	void InvalidateLinks();
 
 protected:

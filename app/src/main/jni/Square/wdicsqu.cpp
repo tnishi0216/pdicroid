@@ -61,7 +61,6 @@ bool Squre::add( tnstr *word, Japa *j, int dicno )
 		memmove( &LinesList[0], &LinesList[1], sizeof( int ) * ( MAX_NDISP - 1 ) );
 		ss.SetRemain( F_BACKWARD );	// Œã•ûŒŸõ•K—v
 		BaseNum++;
-		DBW("IndexOffset=%d", IndexOffset);
 		if ( --IndexOffset <= 0 ){
 			IndexOffset = 0;
 			BaseNum--;

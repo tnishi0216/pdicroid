@@ -147,6 +147,7 @@ protected:
 public:
 	PoolView(IPoolViewer *viewer);
 	~PoolView();
+	IPoolViewer *GetViewer() const { return Viewer; }
 	virtual void Clear();
 	//virtual void Add( const tchar *word, const Japa *japa, int dicno, int level=0 );
 	virtual void AddDirect( tnstr *word, Japa *japa, int dicno, int level=0 );

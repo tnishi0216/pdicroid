@@ -200,6 +200,7 @@ int Squre::incsearch( const tchar *str, diclist_t diclist )
 								y = pool.get_num()-1;
 							}
 						}
+						
 						if (IndexOffset!=y || cury!=0){
 							IndexOffset = y;
 							cury = 0;
@@ -208,6 +209,7 @@ int Squre::incsearch( const tchar *str, diclist_t diclist )
 							Invalidate();
 #else
 							dispStar(0);
+							Invalidate(true);
 #endif
 						} else {
 							// starのみの更新
