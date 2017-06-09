@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.reliefoffice.pdic"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 21
         versionCode 614
-        versionName "0.6.14 alpha"
+        versionName "0.6.15 alpha"
         ndk {
             moduleName "pdjni"
             stl "gnustl_shared"
@@ -29,6 +29,11 @@ android {
 //            jniLibs.srcDir "src/main/libs"	//  ←　最初はコメントアウトしておく！！
         }
     }
+//	lintOptions {
+//		disable 'MissingTranslation'
+//		checkReleaseBuilds false
+//		abortOnError false
+//	}
 }
 
 dependencies {
