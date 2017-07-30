@@ -14,6 +14,7 @@ public class PSBookmarkFileManager implements INetDriveFileInfo.UpdateNotifier {
     static final String PFS_PSBOOKMARK_REMOTE_REVISION = "PSBookmarkRemoteRevision";
 
     static PSBookmarkFileManager This = null;
+    static int refCounter = 0;
 
     int openCount = 0;
 
@@ -28,7 +29,7 @@ public class PSBookmarkFileManager implements INetDriveFileInfo.UpdateNotifier {
         this.ndvFM = ndvFM;
         pref = PreferenceManager.getDefaultSharedPreferences(context);
 
-        pdicjni = new PdicJni();
+        pdicjni = PdicJni.createInstance(null, null);   // ‚Ù‚©‚Åinstance‰»‚³‚ê‚Ä‚¢‚é‘O’ñ
 
         String localName = getFilename();
         String remote = getRemoteFilename();
@@ -39,11 +40,22 @@ public class PSBookmarkFileManager implements INetDriveFileInfo.UpdateNotifier {
     }
 
     public static PSBookmarkFileManager createInstance(Context context, INetDriveFileManager ndFM){
-        return This = new PSBookmarkFileManager(context, ndFM);
+        if (This == null){
+            This = new PSBookmarkFileManager(context, ndFM);
+        }
+        refCounter++;
+        return This;
     }
 
-    public static PSBookmarkFileManager getInstance(){
-        return This;
+    public void deleteInstance(){
+        if (refCounter > 0){
+            refCounter--;
+            if (refCounter == 0) {
+                if (This.pdicjni!=null)
+                    This.pdicjni.deleteInstance();
+                This = null;
+            }
+        }
     }
 
     public boolean open(){

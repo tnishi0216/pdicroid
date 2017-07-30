@@ -12,10 +12,13 @@ import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+//Note:
+// 使用終了時に、uninit()を呼び出さないと、PSBookmarkFileManagerのinstanceが解放されない
 abstract public class PSBookmarkEditWindow {
     Activity activity;
     String editFilename;    //Note: psbmFilename
 
+    INetDriveFileManager ndvFM;
     PSBookmarkFileManager psbmFM;
     PSBookmarkItem psbmItem;    // optional, can be null
     IPSBookmarkEditor  editText;  // optional
@@ -29,7 +32,7 @@ abstract public class PSBookmarkEditWindow {
         //psbmItem = item;   // should not be null.
         this.editFilename = editFilename;
 
-        init();
+        init(activity);
 
         psbmFM.open();
         psbmItem = pdicJni.getPSBookmarkItem(editFilename, item.position);
@@ -45,7 +48,7 @@ abstract public class PSBookmarkEditWindow {
         this.editText = new PSBookmarkEditor(editText);
         this.editFilename = editFilename;
 
-        init();
+        init(activity);
 
         int start = editText.getSelectionStart();
         int end = editText.getSelectionEnd();
@@ -61,11 +64,20 @@ abstract public class PSBookmarkEditWindow {
             psbmItem.comment = "";
         }
     }
-    void init(){
-        psbmFM = PSBookmarkFileManager.getInstance();
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            uninit();
+            super.finalize();
+        } finally {
+        }
+    }
+    void init(Context context){
+        ndvFM = DropboxFileManager.createInstance(context);
+        psbmFM = PSBookmarkFileManager.createInstance(context, ndvFM);
 
         // Initialize JNI.
-        pdicJni = new PdicJni();
+        pdicJni = PdicJni.createInstance(null, null);   // ほかですでにinstance化されている前提
 
         popupWindow = new PopupWindow(activity);
         View view = activity.getLayoutInflater().inflate(R.layout.popup_menu, null);
@@ -108,6 +120,15 @@ abstract public class PSBookmarkEditWindow {
         popupWindow.setWindowLayoutMode((int) width, WindowManager.LayoutParams.WRAP_CONTENT);
         popupWindow.setWidth((int) width);
         popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+    }
+    public void uninit()
+    {
+        if (psbmFM!=null) {
+            psbmFM.deleteInstance();
+            psbmFM = null;
+        }
+        if (pdicJni!=null)
+            pdicJni.deleteInstance();
     }
     public void show(View anchorView){
         popupWindow.showAsDropDown(anchorView);

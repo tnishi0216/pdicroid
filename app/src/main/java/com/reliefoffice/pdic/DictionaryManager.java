@@ -10,6 +10,7 @@ import android.util.Log;
  */
 public class DictionaryManager {
     static DictionaryManager This = null;
+    static int refCounter = 0;
     Context context;
     int openCount = 0;
     PdicJni pdicJni;
@@ -19,13 +20,16 @@ public class DictionaryManager {
 
     }
     public static final DictionaryManager createInstance(Context context){
-        This = new DictionaryManager();
-        This.pdicJni = new PdicJni();
-        This.ndvFM = DropboxFileManager.createInstance(context);
+        if (This == null) {
+            This = new DictionaryManager();
+            This.pdicJni = PdicJni.createInstance(null, null);  // ‚·‚Å‚É‚Ù‚©‚Ì‚Æ‚±‚ë‚Åinstance‰»‚³‚ê‚Ä‚¢‚é‘O’ñ
+        }
         This.context = context;
+        This.ndvFM = DropboxFileManager.createInstance(context);
+        refCounter++;
         return This;
     }
-    public static final DictionaryManager getInstance(Context context){
+    private static final DictionaryManager getInstance(Context context){
         if (This!=null) {
             This.context = context;
             This.ndvFM = DropboxFileManager.createInstance(context);
@@ -33,7 +37,14 @@ public class DictionaryManager {
         return This;
     }
     public static final void deleteInstance(){
-        This = null;
+        if (refCounter>0){
+            refCounter--;
+            if (refCounter==0) {
+                if (This.pdicJni!=null)
+                    This.pdicJni.deleteInstance();
+                This = null;
+            }
+        }
     }
 
     public boolean isDicOpened(){ return openCount>0; }

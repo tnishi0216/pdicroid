@@ -288,18 +288,23 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         showPopupList(false);
 
         // Initialize JNI.
-        pdicJni = new PdicJni();
+        File tempPath = getExternalFilesDir(null);
+        pdicJni = PdicJni.createInstance(getAssets(), tempPath.getAbsolutePath());        // Create JNI callback
 
-        jniCallback = JniCallback.getInstance();
+		jniCallback = JniCallback.createInstance();
         wordListAdapter = new TWordListAdapter(popupList, popupListAdapter);
 
-        psbmFM = PSBookmarkFileManager.getInstance();
+        if (pdicJni != null) {
+            pdicJni.createFrame(jniCallback, 0);
+        }
 
-        dicMan = DictionaryManager.getInstance(this);
+        dicMan = DictionaryManager.createInstance(this);
 
         // Dropbox //
         ndvUtils = DropboxUtils.getInstance(this);
         ndvFM = DropboxFileManager.createInstance(this);
+
+        psbmFM = PSBookmarkFileManager.createInstance(this, ndvFM);
 
         // Initial Text //
         if (Utility.isEmpty(orgTitle)){
@@ -486,6 +491,21 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         if (PSBookmarkReady) {
             PSBookmarkReady = false;
             psbmFM.close();
+        }
+        if (psbmFM != null)
+            psbmFM.deleteInstance();
+        if (dicMan!=null){
+            dicMan.deleteInstance();
+            dicMan = null;
+        }
+        pdicJni.deleteFrame();
+        if (jniCallback != null) {
+            jniCallback.deleteInstance();
+            jniCallback = null;
+        }
+        if (pdicJni != null){
+            pdicJni.deleteInstance();
+            pdicJni = null;
         }
     }
 
@@ -1088,7 +1108,6 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
 
     PdicJni.PSFileInfo loadPSBookmarks (String psbmName) {
         openPSBookmark();
-        JniCallback callback = JniCallback.getInstance();
         if (ipsBookmarkListAdapter == null) {
             ipsBookmarkListAdapter = new IPSBookmarkListAdapter() {
                 @Override
@@ -1104,9 +1123,12 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
                 }
             };
         }
+        JniCallback callback = JniCallback.createInstance();
         callback.setPSBookmarkListAdapter(ipsBookmarkListAdapter);
         pdicJni.loadPSBookmark(psbmName);
         callback.setPSBookmarkListAdapter(null);
+
+        callback.deleteInstance();
 
         PdicJni.PSFileInfo info = pdicJni.loadPSFileInfo(psbmName);
         return info;

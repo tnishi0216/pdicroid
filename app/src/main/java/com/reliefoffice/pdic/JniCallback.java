@@ -11,6 +11,7 @@ import java.io.PrintStream;
  */
 public class JniCallback {
     static JniCallback This;
+    static int refCounter = 0;
     //MainActivity mainActivity;
     ListView wordList;
     WordListAdapter wordListAdapter;
@@ -26,10 +27,16 @@ public class JniCallback {
         if (This==null){
             This = new JniCallback();
         }
+        refCounter++;
         return This;
     }
-    static public JniCallback getInstance(){
-        return This;
+    public void deleteInstance(){
+        if (refCounter>0){
+            refCounter--;
+            if (refCounter==0){
+                This = null;
+            }
+        }
     }
 
     private JniCallback(){
@@ -70,7 +77,8 @@ public class JniCallback {
     public void clearWords()
     {
         //Log.d("PDD", "clearWords\n");
-        wordListAdapter.clear();
+        if (wordListAdapter != null)
+            wordListAdapter.clear();
         savedFirstItem = -1;
         updated = true;
     }

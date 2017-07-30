@@ -15,7 +15,7 @@ import java.io.File;
 
 
 public class SettingsActivity extends PreferenceActivity implements DropboxFileSelectionDialog.OnFileSelectListener {
-    private static SettingsActivity This;
+    private static SettingsActivity This;   // アクセスする方法がわからないので。。
     SharedPreferences pref;
     INetDriveFileManager ndvFM;
     INetDriveUtils ndvUtils;
@@ -49,14 +49,17 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
                         }
                     }
                 } else {
-                    PSBookmarkFileManager.getInstance().changeFilename(null, null, null);
+                    PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(This, ndvFM);
+                    psbmFM.changeFilename(null, null, null);
+                    psbmFM.deleteInstance();
                 }
                 return true;
             }
         });
         if (psbmSharing.isChecked()) {
-            PSBookmarkFileManager psbmFM = PSBookmarkFileManager.getInstance();
+            PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(this, ndvFM);
             psbmSharing.setSummary(psbmFM.getRemoteFilename());
+            psbmFM.deleteInstance();
         }
 
         psbmDefCharset = (CheckBoxPreference)findPreference("DefCharset");
@@ -115,7 +118,9 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
 
                 Toast.makeText(getApplicationContext(), getString(R.string.msg_bookmark_file_downloaded) + to.getPath(), Toast.LENGTH_SHORT).show();
                 Log.d("PDD", "File downloaded: " + to.getAbsolutePath() + " rev:" + revision);
-                PSBookmarkFileManager.getInstance().changeFilename(to.getAbsolutePath(), from, revision);
+                PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(This, ndvFM);
+                psbmFM.changeFilename(to.getAbsolutePath(), from, revision);
+                psbmFM.deleteInstance();
             }
         });
     }
@@ -128,8 +133,10 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
             selectDropboxFile();
         }
 
-        PSBookmarkFileManager psbmFM = PSBookmarkFileManager.getInstance();
-        if (!psbmFM.isRemoteEnabled()){
+        PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(this, ndvFM);
+        boolean enabled = psbmFM.isRemoteEnabled();
+        psbmFM.deleteInstance();
+        if (!enabled){
             psbmSharing.setChecked(false);
         }
 

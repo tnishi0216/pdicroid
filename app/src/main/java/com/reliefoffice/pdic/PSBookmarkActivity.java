@@ -13,12 +13,15 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 
+import java.io.File;
+
 
 public class PSBookmarkActivity extends ActionBarActivity {
     String filename;    // File selection list if filename is null.
                         //Note: psbm filename
 
     PdicJni pdicJni;
+    INetDriveFileManager ndvFM;
     PSBookmarkFileManager psbmFM;
 
     ListView psbList;
@@ -38,8 +41,10 @@ public class PSBookmarkActivity extends ActionBarActivity {
             setTitle(getString(R.string.title_activity_loadfile_history));
         }
 
-        pdicJni = new PdicJni();
-        psbmFM = PSBookmarkFileManager.getInstance();
+        File tempPath = getExternalFilesDir(null);
+        pdicJni = PdicJni.createInstance(getAssets(), tempPath.getAbsolutePath());
+        ndvFM = DropboxFileManager.createInstance(this);
+        psbmFM = PSBookmarkFileManager.createInstance(this, ndvFM);
 
         // Create ListView for bookmark list
         psbListAdapter = new PSBookmarkListAdapter(this, R.layout.list_item_psbookmarklist);
@@ -95,7 +100,6 @@ public class PSBookmarkActivity extends ActionBarActivity {
                 return;
             }
         }
-        JniCallback callback = JniCallback.getInstance();
         IPSBookmarkListAdapter ipsBookmarkListAdapter = new IPSBookmarkListAdapter() {
             @Override
             public int addItem(int position, int length, int style, int color, String markedWord, String comment) {
@@ -110,6 +114,7 @@ public class PSBookmarkActivity extends ActionBarActivity {
                 return 0;
             }
         };
+        JniCallback callback = JniCallback.createInstance();
         callback.setPSBookmarkListAdapter(ipsBookmarkListAdapter);
         if (Utility.isEmpty(filename)) {
             pdicJni.loadPSBookmarkFiles();
@@ -117,6 +122,7 @@ public class PSBookmarkActivity extends ActionBarActivity {
             pdicJni.loadPSBookmark(filename);
         }
         callback.setPSBookmarkListAdapter(null);
+        callback.deleteInstance();
     }
 
     @Override
@@ -209,5 +215,9 @@ public class PSBookmarkActivity extends ActionBarActivity {
             PSBookmarkReady = false;
             psbmFM.close();
         }
+        if (psbmFM != null)
+            psbmFM.deleteInstance();
+        if (pdicJni != null)
+            pdicJni.deleteInstance();
     }
 }

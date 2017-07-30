@@ -10,29 +10,58 @@ public class PdicJni {
     public static final int VF_PRON = 0x08;
     public static final int VF_EXP  = 0x20;
 
+    static PdicJni This;
+    static int refCounter = 0;
+
     // generic return value //
     public String retString;
 
-    // call only once.
-    public int init(int param1, AssetManager assetManager, String tempPath)
-    {
-        System.loadLibrary("pdjni");
+    private PdicJni(){
 
-        if (assetManager == null) {
-            System.out.println("AssetManager is null");
-            return -99;
-        } else {
-            return initPdic(param1, assetManager, tempPath);
+    }
+
+    static public PdicJni createInstance(AssetManager assetManager, String tempPath)
+    {
+        if (refCounter==0) {
+            if (assetManager == null) {
+                System.out.println("AssetManager is null");
+                return null;
+            }
+
+            System.loadLibrary("pdjni");
+
+            This = new PdicJni();
+            //TODO: initPdic()‚ðassertManager!=null‚Å‚ ‚ê‚Îí‚ÉŒÄ‚Ño‚·‚©H
+            int ret = This.initPdic(0, assetManager, tempPath);
+            if (ret!=0){
+                This = null;
+                return null;
+            }
+        }
+        refCounter++;
+        return This;
+    }
+    static public void deleteInstance()
+    {
+        if (refCounter>0){
+            refCounter--;
+            if (refCounter==0){
+                This = null;
+            }
         }
     }
+
     public int createFrame(JniCallback callback, int param1)
     {
         return createPdicFrame(callback, param1);
     }
+    public int deleteFrame(){
+        return deletePdicFrame(0);
+    }
     private native int initPdic(int param1, AssetManager assetManager, String tempPath);
     //public native int inittest(int param1);
     private native int createPdicFrame(JniCallback callback, int param1);
-    //native native int deletePdicFrame(int param1);
+    private native int deletePdicFrame(int param1);
 
     public native int config(int viewFlags);
 
@@ -67,10 +96,11 @@ public class PdicJni {
     native int xclosePSBookmark();
     public PSBookmarkItem getPSBookmarkItem(String filename, int position){
         PSBookmarkItem item = new PSBookmarkItem();
-        JniCallback callback = JniCallback.getInstance();
+        JniCallback callback = JniCallback.createInstance();
         callback.setPSBookmarkItem(item);
         int ret = loadPSBookmarkItem(filename, position);
         callback.setPSBookmarkItem(null);
+        callback.deleteInstance();
         return ret==1?item:null;
     }
     public boolean addPSBookmark(String filename, PSBookmarkItem item){

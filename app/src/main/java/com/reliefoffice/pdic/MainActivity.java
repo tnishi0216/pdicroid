@@ -126,14 +126,14 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         });
 
         // Initialize JNI.
-        pdicJni = new PdicJni();
         File tempPath = getExternalFilesDir(null);
-        int res = pdicJni.init(0, getAssets(), tempPath.getAbsolutePath());        // Create JNI callback
+        pdicJni = PdicJni.createInstance(getAssets(), tempPath.getAbsolutePath());        // Create JNI callback
 
-        jniCallback = JniCallback.createInstance();
+		jniCallback = JniCallback.createInstance();
         jniCallback.setWordListAdapter(wordList, wordListAdapter);
 
-        if (res == 0) {
+        int res = -1;
+        if (pdicJni != null) {
             res = pdicJni.createFrame(jniCallback, 0);
         }
 
@@ -158,8 +158,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         ndvFM = DropboxFileManager.createInstance(this);
 
         dicMan = DictionaryManager.createInstance(this);
-
-        PSBookmarkFileManager.createInstance(this, ndvFM);
     }
 
     /*
@@ -305,6 +303,15 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
         if (!dicMan.isDicOpened())
             ndvFM.removeAll();
+        pdicJni.deleteFrame();
+        if (jniCallback != null) {
+            jniCallback.deleteInstance();
+            jniCallback = null;
+        }
+        if (pdicJni != null){
+            pdicJni.deleteInstance();
+            pdicJni = null;
+        }
     }
 
     @Override
