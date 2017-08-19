@@ -39,6 +39,34 @@ public class Utility {
         return NumberFormat.getNumberInstance().format(value);
     }
 
+    // ファイル名の拡張子を変更する
+    public static final String changeExtension(String filename, String extention){
+        File in = new File(filename);
+        String fileName = in.getName(); // フルパスからファイル名だけを取得
+
+        // 拡張子の文字位置を取得
+        int postion = fileName.lastIndexOf(".");
+
+        if (postion == -1) {
+            // 拡張子がない場合
+            return filename + "." + extention; //
+        } else {
+            // 拡張子がある場合
+            int postionOfFullPath = filename.lastIndexOf(".");
+            String pathWithoutExt = filename.substring(0, postionOfFullPath);
+            return pathWithoutExt + "." + extention;
+        }
+    }
+
+    // ファイル名のパスを変更する
+    public static final String changePath(String filename, String path){
+        File in = new File(filename);
+        String fileName = in.getName(); // フルパスからファイル名だけを取得
+
+        File out = new File(path, fileName);
+        return out.getAbsolutePath();
+    }
+
     // general purpose for EditText
     // 現在行を返す
     //TODO: 動作未確認
