@@ -639,13 +639,12 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     }
 
     void showPopupList(boolean on){
-        if (popupList.getVisibility()==View.GONE){
+        if (popupList.getVisibility() == View.GONE) {
             // to visible
             if (!on) return;
             ViewGroup.LayoutParams params;
             params = editText.getLayoutParams();
             params.height = savedEditTextHeight;
-            editText.setLayoutParams(params);
             popupList.setVisibility(View.VISIBLE);
         } else {
             // to invisible
@@ -653,10 +652,9 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             popupList.setVisibility(View.GONE);
             ViewGroup.LayoutParams params;
             params = editText.getLayoutParams();
-            if (savedEditTextHeight<0)
+            if (savedEditTextHeight < 0)
                 savedEditTextHeight = params.height;
             params.height = MATCH_PARENT;
-            editText.setLayoutParams(params);
         }
     }
 
