@@ -5,36 +5,43 @@
     android:orientation="vertical">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" android:id="@+id/container_seekbar"
+        xmlns:tools="http://schemas.android.com/tools" android:id="@+id/container_audio"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="vertical">
-        <SeekBar
-            android:id="@+id/audioSeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:progress="25"
-            android:max="100"
-            />
+
+	    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	        xmlns:tools="http://schemas.android.com/tools" android:id="@+id/container_seekbar"
+	        android:layout_width="match_parent" android:layout_height="wrap_content"
+	        android:orientation="horizontal">
+
+	        <SeekBar
+	            android:id="@+id/audioSeekBar"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:progress="25"
+	            android:max="100"
+	            />
+	    </LinearLayout>
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools" android:id="@+id/container_seekbar"
+            xmlns:tools="http://schemas.android.com/tools" android:id="@+id/container_status"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal">
-        <Button
-            android:text="Back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_step_rewind" />
-        <Button
-            android:text="Play/Pause"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_play_stop" />
-        <TextView
-            android:id="@+id/text_position"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-            </LinearLayout>
+            <Button
+                android:text="Back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_step_rewind" />
+            <Button
+                android:text="Play/Pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_play_stop" />
+            <TextView
+                android:id="@+id/text_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
     </LinearLayout>
 

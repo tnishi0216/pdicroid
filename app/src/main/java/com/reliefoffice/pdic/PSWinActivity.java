@@ -863,7 +863,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             audioFileName = Utility.changePath(audioFileName, altAudioFolder);
             audioOk = openAudioPlayer(audioFileName);
         }
-        showAudioSlider(audioOk);
+        showAudio(audioOk);
     }
 
     // file load エラー後処理
@@ -1183,6 +1183,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     // --------------------------------------- //
     // Audio Player
     // --------------------------------------- //
+    private LinearLayout audioLayout;
     private SeekBar audioSlider;
     private Button btnStepRewind;
     private Button btnPlayPause;
@@ -1198,6 +1199,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
 
     private AudioSliderUpdateThread updateThread;
     void initAudioPlayer(){
+        audioLayout = (LinearLayout)findViewById(R.id.container_audio);
         audioSlider = (SeekBar)findViewById(R.id.audioSeekBar);
         audioSlider.setOnSeekBarChangeListener(this);
         btnStepRewind = (Button)findViewById(R.id.btn_step_rewind);
@@ -1215,7 +1217,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             }
         });
         tvPosition = (TextView)findViewById(R.id.text_position);
-        showAudioSlider(false);
+        showAudio(false);
     }
     boolean openAudioPlayer(String filename){
         closeAudioPlayer(false);
@@ -1269,7 +1271,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             mediaPlayer.release();
             mediaPlayer = null;
             if (showControl) {
-                showAudioSlider(false);
+                showAudio(false);
             }
         }
     }
@@ -1291,21 +1293,15 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         }
     }
 
-    void showAudioSlider(boolean on){
-        if (audioSlider.getVisibility()==View.GONE){
+    void showAudio(boolean on){
+        if (audioLayout.getVisibility()==View.GONE){
             // to visible
             if (!on) return;
-            audioSlider.setVisibility(View.VISIBLE);
-            btnStepRewind.setVisibility(View.VISIBLE);
-            btnPlayPause.setVisibility(View.VISIBLE);
-            tvPosition.setVisibility(View.VISIBLE);
+            audioLayout.setVisibility(View.VISIBLE);
         } else {
             // to invisible
             if (on) return;
-            audioSlider.setVisibility(View.GONE);
-            btnStepRewind.setVisibility(View.GONE);
-            btnPlayPause.setVisibility(View.GONE);
-            tvPosition.setVisibility(View.GONE);
+            audioLayout.setVisibility(View.GONE);
         }
     }
 
