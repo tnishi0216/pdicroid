@@ -1223,6 +1223,8 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     }
     boolean openAudioPlayer(String filename){
         closeAudioPlayer(false);
+        if (!Utility.fileExists(filename))
+            return false;
         mediaPlayer = new MediaPlayer();
         try {
             mediaPlayer.setDataSource(filename);
