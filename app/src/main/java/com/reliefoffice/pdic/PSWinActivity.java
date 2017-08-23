@@ -1196,7 +1196,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     private int audioDuration = 0;
     private int audioDurationSec = 0;
     // settings
-    private int stepRewindTime = 8000; // [msec]
+    private int stepRewindTime = 5000; // [msec]
     private String altAudioFolder = "/storage/sdcard0/Download";
 
     private AudioSliderUpdateThread updateThread;
