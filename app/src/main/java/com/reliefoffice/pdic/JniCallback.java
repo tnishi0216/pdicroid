@@ -64,6 +64,7 @@ public class JniCallback {
     public void requestUpdate()
     {
         if (updated){
+            //TODO: wordListAdapter‚ªnull‚Å—Ž‚¿‚éŽž‚ª‚ ‚Á‚½ 2017.8.26 PSWinActivity.getWordText()‚æ‚è
             wordListAdapter.notifyDataSetChanged();
             if (savedFirstItem>=0) {
                 Log.i("PDD", "Restore: "+savedFirstItem+" "+savedOffset);
