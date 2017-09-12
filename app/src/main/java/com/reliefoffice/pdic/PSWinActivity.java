@@ -378,7 +378,11 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             psbEditWindow = new PSBookmarkEditWindow(this, editText, psbmFilename) {
                 @Override
                 void notifyChanged(PSBookmarkItem item) {
-
+                }
+                @Override
+                void closeNotify(){
+                    psbEditWindow = null;
+                    This.editText.requestFocus(View.FOCUS_UP);
                 }
             };
             int x = (int)lastX;

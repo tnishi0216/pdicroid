@@ -177,6 +177,10 @@ public class PSBookmarkActivity extends ActionBarActivity {
                 i.comment = item.comment;
                 psbListAdapter.notifyDataSetChanged();
             }
+            @Override
+            void closeNotify(){
+
+            }
         };
         psbEditWindow.show(itemView);
     }

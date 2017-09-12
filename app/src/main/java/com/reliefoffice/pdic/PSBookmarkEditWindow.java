@@ -253,5 +253,8 @@ abstract public class PSBookmarkEditWindow {
             popupWindow.dismiss();
             popupWindow = null;
         }
+        closeNotify();
     }
+
+    abstract void closeNotify();
 }
