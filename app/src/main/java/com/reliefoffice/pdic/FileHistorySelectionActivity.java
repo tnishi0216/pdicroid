@@ -66,7 +66,7 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
                 fileInfo.setModDate(localFile.lastModified());
             } else {
                 // normal file
-                fileInfo = new FileInfo(filename, file);
+                fileInfo = new FileInfo(file.getName(), file);
             }
             fileInfo.setReaddate(fileHistory.getDateLong(i));
             listFile.add(fileInfo);
