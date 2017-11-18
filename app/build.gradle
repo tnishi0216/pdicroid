@@ -8,8 +8,8 @@ android {
         applicationId "com.reliefoffice.pdic"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 618
-        versionName "0.6.18 alpha"
+        versionCode 619
+        versionName "0.6.19 alpha"
         ndk {
             moduleName "pdjni"
             stl "gnustl_shared"
