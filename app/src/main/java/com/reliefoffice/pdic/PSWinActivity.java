@@ -1189,6 +1189,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     // --------------------------------------- //
     // Audio Player
     // --------------------------------------- //
+    private boolean autoLooping = true;
     private LinearLayout audioLayout;
     private SeekBar audioSlider;
     private Button btnStepRewind;
@@ -1199,6 +1200,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     private int lastPlayPosition = 0;
     private int audioDuration = 0;
     private int audioDurationSec = 0;
+    private boolean lastPlaying = false;
     // settings
     private int stepRewindTime = 5000; // [msec]
     private String altAudioFolder = "/storage/sdcard0/Download";
@@ -1249,8 +1251,9 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         audioDurationSec = audioDuration / 1000;
         audioSlider.setMax(audioDuration);
 
-        mediaPlayer.setLooping(true);
+        //mediaPlayer.setLooping(true);
         mediaPlayer.start();
+        lastPlaying = true;
 
         updateThread = new AudioSliderUpdateThread();
         updateThread.start();
@@ -1295,9 +1298,11 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         if (mediaPlayer.isPlaying()){
             mediaPlayer.pause();
             btnPlayPause.setText(R.string.label_play);
+            lastPlaying = false;
         } else {
             mediaPlayer.start();
             btnPlayPause.setText(R.string.label_pause);
+            lastPlaying = true;
         }
     }
 
@@ -1355,8 +1360,16 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     }
     private Handler threadHandler = new Handler() {
         public void handleMessage(Message msg) {
-            audioSlider.setProgress(msg.what);
-            int sec = msg.what / 1000;
+            int position = msg.what;
+            if (autoLooping && lastPlaying){
+                if (position >= audioDuration){
+                    position = 0;
+                    mediaPlayer.seekTo(0);
+                    mediaPlayer.start();
+                }
+            }
+            audioSlider.setProgress(position);
+            int sec = position / 1000;
             String text = String.format("%d:%02d/%d:%02d", sec/60, sec % 60, audioDurationSec/60, audioDurationSec%60);
             tvPosition.setText(text);
             //tvPosition.setText( Integer.toString(sec/60) + ":" + Integer.toString(sec % 60) + "/" + Integer.toString(audioDurationSec/60) + ":" + Integer.toString(audioDurationSec%60));
