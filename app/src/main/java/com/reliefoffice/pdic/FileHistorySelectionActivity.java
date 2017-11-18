@@ -64,11 +64,11 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
                 fileInfo = new FileInfo(localFile.getName(), file);
                 fileInfo.setFileSize(localFile.length());
                 fileInfo.setModDate(localFile.lastModified());
-                fileInfo.setReaddate(fileHistory.getDateLong(i));
             } else {
                 // normal file
                 fileInfo = new FileInfo(filename, file);
             }
+            fileInfo.setReaddate(fileHistory.getDateLong(i));
             listFile.add(fileInfo);
         }
         return listFile;
