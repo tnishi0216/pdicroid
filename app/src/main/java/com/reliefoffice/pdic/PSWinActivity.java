@@ -1189,7 +1189,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     // --------------------------------------- //
     // Audio Player
     // --------------------------------------- //
-    private boolean autoLooping = true;
+    private boolean autoLooping = false;
     private LinearLayout audioLayout;
     private SeekBar audioSlider;
     private Button btnStepRewind;
@@ -1251,7 +1251,8 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         audioDurationSec = audioDuration / 1000;
         audioSlider.setMax(audioDuration);
 
-        //mediaPlayer.setLooping(true);
+        if (!autoLooping)
+            mediaPlayer.setLooping(true);
         mediaPlayer.start();
         lastPlaying = true;
 
