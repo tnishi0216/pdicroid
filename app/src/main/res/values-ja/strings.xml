@@ -102,4 +102,5 @@
     <string name="label_date">日付</string>
     <string name="label_read">読込</string>
     <string name="label_path">パス</string>
+    <string name="title_enter_path">ファイルが見つからないので直接ディレクトリを指定してください</string>
 </resources>

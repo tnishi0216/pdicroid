@@ -65,8 +65,7 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
     MetadataTask metadataTask;
 
     @Override
-    protected List<FileInfo> getListFileInfo(FileInfo fileDirectory) {
-        String path = fileDirectory.getAbsolutePath();
+    protected List<FileInfo> getListFileInfo(String path) {
         metadataTask = new MetadataTask((Dropbox2FileManager)ndvFM, path);
         metadataTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         createProgressDialog(msgListing);

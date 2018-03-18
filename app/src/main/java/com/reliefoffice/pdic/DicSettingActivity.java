@@ -166,8 +166,7 @@ public class DicSettingActivity extends Activity implements FileSelectionDialog.
                 String filename = bundle.getString("filename");
                 if (Utility.isNotEmpty(filename)) {
                     if (requestCode == REQUEST_CODE_ADD_FILE) {
-                        File file = new File(filename);
-                        FileInfo fileInfo = new FileInfo(file.getName(), file);
+                        FileInfo fileInfo = new FileInfo(filename);
                         onFileSelect(fileInfo);
                     } else
                     if (requestCode == REQUEST_CODE_ADD_FILE_DBX) {

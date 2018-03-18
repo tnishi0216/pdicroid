@@ -8,7 +8,7 @@ import java.io.File;
 public class FileInfo implements Comparable<FileInfo> {
 
     private String	m_strName;	// display name
-    private File	m_file;	// file object
+    private File	m_file;	// file object (can be null)
 
     private boolean m_isDir;
     private String m_parent;
@@ -20,10 +20,7 @@ public class FileInfo implements Comparable<FileInfo> {
     // constructor
     public FileInfo( String strName, File file )
     {
-        m_strName = strName;
-        m_file = file;
-        m_size = file.length();
-        m_modDate = file.lastModified();
+        initialize(strName, file);
     }
     // constructor
     public FileInfo( String strName, boolean isDir, String parent )
@@ -31,6 +28,17 @@ public class FileInfo implements Comparable<FileInfo> {
         m_strName = strName;
         m_isDir = isDir;
         m_parent = parent;
+    }
+    // constructor
+    public FileInfo(String filename){
+        File file = new File(filename);
+        initialize(file.getName(), file);
+    }
+    private void initialize(String strName, File file) {
+        m_strName = strName;
+        m_file = file;
+        m_size = file.length();
+        m_modDate = file.lastModified();
     }
     public boolean isDirectory(){ return m_file!=null ? m_file.isDirectory() : m_isDir; }
 

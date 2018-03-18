@@ -13,7 +13,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 //Note:
-// g—pI—¹‚ÉAuninit()‚ğŒÄ‚Ño‚³‚È‚¢‚ÆAPSBookmarkFileManager‚Ìinstance‚ª‰ğ•ú‚³‚ê‚È‚¢
+// ä½¿ç”¨çµ‚äº†æ™‚ã«ã€uninit()ã‚’å‘¼ã³å‡ºã•ãªã„ã¨ã€PSBookmarkFileManagerã®instanceãŒè§£æ”¾ã•ã‚Œãªã„
 abstract public class PSBookmarkEditWindow {
     Activity activity;
     String editFilename;    //Note: psbmFilename
@@ -77,7 +77,7 @@ abstract public class PSBookmarkEditWindow {
         psbmFM = PSBookmarkFileManager.createInstance(context, ndvFM);
 
         // Initialize JNI.
-        pdicJni = PdicJni.createInstance(null, null);   // ‚Ù‚©‚Å‚·‚Å‚Éinstance‰»‚³‚ê‚Ä‚¢‚é‘O’ñ
+        pdicJni = PdicJni.createInstance(null, null);   // ã»ã‹ã§ã™ã§ã«instanceåŒ–ã•ã‚Œã¦ã„ã‚‹å‰æ
 
         popupWindow = new PopupWindow(activity);
         View view = activity.getLayoutInflater().inflate(R.layout.popup_menu, null);
@@ -227,9 +227,9 @@ abstract public class PSBookmarkEditWindow {
     void editComment(){
         commentInputDialog = new CommentInputDialog();
         commentInputDialog.setText(psbmItem.comment);
-        commentInputDialog.setCallback(new CommentInputCallback() {
+        commentInputDialog.setCallback(new TextInputCallback() {
             @Override
-            public void onCommentInputClickOk() {
+            public void onTextInputClickOk() {
                 psbmItem.comment = commentInputDialog.getText();
                 psbmItem.color &= ~0xFF000000;   //TODO: alpha support
                 psbmFM.open();
@@ -240,7 +240,7 @@ abstract public class PSBookmarkEditWindow {
             }
 
             @Override
-            public void onCommentInputClickCancel() {
+            public void onTextInputClickCancel() {
                 commentInputDialog.dismiss();
                 commentInputDialog = null;
             }

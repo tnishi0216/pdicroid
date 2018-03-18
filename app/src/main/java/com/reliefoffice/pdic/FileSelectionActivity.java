@@ -28,8 +28,7 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
     protected  String[] m_exts = {".dic", ".txt"};
     protected FileInfo m_fileDirectory;
     void setFileDirectory(String dir){
-        File file = new File(dir);
-        m_fileDirectory = new FileInfo(file.getName(), file);
+        m_fileDirectory = new FileInfo(dir);
     }
     String getCurrentDir(){
         return m_fileDirectory.getPath();
@@ -195,12 +194,37 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
         return true;
     }
 
+    TextInputDialog pathDialog;
     protected void startSelectFile(){
-        Log.d("PDD", "fileDirectory="+m_fileDirectory.getPath());
+        Log.d("PDD", "fileDirectory = "+m_fileDirectory.getPath());
 
-        List<FileInfo> listFileInfo = getListFileInfo(m_fileDirectory);
-        if (listFileInfo == null) {
-            return; // error or pending
+        List<FileInfo> listFileInfo = getListFileInfo(m_fileDirectory.getAbsolutePath());
+        if (listFileInfo == null || listFileInfo.size() <= 1){
+            String rootStr = "/";
+            //Note: rootStr == m_fileDirectory.getAbsolutePath()では正常に動かない
+            if (rootStr.compareTo(m_fileDirectory.getAbsolutePath())==0){
+                pathDialog = new TextInputDialog();
+                pathDialog.titleText = getString(R.string.title_enter_path);
+                pathDialog.setText(m_fileDirectory.getPath());
+                pathDialog.setCallback(new TextInputCallback() {
+                    @Override
+                    public void onTextInputClickOk() {
+                        m_fileDirectory = new FileInfo(pathDialog.getText());
+                        pathDialog.dismiss();
+                        pathDialog = null;
+                        startSelectFile();
+                    }
+                    @Override
+                    public void onTextInputClickCancel() {
+                        pathDialog.dismiss();
+                        pathDialog = null;
+                    }
+                });
+                pathDialog.show(getFragmentManager(), "test");    //TODO: what is the second argument?
+                return;
+            } else {
+                return; // error or pending
+            }
         }
 
         showPost(m_fileDirectory, listFileInfo);
@@ -233,8 +257,8 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
         startSelectFile();
     }
 
-    protected List<FileInfo> getListFileInfo(FileInfo fileDirectory){
-        File file = new File(fileDirectory.getAbsolutePath());
+    protected List<FileInfo> getListFileInfo(String fileDirectory){
+        File file = new File(fileDirectory);
         File[] aFile = file.listFiles();
         List<FileInfo> listFileInfo = new ArrayList<FileInfo>();
         if( null != aFile ){

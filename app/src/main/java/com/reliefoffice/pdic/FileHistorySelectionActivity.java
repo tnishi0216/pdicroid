@@ -26,7 +26,7 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
     }
 
     @Override
-    protected List<FileInfo> getListFileInfo(FileInfo fileDirectory) {
+    protected List<FileInfo> getListFileInfo(String path) {
         if (fileHistory.size()==0){
             // no history exists
             AlertDialog.Builder builder = new AlertDialog.Builder(this);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="1st Category">
+    <PreferenceCategory android:title="">
         <CheckBoxPreference
             android:summaryOn="@string/showpronexp_on"
             android:summaryOff="@string/showpronexp_off"
@@ -9,7 +9,7 @@
             android:defaultValue="false"
             android:key="ShowPronExp"></CheckBoxPreference>
         </PreferenceCategory>
-    <PreferenceCategory android:title="2nd Category">
+    <PreferenceCategory android:title="">
         <CheckBoxPreference
             android:summaryOn=""
             android:summaryOff="@string/bookmark_sharing_summary"
@@ -18,7 +18,7 @@
             android:defaultValue="false"
             android:key="PSBookmarkSharing"></CheckBoxPreference>
     </PreferenceCategory>
-    <PreferenceCategory android:title="3rd Category">
+    <PreferenceCategory android:title="">
         <CheckBoxPreference
             android:summaryOn="@string/defcharset_summary_on"
             android:summaryOff="@string/defcharset_summary_off"
