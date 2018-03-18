@@ -334,6 +334,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             HistoryFilename histName = getLatestHistoryName();
             if (histName!=null){
                 fileEncoding = histName.encoding;
+                autoStartPlayMode = false;
                 loadFile(histName.filename, histName.remoteName);
             }
         }
@@ -951,6 +952,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
 
     @Override
     public void onFileSelect(FileInfo file) {
+        autoStartPlayMode = true;
         if (fromDropbox) {
             ndvUtils.setInitialDir(file.getParent());
             String toFileName = ndvUtils.convertToLocalName(file.getAbsolutePath());
@@ -1093,6 +1095,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
                     } else {
                         // File Load from History
                         fileEncoding = bundle.getString("fileEncoding");
+                        autoStartPlayMode = true;
                         loadFile(filename, remotename);
                     }
                 }
@@ -1190,6 +1193,8 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     // Audio Player
     // --------------------------------------- //
     private boolean autoLooping = false;
+    private boolean autoStartPlay = false;
+    private boolean autoStartPlayMode = false;
     private LinearLayout audioLayout;
     private SeekBar audioSlider;
     private Button btnStepRewind;
@@ -1227,7 +1232,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         tvPosition = (TextView)findViewById(R.id.text_position);
         showAudio(false);
     }
-    boolean openAudioPlayer(String filename){
+    boolean openAudioPlayer(String filename) {
         closeAudioPlayer(false);
         if (!Utility.fileExists(filename))
             return false;
@@ -1253,13 +1258,12 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
 
         if (!autoLooping)
             mediaPlayer.setLooping(true);
-        mediaPlayer.start();
-        lastPlaying = true;
 
         updateThread = new AudioSliderUpdateThread();
         updateThread.start();
-        btnPlayPause.setText(R.string.label_pause);
         tvPosition.setText("sss");
+
+        audioPlayPause(!autoStartPlayMode && !autoStartPlay);
 
         return true;
     }
@@ -1296,12 +1300,18 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     }
     void audioPlayPause(){
         if (mediaPlayer == null) return;
-        if (mediaPlayer.isPlaying()){
-            mediaPlayer.pause();
+        audioPlayPause(mediaPlayer.isPlaying());
+    }
+    void audioPlayPause(boolean pause){
+        if (mediaPlayer == null) return;
+        if (pause){
+            if (mediaPlayer.isPlaying())
+                mediaPlayer.pause();
             btnPlayPause.setText(R.string.label_play);
             lastPlaying = false;
         } else {
-            mediaPlayer.start();
+            if (!mediaPlayer.isPlaying())
+                mediaPlayer.start();
             btnPlayPause.setText(R.string.label_pause);
             lastPlaying = true;
         }
