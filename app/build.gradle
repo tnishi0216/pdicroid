@@ -9,7 +9,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 619
-        versionName "0.6.19 alpha"
+        versionName "0.6.20 alpha"
         ndk {
             moduleName "pdjni"
             stl "gnustl_shared"
