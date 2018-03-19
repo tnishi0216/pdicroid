@@ -227,9 +227,9 @@ abstract public class PSBookmarkEditWindow {
     void editComment(){
         commentInputDialog = new CommentInputDialog();
         commentInputDialog.setText(psbmItem.comment);
-        commentInputDialog.setCallback(new TextInputCallback() {
+        commentInputDialog.setCallback(new CommentInputCallback() {
             @Override
-            public void onTextInputClickOk() {
+            public void onCommentInputClickOk() {
                 psbmItem.comment = commentInputDialog.getText();
                 psbmItem.color &= ~0xFF000000;   //TODO: alpha support
                 psbmFM.open();
@@ -240,7 +240,7 @@ abstract public class PSBookmarkEditWindow {
             }
 
             @Override
-            public void onTextInputClickCancel() {
+            public void onCommentInputClickCancel() {
                 commentInputDialog.dismiss();
                 commentInputDialog = null;
             }
