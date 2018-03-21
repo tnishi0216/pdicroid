@@ -53,7 +53,7 @@ public class FileHistoryManager {
             long date = pref.getLong(PFS_FILEHISTORYDATE+i, 0);
             String encoding = pref.getString(PFS_FILEENCODING+i, "");
             fileList.add(new HistoryItem(filename, date, encoding));
-            Log.d("PDD", "filehist:"+ filename + " date:" + date);
+            //Log.d("PDD", "filehist:"+ filename + " date:" + date);
         }
     }
     void save(){
