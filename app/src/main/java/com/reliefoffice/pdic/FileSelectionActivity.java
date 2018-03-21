@@ -262,7 +262,9 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
         File[] aFile = file.listFiles();
         List<FileInfo> listFileInfo = new ArrayList<FileInfo>();
         if( null != aFile ){
+            String altAudioFolder = Utility.altAudioFolder(pref);
             for( File fileTemp : aFile ){
+                boolean mp3Exists = false;
                 if (m_exts!=null && m_exts.length!=0 && !fileTemp.isDirectory()){
                     String lcName = fileTemp.getName().toLowerCase();
                     boolean found = false;
@@ -273,8 +275,11 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
                         }
                     }
                     if (!found) continue;
+
+                    // 音声ファイルがあるか？
+                    mp3Exists = Utility.mp3Exists(fileTemp.getName(), altAudioFolder);
                 }
-                listFileInfo.add( new FileInfo( fileTemp.getName(), fileTemp ) );
+                listFileInfo.add( new FileInfo( fileTemp.getName(), fileTemp, mp3Exists ) );
             }
             Collections.sort(listFileInfo);
         }

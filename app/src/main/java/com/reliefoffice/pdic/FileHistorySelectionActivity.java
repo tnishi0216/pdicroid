@@ -53,6 +53,7 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
         INetDriveUtils ndvUtils = DropboxUtils.getInstance(this);
 
         List<FileInfo> listFile = new ArrayList<FileInfo>();
+        String altAudioFolder = Utility.altAudioFolder(pref);
         for (int i=0;i<fileHistory.size();i++) {
             String filename = fileHistory.get(i);
             File file = new File(filename);
@@ -69,6 +70,7 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
                 fileInfo = new FileInfo(file.getName(), file);
             }
             fileInfo.setReaddate(fileHistory.getDateLong(i));
+            fileInfo.m_mp3Exists = Utility.mp3Exists(fileInfo.getName(), altAudioFolder);
             listFile.add(fileInfo);
         }
         return listFile;

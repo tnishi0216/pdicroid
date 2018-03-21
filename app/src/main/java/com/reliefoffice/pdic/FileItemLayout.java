@@ -36,6 +36,9 @@ public class FileItemLayout extends LinearLayout {
         if (item.isDirectory()) {
             imageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_folder));
         } else {
+            if (item.m_mp3Exists) {
+                imageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_textmp3_file));
+            } else
             if (!item.getName().toLowerCase().endsWith(".dic")){
                 imageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_text_file));
             }

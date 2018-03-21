@@ -17,10 +17,18 @@ public class FileInfo implements Comparable<FileInfo> {
     Long m_modDate;
     Long m_readDate;
 
+    boolean m_mp3Exists = false;
+
     // constructor
     public FileInfo( String strName, File file )
     {
         initialize(strName, file);
+    }
+    // constructor
+    public FileInfo( String strName, File file, boolean mp3Exists )
+    {
+        initialize(strName, file);
+        m_mp3Exists = mp3Exists;
     }
     // constructor
     public FileInfo( String strName, boolean isDir, String parent )

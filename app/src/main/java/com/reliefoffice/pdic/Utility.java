@@ -1,6 +1,7 @@
 package com.reliefoffice.pdic;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.Layout;
@@ -16,6 +17,8 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.reliefoffice.pdic.text.pfs;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -70,6 +73,25 @@ public class Utility {
     public static boolean fileExists(String filename){
         File file = new File(filename);
         return file.exists();
+    }
+
+    // audio folderのpathを返す
+    public static String altAudioFolder(SharedPreferences pref){
+        String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity.DefaultAudioFolder);
+        if (Utility.isEmpty(altAudioFolder))
+            altAudioFolder = SettingsActivity.DefaultAudioFolder;
+        return altAudioFolder;
+    }
+
+    // filenameに対するmp3ファイルが存在するか？
+    public static boolean mp3Exists(String filename, String altAudioFolder){
+        String audioFileName = Utility.changeExtension(filename, "mp3");
+        boolean mp3Exists = Utility.fileExists(audioFileName);
+        if (!mp3Exists){
+            audioFileName = Utility.changePath(audioFileName, altAudioFolder);
+            mp3Exists = Utility.fileExists(audioFileName);
+        }
+        return mp3Exists;
     }
 
     // general purpose for EditText
