@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -20,7 +21,9 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
     INetDriveFileManager ndvFM;
     INetDriveUtils ndvUtils;
     CheckBoxPreference psbmSharing;
+    EditTextPreference AudioFileFolder;
     CheckBoxPreference psbmDefCharset;
+    static public String DefaultAudioFolder = "/storage/sdcard0/Download";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +36,7 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
         ndvFM = DropboxFileManager.createInstance(this);
         ndvUtils = DropboxUtils.getInstance(this);
 
-        psbmSharing = (CheckBoxPreference)findPreference("PSBookmarkSharing");
+        psbmSharing = (CheckBoxPreference) findPreference("PSBookmarkSharing");
         psbmSharing.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -62,8 +65,21 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
             psbmFM.deleteInstance();
         }
 
-        psbmDefCharset = (CheckBoxPreference)findPreference("DefCharset");
+        AudioFileFolder = (EditTextPreference) findPreference("AudioFileFolder");
+        if (Utility.isEmpty(AudioFileFolder.getText())){
+            AudioFileFolder.setText(DefaultAudioFolder);
+        }
+
+        psbmDefCharset = (CheckBoxPreference) findPreference("DefCharset");
     }
+
+    // summaryの動的変更
+    private SharedPreferences.OnSharedPreferenceChangeListener listener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    AudioFileFolder.setSummary(AudioFileFolder.getText());
+                }
+            };
 
     public static class MyDropboxAppKeysDialog extends DropboxAppKeysDialog {
         @Override
@@ -129,6 +145,8 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
     protected void onResume() {
         super.onResume();
 
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
+
         if (ndvFM.authComplete(this)){
             selectDropboxFile();
         }
@@ -139,7 +157,12 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
         if (!enabled){
             psbmSharing.setChecked(false);
         }
+    }
 
+    @Override
+    protected void onPause(){
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     /*

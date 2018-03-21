@@ -9,4 +9,5 @@ public class pfs {
     public static final String INITIALDIR = "InitialDir";
     public static final String DEFCHARSET = "DefCharset";
     public static final String SHOW_PRONEXP = "ShowPronExp";
+    public static final String AUDIOFILEFOLDER = "AudioFileFolder";
 }

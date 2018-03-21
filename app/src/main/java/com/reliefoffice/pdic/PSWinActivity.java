@@ -867,6 +867,9 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         String audioFileName = Utility.changeExtension(openedFilename, "mp3");
         boolean audioOk = openAudioPlayer(audioFileName);
         if (!audioOk){
+            String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity.DefaultAudioFolder);
+            if (Utility.isEmpty(altAudioFolder))
+                altAudioFolder = SettingsActivity.DefaultAudioFolder;
             audioFileName = Utility.changePath(audioFileName, altAudioFolder);
             audioOk = openAudioPlayer(audioFileName);
         }
@@ -1208,7 +1211,6 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     private boolean lastPlaying = false;
     // settings
     private int stepRewindTime = 5000; // [msec]
-    private String altAudioFolder = "/storage/sdcard0/Download";
 
     private AudioSliderUpdateThread updateThread;
     void initAudioPlayer(){

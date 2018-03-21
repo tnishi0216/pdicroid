@@ -19,6 +19,15 @@
             android:key="PSBookmarkSharing"></CheckBoxPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="">
+        <EditTextPreference
+            android:title="@string/audio_file_folder"
+            android:summary=""
+            android:dialogTitle="@string/audio_file_folder"
+            android:inputType="textUri"
+            android:key="AudioFileFolder">
+        </EditTextPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="">
         <CheckBoxPreference
             android:summaryOn="@string/defcharset_summary_on"
             android:summaryOff="@string/defcharset_summary_off"
