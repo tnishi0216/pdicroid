@@ -67,10 +67,10 @@ bool IsKinsokuA( ushort c )
 	const tchar *p = StrKinsokuH;
 	while ( *p ){
 		if ( (tuchar)*p == (tuchar)c )
-			return TRUE;
+			return true;
 		p++;
 	}
-	return FALSE;
+	return false;
 }
 
 bool IsKinsokuJ( ushort c )
@@ -96,7 +96,7 @@ bool IsKinsokuJ( ushort c )
 		uchar c1 = (uchar)(c>>8);
 		while ( *p ){
 			if ( (uchar)*p == c1 && (uchar)*(p+1) == (uchar)c ){
-				return TRUE;
+				return true;
 			}
 			p += 2;
 		}
@@ -104,13 +104,13 @@ bool IsKinsokuJ( ushort c )
 		p = StrKinsokuK;
 		while ( *p ){
 			if ( (uchar)*p == (uchar)c )
-				return TRUE;
+				return true;
 			p++;
 		}
 		return IsKinsokuA( c );
 	}
 #endif
-	return FALSE;
+	return false;
 }
 
 // Helper function.
@@ -634,6 +634,7 @@ const tchar *FindDelimiter(const tchar *leftp, int &delimtype, vector<int> &word
 				if ( isalnum( c )
 					|| ( (uchar)c >= 0x80 )	// 0x80以降はどれがワードブレークになるかわからないためすべて??
 					){
+jwordchar:
 					if (word_reset){
 						word_reset = false;
 						wordindex.push_back(STR_DIFF(p, leftp));
@@ -653,12 +654,10 @@ const tchar *FindDelimiter(const tchar *leftp, int &delimtype, vector<int> &word
 								break;
 							case '\r':
 								dmt = DMT_CR;
-#if 1
 								// 改行
 								if (*nextp=='\n'){
-									nextp++;
+									p++;
 								}
-#endif
 								break;
 							case '\n':
 								dmt = DMT_CR;
@@ -668,16 +667,8 @@ const tchar *FindDelimiter(const tchar *leftp, int &delimtype, vector<int> &word
 								dmt = DMT_ILLEGAL;
 								break;
 						}
-#if 0
-						if (p==leftp){
-							delimtype = dmt;
-							return nextp;
-						} else
-#endif
-						{
-							delimtype = dmt;	// Ver.2同様
-							return p;
-						}
+						delimtype = dmt;	// Ver.2同様
+						return p;
 					} else {
 						// normal char.
 						if (fa){
@@ -744,6 +735,10 @@ const tchar *FindDelimiter(const tchar *leftp, int &delimtype, vector<int> &word
 					}
 				}
 			} else {
+				// 禁則文字
+				if (c <= 0x2B8){
+					goto jwordchar;
+				}
 				if (!word_reset){
 					word_reset = true;
 					wordindex.push_back(STR_DIFF(p,leftp));
@@ -1267,7 +1262,7 @@ const tchar *ParsePdicHyperLink2(const tchar *text, const tchar *top)
 			for (;;){
 				if (IsHypLinkTerm(*p)){
 					// Found terminator.
-					return text-offs;
+					return p;
 				}
 				p = _CharNext(p, false);
 			}

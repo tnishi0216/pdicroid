@@ -259,8 +259,10 @@ tchar *bintohex( tchar *buffer, const byte *bin, int bytes )
 // bin‚©‚çbytes•ª‚¾‚¯hex•¶š—ñ‚É•ÏŠ·
 tnstr bintohex( const byte *bin, int bytes )
 {
-	autoptr<tchar> s(BinToHex(bin, bytes));
-	return tnstr(s);
+	tnstr s;
+	s.reserve(bytes*2);
+	bintohex(s.data(), bin, bytes);
+	return s;
 }
 // str‚Ì’†‚Å target ‚Éˆê’v‚·‚é•¶š—ñ‚ª‚ ‚Á‚½ê‡Anewstring‚É’u‚«Š·‚¦‚é
 bool ReplaceString( tchar *str, const tchar *target, const tchar *newstring )

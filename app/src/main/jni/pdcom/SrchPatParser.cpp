@@ -529,7 +529,7 @@ jesc2:;
 		}
 	}
 	work.close(dp);
-	if (dp!=buf){
+	if (dp!=buf && buf[0]){
 		tnstr *s = new tnstr();
 		s->setBuf(buf);
 		pats.add(s);

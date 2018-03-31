@@ -177,6 +177,8 @@ public:
 		{ return (T**)super::migrate( ); }
 	int insert( int i, T *obj )
 		{ return super::insert( i, obj ); }
+	int insert( int i, const FlexObjectArray<T> &o );
+	int insert_discard( int i, FlexObjectArray<T> &o );
 	int replace( int i, T *obj )
 		{ return super::replace( i, obj ); }
 	int add( T *obj )
@@ -216,6 +218,56 @@ void FlexObjectArray<T>::assign(const FlexObjectArray<T> &o)
 {
 	clear();
 	add(o);
+}
+
+template <class T>
+int FlexObjectArray<T>::insert( int i, const FlexObjectArray<T> &o )
+{
+	if (o.size() == 0)
+		return 0;
+
+	if ( i > num )
+		return -1;
+
+	if (max_num!=-1 && num + o.size() > max_num)
+		return -1;
+
+	allocate( num + o.size() );
+
+	if (num-i>0)
+		memmove( &array[i+o.size()], &array[i], ( num-i ) * sizeof(void *) );
+
+	for (int j=0;j<o.size();j++){
+		array[ i + j ] = new T(o[j]);
+	}
+	num += o.size();
+	return 0;
+}
+
+// o.discard()‚µ‚Äinsert
+template <class T>
+int FlexObjectArray<T>::insert_discard( int i, FlexObjectArray<T> &o )
+{
+	if (o.size() == 0)
+		return 0;
+
+	if ( i > num )
+		return -1;
+
+	if (max_num!=-1 && num + o.size() > max_num)
+		return -1;
+
+	allocate( num + o.size() );
+
+	if (num-i>0)
+		memmove( &array[i+o.size()], &array[i], ( num-i ) * sizeof(void *) );
+
+	for (int j=0;j<o.size();j++){
+		array[ i + j ] = &o[j];
+	}
+	num += o.size();
+	o.discard();
+	return 0;
 }
 
 template <class T>

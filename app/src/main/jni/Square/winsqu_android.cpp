@@ -165,7 +165,7 @@ void Squre::CloseAutoLink()
 }
 void Squre::_dispStar( int no, int rev )
 {
-	DBW("_dispStar-1:%d rev=%d",no, rev);
+	//DBW("_dispStar-1:%d rev=%d",no, rev);
 	if ( no < 0 || no > LastIndex+1 )
 		return;
 

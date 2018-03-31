@@ -618,7 +618,9 @@ inline char *NEXT_CHAR( const char *str ){ if ( _ismbblead( *str ) ) return (cha
 #endif	// !__ANDROID__
 
 #define	_delete( obj )	delete obj; obj = 0
+#define	_delete_( obj )	delete[] obj; obj = 0
 #define	__delete( obj )	if ( obj ){ delete obj; obj=0; }
+#define	__delete_( obj )	if ( obj ){ delete[] obj; obj=0; }
 
 int __wcsicmp(const wchar_t *str1, const wchar_t *str2);
 int __wcsnicmp(const wchar_t *str1, const wchar_t *str2, int n);

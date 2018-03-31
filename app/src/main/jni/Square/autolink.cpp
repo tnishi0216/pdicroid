@@ -638,6 +638,7 @@ void Squre::CloseAllPopup( )
 	KillTimer( TM_ALTIMERCLICK );
 	CloseAutoLink();
 	if ( ps ){
+		ps->Close();	// 2018.3.8 popup&link‚Åpopup window‚ªopen‚µ‚Ä‚¢‚éó‘Ô‚ÅPDICI—¹‚·‚é‚Æps->Free(0)“à‚Ìdelete this‚Å—Ž‚¿‚é‚½‚ß‚Ì‘Îô(®‡«‚É–â‘è‚È‚¯‚ê‚Î‚±‚ÌƒRƒƒ“ƒgíœOK)
 		ps->Free(0);
 		ps = NULL;
 	}

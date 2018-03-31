@@ -10,6 +10,17 @@
 // 0xFFFF00F0-0xFFFFFFFE can be used for test, local only.
 // 0xFFFFFFFF is inhibitted.
 
+/*
+0x00000000
+0x00010000 : 標準
+0x0001FF00 : 汎用
+0x00020000 : simple
+0x00020001 : simple(old)
+0x80100010 : チェコ語(試作版)
+0x00100011 : チェコ語(正式版)
+Note: 現在のPDICはlayerAが同じであればopenできる仕様になっている
+*/
+
 #define	LPID_LA_MASK	0xFF	// LayerA bit mask
 
 // LangProc Id structure - old style
@@ -131,10 +142,7 @@ protected:
 	TIrregDics Irregs;	// 不規則変化辞書
 	class TBiPoolJ *IrregPool;
 	bool IrregCheckCase;	// normalize前の単語も比較する
-//	DWORD IrregLastCheck;
 public:
-//	void SetIrreg( const tchar *filename )
-//		{ IrregName = filename; }
 	void AddIrregFile(const tchar *filename);
 	bool IsIrregOpened()
 		{ return IrregPool!=NULL; }

@@ -35,7 +35,7 @@ int __nstr( const tchar *str1, const tchar *str2 )
 //iが-1のときは消去
 int Squre::dispStar(int i, bool linkui)
 {
-	DBW("dispStar:%d cury=%d/%d/%d", i, cury, get_num(), IndexOffset);
+	//DBW("dispStar:%d cury=%d/%d/%d", i, cury, get_num(), IndexOffset);
 	if ( i+IndexOffset >= get_num() )
 		i = get_num() - IndexOffset - 1;
 

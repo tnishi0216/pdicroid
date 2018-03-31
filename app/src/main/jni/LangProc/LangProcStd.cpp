@@ -99,7 +99,7 @@ bool TLangProcStd::CompareStd( COMPARE_STRUCT &cs, const int _flags )
 	if ( _flags & SLW_REPLACEANY3 ){
 		if ( _flags != SLW_REPLACEANY3 )
 			return true;
-		// ~による置換
+		// __による置換
 		dp = cs.dp;
 		if ( *(dp-2) == '_' )
 			return true;
@@ -1043,16 +1043,23 @@ jnext:;
 				}
 			}
 			srccomp = dstcomp;
-			if ( notrans_part.get_num() )
-				for ( ;notrans_part.get_num(); )
+			if ( notrans_part.get_num() ){
+				for ( ;notrans_part.get_num(); ){
+					// 重複チェック
+					for (int i=0;i<dstpart->size();i++){
+						if ( ((*dstpart)[i]).word == notrans_part[0].word ){
+							dstpart->del(i);
+							break;
+						}
+					}
+
 					srccomp->add( notrans_part.discard(0) );
-#if 1		// 2000.9.7 追加 単語単位の部分一致であれば、後続もヒットする可能性があるため
+				}
+			}
+			// 2000.9.7 追加 単語単位の部分一致であれば、後続もヒットする可能性があるため
 			// 例：Academy Awards Presentation
 			// 2009.3.13 insert indexを間違っていた
-			for(int i=0;dstpart->get_num();i++){
-				srccomp->insert( i, dstpart->discard(0) );
-			}
-#endif
+			srccomp->insert_discard(0, *dstpart);
 			skip_retry = 0;
 		} else {
 			//DBW("skip_retry=%d", skip_retry);
@@ -1069,7 +1076,24 @@ jnext:;
 			// その場合、srccompは、partになる。
 			// partにもひとつもなければ終了！！
 			if ( dstpart->get_num() ){
-				srccomp = dstpart;
+				// すべてがSLW_REPLACEANYxである場合、後続追加でヒットしない場合があるため
+				// 今回使用したものも再度使用する
+				int i;
+				for (i=0;i<dstpart->size();i++){
+					if (((*dstpart)[i].flag & SLW_REPLACEANYx) && !((*dstpart)[i].flag & ~SLW_REPLACEANYx)){
+						continue;
+					}
+					break;
+				}
+				if (i == dstpart->size()){
+					// すべてSLW_REPLACEANYxのみ
+					// やり直し方式と通常処理がある - どちらがいいだろうか？
+					compindex ^= 1;
+					srccomp->insert_discard(0, *dstpart);
+					to_continue = true;
+				} else {
+					srccomp = dstpart;
+				}
 				if (skip_retry==-1) skip_retry = 0;
 				// 完全一致でなければ返さないので、maxlenの設定は不要！！
 			} else {
@@ -1171,8 +1195,10 @@ int TLangProcStd::FindLoop(COMPARE_STRUCT &cs)
 #endif
 						0 };
 					for ( int fj=0;fj<sizeof(tbl_caseignore)/sizeof(int);fj++ ){
+#if OLDCASE
 						if ( (cs.flags & tbl_caseignore[fj]) != tbl_caseignore[fj])
 							continue;
+#endif
 						// SLW_REPLACE loop //
 						static int tbl1[6]
 							= {
@@ -1341,7 +1367,7 @@ int TLangProcStd::SearchLongestWord( MultiPdic &dic, const tchar *words, const t
 	*str = '\0';
 	int r = Search( cs, words, str, HitWords );
 	if ( r == -1 ){
-		delete _str;
+		delete[] _str;
 		return -1;
 	}
 	if ( maxlen < r )
@@ -1737,7 +1763,7 @@ int TLangProcStd::SearchLongestWordOptional( MultiPdic &dic, const tchar *words,
 
 exit:
 //	if ( fstr ) delete fstr;
-	if ( temp ) delete temp;
+	if ( temp ) delete[] temp;
 
 	return maxlen;
 }

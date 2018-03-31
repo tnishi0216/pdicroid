@@ -158,17 +158,19 @@ bool TRegexpp::CompareEx(const tchar *pattern, const tchar *str, tnstr_vec &strs
 		if (!handle)
 			return false;
 	}
+	bool ret = false;
 	if (regmatch(handle, str)){
 		for (int i=1;;i++){
 			const wchar_t *s = regmatch_string(handle, i);
 			if (!s || !s[0])
 				break;
 			strs.push_back(s);
+			ret = true;
 		}
 	}
 	if (pattern)
 		regfree(handle);
-	return true;
+	return ret;
 }
 #if 0
 // pattern match‚É‚æ‚éˆê’v•¶Žš‚ÌŽæ“¾‚ª‰Â”\
