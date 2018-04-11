@@ -38,6 +38,14 @@ public class FileInfo implements Comparable<FileInfo> {
         m_parent = parent;
     }
     // constructor
+    public FileInfo( String strName, boolean isDir, String parent, boolean mp3Exists )
+    {
+        m_strName = strName;
+        m_isDir = isDir;
+        m_parent = parent;
+        m_mp3Exists = mp3Exists;
+    }
+    // constructor
     public FileInfo(String filename){
         File file = new File(filename);
         initialize(file.getName(), file);

@@ -86,7 +86,9 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
         // assert( metadataTask.metadata instanceof FolderMetadata )
 
         List<FileInfo> listFileInfo = new ArrayList<FileInfo>();
+        String altAudioFolder = Utility.altAudioFolder(pref);
         for( Map.Entry<String,Metadata> fileTemp : metadataTask.children.entrySet() ){
+            boolean mp3Exists = false;
             Metadata md = fileTemp.getValue();
             if (m_exts!=null && m_exts.length!=0 && !(md instanceof FolderMetadata)){
                 String lcName = md.getName().toLowerCase();
@@ -98,11 +100,14 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
                     }
                 }
                 if (!found) continue;
+
+                // 音声ファイルがあるか？
+                mp3Exists = Utility.mp3Exists(md.getName(), altAudioFolder);
             }
             File file = new File(md.getPathDisplay());
             String path = file.getParent();
             if (path != "/") path += "/";
-            FileInfo fileInfo = new FileInfo( md.getName(), md instanceof FolderMetadata, path );
+            FileInfo fileInfo = new FileInfo( md.getName(), md instanceof FolderMetadata, path, mp3Exists );
             if (md instanceof FileMetadata){
                 FileMetadata fm = (FileMetadata)md;
                 fileInfo.setFileSize(fm.getSize());
