@@ -52,10 +52,10 @@ public class Dropbox2PollingFolders extends AsyncTask<Void, Void, Void> {
         }
         Log.d("PDD", "dbCursor is "+dbCursor);
         while (!isCancelled()) {
+            checkUpload();
             if (checkRevision()){
                 checkDownload();
             }
-            checkUpload();
             if (dbxFM.needRemoteCheck()) {
                 dbxFM.lockApi();
                 try {
