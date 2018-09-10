@@ -98,6 +98,7 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
         }
     }
 
+    // Dropbox serverからdownloadするファイルを選択する
     //DropboxFileSelectionDialog fileSelectionDialog;
     private void selectDropboxFile(){
         DropboxFileSelectionDialog dlg = DropboxFileSelectionDialog.createInstance( this, this, ndvFM, false);

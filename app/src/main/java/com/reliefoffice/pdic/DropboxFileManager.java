@@ -191,7 +191,7 @@ public class DropboxFileManager extends DropboxBaseFileManager {
 
     // End of polling operations //
 
-    // Donload Task //
+    // Download Task //
     @Override
     public void executeDownload(String from, File to, final OnExecuteListener listener){
         DownloadTask task = new DownloadTask(this, from, to, listener);
