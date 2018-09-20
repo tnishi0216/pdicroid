@@ -72,7 +72,7 @@
     <string name="label_select">Select</string>
     <string name="labe_save">Save</string>
     <string name="msg_mkdir_failed">Failed to mkdirs : </string>
-    <string name="msg_nodictionary">No dictionary is not configured to use PDIC. Please add one or more dictionaries in Dictionary Setting.</string>
+    <string name="msg_nodictionary">Dictionary is not configured to use PDIC. Please add one or more dictionaries in Dictionary Setting.</string>
     <string name="msg_input_word">Input Search Words</string>
     <string name="title_downloading_file">Downloading file..</string>
     <string name="msg_clipboard_loaded">Clipboard loaded.</string>
