@@ -388,8 +388,16 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             };
             int x = (int)lastX;
             final int fontHeight = 32;  //TODO: １行分の高さ
-            int y = ((int)lastY) - editText.getHeight() + fontHeight + 4;
-            //Log.d("PDD", "y="+y+" lastY="+lastY+" editText.Height="+editText.getHeight()+" fontHeight="+fontHeight);
+            int y;
+            if (popupList.getVisibility() == View.GONE){
+                // popup is visible
+                //TODO: こちらはまだおかしい
+                y = - ((int)lastY) + fontHeight + 4;
+            } else {
+                // popup is invisible
+                y = ((int)lastY) - editText.getHeight() + fontHeight + 4;
+            }
+            Log.d("PDD", "y="+y+" lastY="+lastY+" editText.Height="+editText.getHeight()+" fontHeight="+fontHeight);
             psbEditWindow.show(editText, x, y);
         }
     }
