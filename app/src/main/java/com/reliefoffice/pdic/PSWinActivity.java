@@ -717,18 +717,18 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     static final int REQUEST_CODE_SELECT_FILE_DBX = 3;
 
     boolean fromDropbox = false;
-    private String m_strInitialDir = "/";
+    private String m_strInitialDir;
 
     void selectFile() {
         if (config.useOldFileSelection) {
             FileSelectionDialog dlg = new FileSelectionDialog(this, this, false);
             String[] exts = {".txt"};
-            m_strInitialDir = pref.getString(pfs.PSINITIALDIR, m_strInitialDir);
+            m_strInitialDir = pref.getString(pfs.PSINITIALDIR, Utility.initialFileDirectory());
             dlg.show(new File(m_strInitialDir), exts);
             fromDropbox = false;
         } else {
             Intent i = new Intent().setClassName(this.getPackageName(), FileDirSelectionActivity.class.getName());
-            i.putExtra(pfs.INITIALDIR, pref.getString(pfs.PSINITIALDIR, m_strInitialDir));
+            i.putExtra(pfs.INITIALDIR, pref.getString(pfs.PSINITIALDIR, Utility.initialFileDirectory()));
             startActivityForResult(i, REQUEST_CODE_SELECT_FILE);
         }
     }

@@ -24,7 +24,7 @@ public class FileSaveActivity extends ActionBarActivity implements FileSelection
     static final String PFS_PSINITIALDIR = "PSInitialDir";
     SharedPreferences pref;
 
-    private String m_strInitialDir = "/";
+    private String m_strInitialDir;
     private String filename = "";
 
     // Dropbox members //
@@ -42,7 +42,7 @@ public class FileSaveActivity extends ActionBarActivity implements FileSelection
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
-        m_strInitialDir = pref.getString(PFS_PSINITIALDIR, m_strInitialDir);
+        m_strInitialDir = pref.getString(PFS_PSINITIALDIR, Utility.initialFileDirectory());
 
         // Dropbox //
         ndvUtils = DropboxUtils.getInstance(this);

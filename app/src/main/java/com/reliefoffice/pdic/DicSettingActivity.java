@@ -30,7 +30,7 @@ public class DicSettingActivity extends Activity implements FileSelectionDialog.
     ArrayAdapter<String> adpDicList;
     int lastSelDic;
 
-    private String m_strInitialDir = "/";
+    private String m_strInitialDir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +103,7 @@ public class DicSettingActivity extends Activity implements FileSelectionDialog.
     protected void onResume() {
         super.onResume();
         updateList();
-        m_strInitialDir = pref.getString(pfs.INITIALDIR, m_strInitialDir);
+        m_strInitialDir = pref.getString(pfs.INITIALDIR, Utility.initialFileDirectory());
     }
 
     void updateList(){

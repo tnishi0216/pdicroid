@@ -42,6 +42,10 @@ public class Utility {
         return NumberFormat.getNumberInstance().format(value);
     }
 
+    public static String initialFileDirectory(){
+        return "/storage/emulated/0";
+    }
+
     // ファイル名の拡張子を変更する
     public static final String changeExtension(String filename, String extention){
         File in = new File(filename);

@@ -202,7 +202,8 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
         if (listFileInfo == null || listFileInfo.size() <= 1){
             String rootStr = "/";
             //Note: rootStr == m_fileDirectory.getAbsolutePath()では正常に動かない
-            if (rootStr.compareTo(m_fileDirectory.getAbsolutePath())==0){
+            if (rootStr.compareTo(m_fileDirectory.getAbsolutePath())==0
+                    || Utility.initialFileDirectory().compareTo(m_fileDirectory.getAbsolutePath())==0){
                 pathDialog = new TextInputDialog();
                 pathDialog.titleText = getString(R.string.title_enter_path);
                 pathDialog.setText(m_fileDirectory.getPath());

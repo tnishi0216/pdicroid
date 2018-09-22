@@ -13,7 +13,7 @@ import java.util.List;
 
 public class FileDirSelectionActivity extends FileSelectionActivity {
     static final String PFS_INITIALDIR = "FileSelInitialDir";
-    String m_strInitialDir = "/";
+    String m_strInitialDir = Utility.initialFileDirectory();
 
     public void setSaveMode(){
         modeForSave = true;
