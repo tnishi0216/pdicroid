@@ -662,7 +662,10 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             popupList.setVisibility(View.VISIBLE);
         } else {
             // to invisible
-            if (on) return;
+            if (on){
+                popupList.setSelection(0);
+                return;
+            }
             popupList.setVisibility(View.GONE);
             ViewGroup.LayoutParams params;
             params = editText.getLayoutParams();
