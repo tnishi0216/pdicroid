@@ -1,9 +1,6 @@
 #ifndef __defs_android_h
 #define __defs_android_h
 
-#define	DOCPATH		"/sdcard/Pdic"
-#define	_tDOCPATH	_t("/sdcard/Pdic")
-
 #define LOGF(...) __android_log_print(ANDROID_LOG_FATAL, "PDJ", __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "PDJ", __VA_ARGS__)
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, "PDJ", __VA_ARGS__)

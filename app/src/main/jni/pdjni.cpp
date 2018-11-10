@@ -27,8 +27,13 @@
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "PDJ", __VA_ARGS__)
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, "PDJ", __VA_ARGS__)
 
+tnstr AppInternalPath;
+tnstr TempPath;
+
+void DeleteOldInternalFiles();
+bool unlinkDocPath(const char *filename);
 bool CopyInternalFiles(AAssetManager *mgr);
-bool LoadAssetFile(AAssetManager *mgr, const char *src, const char *dst);
+bool LoadAssetFile(AAssetManager *mgr, const char *src, const char *dstpath, const char *dstname);
 bool InitLangProc();
 void LoadAllProfile( );
 
@@ -40,6 +45,7 @@ protected:
 	std::wstring wstr;
 	JNIEnv *env;
 	const jchar *jstr;
+	__tnstrA utf8;
 public:
 	JString(JNIEnv *_env, jstring _str)
 		:env(_env)
@@ -65,6 +71,12 @@ public:
 		return wstr[i];
 	}
 	operator const wchar_t *(){ return wstr.c_str(); }
+	const char *c_utf8() {
+		if (utf8.empty()){
+			utf8.setUTF8(wstr.c_str());
+		}
+		return utf8;
+	}
 };
 
 class JReturn {
@@ -92,7 +104,9 @@ JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_inittest(JNIEnv* env, 
 	return 0;
 }
 
-JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_initPdic(JNIEnv* env, jint param1, jclass thiz, jobject assetManager, jstring tempPath)
+// tempPath: temporary path (メモリ不足時解放）
+// appInternalPath: アプリ固有のstorage(application uninstallで削除)
+JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_initPdic(JNIEnv* env, jint param1, jclass thiz, jobject assetManager, jstring tempPath, jstring appInternalPath)
 {
 	if (!assetManager){
 		return -1;
@@ -103,9 +117,14 @@ JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_initPdic(JNIEnv* env, 
 	}
 
 	JString wtempPath(env, tempPath);
+	TempPath = wtempPath;
+	JString wappInternalPath(env, appInternalPath);
+	AppInternalPath = wappInternalPath;
 
-	InitAndroid(wtempPath.c_str());
+	InitAndroid(wtempPath);
 	
+	DeleteOldInternalFiles();
+
 	if (!CopyInternalFiles(mgr)){
 		return -3;
 	}
@@ -618,7 +637,7 @@ JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_xopenPSBookmark
 	const wchar_t *wfilename;
 	JString jfilename(env, filename);
 	if (jfilename.empty()){
-		const char *defname = DOCPATH "/PSBookmark.txt";
+		__tnstrA defname; defname << __cstr(AppInternalPath).utf8() << "/PSBookmark.txt";
 		_wfilename.setUTF8( defname );
 		wfilename = _wfilename;
 	} else {
@@ -746,45 +765,61 @@ JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_xloadPSFileInfo
 
 } /* "C" */
 
+// from 2018.11.10 (１年くらい経ったら削除？）
+void DeleteOldInternalFiles()
+{
+	unlinkDocPath("Sample.dic");
+	unlinkDocPath("DefLangProc.ctt");
+	unlinkDocPath("SrchPat.ctt");
+	unlinkDocPath("IrregDic.txt");
+	unlinkDocPath("example.txt");
+}
+
+bool unlinkDocPath(const char *filename)
+{
+	__tnstrA path;
+	path << DEF_DOCPATH << "/" << filename;
+	return unlink(path) == 0;
+}
+
 bool CopyInternalFiles(AAssetManager *mgr)
 {
-	if (mkdir(DOCPATH, 0777)){
-		if (errno!=EEXIST){
-			LOGE("mkdir error : %d", errno);
-		}
-	}
-	if (!LoadAssetFile(mgr, "Sample.dic", DOCPATH "/Sample.dic")){
+	__tnstrA path = __cstr(AppInternalPath).utf8();
+
+	if (!LoadAssetFile(mgr, "Sample.dic", path, "Sample.dic")){
 		return false;
 	}
-	if (!LoadAssetFile(mgr, "DefLangProc.ctt", DOCPATH "/DefLangProc.ctt")){
+	if (!LoadAssetFile(mgr, "DefLangProc.ctt", path, "DefLangProc.ctt")){
 		return false;
 	}
-	if (!LoadAssetFile(mgr, "SrchPat.ctt", DOCPATH "/SrchPat.ctt")){
+	if (!LoadAssetFile(mgr, "SrchPat.ctt", path, "SrchPat.ctt")){
 		return false;
 	}
-	if (!LoadAssetFile(mgr, "IrregDic.txt", DOCPATH "/IrregDic.txt")){
+	if (!LoadAssetFile(mgr, "IrregDic.txt", path, "IrregDic.txt")){
 		return false;
 	}
-	if (!LoadAssetFile(mgr, "example.txt", DOCPATH "/example.txt")){
+	if (!LoadAssetFile(mgr, "example.txt", path, "example.txt")){
 		return false;
 	}
 	return true;
 }
 
-bool LoadAssetFile(AAssetManager *mgr, const char *src, const char *dst)
+bool LoadAssetFile(AAssetManager *mgr, const char *src, const char *dstpath, const char *dstname)
 {
 	AAsset* asset = AAssetManager_open(mgr, src, AASSET_MODE_STREAMING);
 	if (!asset){
 		LOGE("asset open error: %s", src);
 		return false;
 	}
+	__tnstrA dstfile;
+	dstfile << dstpath << "/" << dstname;
 	bool ok = false;
 	size_t size = AAsset_getLength(asset);
 	char *buf = (char*)malloc(size);
 	if (buf){
 		AAsset_read(asset, buf, size);
 		AAsset_close(asset);
-		FILE *fp = fopen(dst, "w");
+		FILE *fp = fopen(dstfile, "w");
 		if (fp){
 			int wb = fwrite(buf, size, 1, fp);
 			if (wb==1){
@@ -792,7 +827,7 @@ bool LoadAssetFile(AAssetManager *mgr, const char *src, const char *dst)
 			}
 			fclose(fp);
 		} else {
-			LOGE("open error: %s : %d", dst, errno);
+			LOGE("open error: %s : %d", dstfile.c_str(), errno);
 		}
 		free(buf);
 	}

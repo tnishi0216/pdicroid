@@ -295,8 +295,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         showPopupList(false);
 
         // Initialize JNI.
-        File tempPath = getExternalFilesDir(null);
-        pdicJni = PdicJni.createInstance(getAssets(), tempPath.getAbsolutePath());        // Create JNI callback
+        pdicJni = PdicJni.createInstance(this, getAssets());        // Create JNI callback
 
 		jniCallback = JniCallback.createInstance();
         wordListAdapter = new TWordListAdapter(popupList, popupListAdapter);
@@ -879,9 +878,9 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         String audioFileName = Utility.changeExtension(openedFilename, "mp3");
         boolean audioOk = openAudioPlayer(audioFileName);
         if (!audioOk){
-            String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity.DefaultAudioFolder);
+            String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity.getDefaultAudioFolder());
             if (Utility.isEmpty(altAudioFolder))
-                altAudioFolder = SettingsActivity.DefaultAudioFolder;
+                altAudioFolder = SettingsActivity.getDefaultAudioFolder();
             audioFileName = Utility.changePath(audioFileName, altAudioFolder);
             audioOk = openAudioPlayer(audioFileName);
         }

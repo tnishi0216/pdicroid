@@ -3,6 +3,7 @@ package com.reliefoffice.pdic;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -23,7 +24,11 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
     CheckBoxPreference psbmSharing;
     EditTextPreference AudioFileFolder;
     CheckBoxPreference psbmDefCharset;
-    static public String DefaultAudioFolder = "/storage/sdcard0/Download";
+
+    static final public String getDefaultAudioFolder()
+    {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,9 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
 
         AudioFileFolder = (EditTextPreference) findPreference("AudioFileFolder");
         if (Utility.isEmpty(AudioFileFolder.getText())){
+            String DefaultAudioFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+            // DefaultAudioFolder = "/storage/emulated/0/Download";
+            // DefaultAudioFolder = "/storage/sdcard0/Download";
             AudioFileFolder.setText(DefaultAudioFolder);
         }
 

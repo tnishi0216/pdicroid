@@ -74,7 +74,8 @@ bool TRegKey::ReadMulti( const tchar *name, tnstr_vec &array )
 
 const tchar *GetDocumentsPath()
 {
-	return _tDOCPATH;
+	extern tnstr TempPath;
+	return TempPath;
 }
 
 tnstr PdProfile::GetDictionaryPath(bool create)

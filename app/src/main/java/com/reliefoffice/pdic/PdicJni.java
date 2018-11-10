@@ -1,6 +1,10 @@
 package com.reliefoffice.pdic;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.res.AssetManager;
+
+import java.io.File;
 
 /**
  * Created by tnishi on 2015/06/10.
@@ -20,7 +24,7 @@ public class PdicJni {
 
     }
 
-    static public PdicJni createInstance(AssetManager assetManager, String tempPath)
+    static public PdicJni createInstance(Context context, AssetManager assetManager)
     {
         if (refCounter==0) {
             if (assetManager == null) {
@@ -32,7 +36,9 @@ public class PdicJni {
 
             This = new PdicJni();
             //TODO: initPdic()ÇassertManager!=nullÇ≈Ç†ÇÍÇŒèÌÇ…åƒÇ—èoÇ∑Ç©ÅH
-            int ret = This.initPdic(0, assetManager, tempPath);
+            File appCachePath = context.getCacheDir();
+            File appInternalPath = context.getFilesDir();
+            int ret = This.initPdic(0, assetManager, appCachePath.getAbsolutePath(), appInternalPath.getAbsolutePath());
             if (ret!=0){
                 This = null;
                 return null;
@@ -58,7 +64,7 @@ public class PdicJni {
     public int deleteFrame(){
         return deletePdicFrame(0);
     }
-    private native int initPdic(int param1, AssetManager assetManager, String tempPath);
+    private native int initPdic(int param1, AssetManager assetManager, String appInternalPath, String appCachePath);
     //public native int inittest(int param1);
     private native int createPdicFrame(JniCallback callback, int param1);
     private native int deletePdicFrame(int param1);

@@ -126,8 +126,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         });
 
         // Initialize JNI.
-        File tempPath = getExternalFilesDir(null);
-        pdicJni = PdicJni.createInstance(getAssets(), tempPath.getAbsolutePath());        // Create JNI callback
+        pdicJni = PdicJni.createInstance(this, getAssets());        // Create JNI callback
 
 		jniCallback = JniCallback.createInstance();
         jniCallback.setWordListAdapter(wordList, wordListAdapter);

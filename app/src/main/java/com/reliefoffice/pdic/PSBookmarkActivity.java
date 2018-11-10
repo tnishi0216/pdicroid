@@ -41,8 +41,7 @@ public class PSBookmarkActivity extends ActionBarActivity {
             setTitle(getString(R.string.title_activity_loadfile_history));
         }
 
-        File tempPath = getExternalFilesDir(null);
-        pdicJni = PdicJni.createInstance(getAssets(), tempPath.getAbsolutePath());
+        pdicJni = PdicJni.createInstance(this, getAssets());
         ndvFM = DropboxFileManager.createInstance(this);
         psbmFM = PSBookmarkFileManager.createInstance(this, ndvFM);
 

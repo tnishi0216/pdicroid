@@ -3,6 +3,7 @@ package com.reliefoffice.pdic;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.Selection;
@@ -43,7 +44,8 @@ public class Utility {
     }
 
     public static String initialFileDirectory(){
-        return "/storage/emulated/0";
+        //return "/storage/emulated/0";
+        return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
     // ファイル名の拡張子を変更する
@@ -81,9 +83,9 @@ public class Utility {
 
     // audio folderのpathを返す
     public static String altAudioFolder(SharedPreferences pref){
-        String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity.DefaultAudioFolder);
+        String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity.getDefaultAudioFolder());
         if (Utility.isEmpty(altAudioFolder))
-            altAudioFolder = SettingsActivity.DefaultAudioFolder;
+            altAudioFolder = SettingsActivity.getDefaultAudioFolder();
         return altAudioFolder;
     }
 
