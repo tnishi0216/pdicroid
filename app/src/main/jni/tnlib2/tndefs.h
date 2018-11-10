@@ -78,6 +78,7 @@ inline tchar *NEXT_CHAR( const tchar *str ){ return (tchar*)str+1; }	//TODO: ƒTƒ
 #define	_MAX_PATH	256		//TODO: ‚¢‚­‚ÂH
 
 #define	__override	virtual
+#define	__thread_unsafe
 
 typedef tchar TCHAR;
 

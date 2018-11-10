@@ -287,6 +287,7 @@ public:
 	__tnstrT<T> &operator = ( T *str ) {set( str ); return *this;}
 	__tnstrT<T> &operator = ( const __tnstrT<T> &o ) {set(o.c_str()); return *this;}
 	__tnstrT<T> &operator += (const T *str) { cat(str); return *this; }
+	__tnstrT<T> &operator << (const T *str) { cat(str); return *this; }
 	__tnstrT<T> &operator += (const T c) { cat(c); return *this; }
 //	__tnstrT<T> operator + (const __tnstrT<T> &o) {
 //		return __tnstrT<T>(buf, o.buf);
@@ -554,6 +555,8 @@ public:
 #endif
 	__tnstrW &operator = ( const AnsiString &o)
 		{ setAnsi(o.c_str()); return *this; }
+	bool operator == (const WideString &s) const
+		{ return s.c_bstr() ? wcscmp(buf?buf:buf_null, s)==0 : empty(); }
 #endif
 
 	// Operators //
@@ -768,6 +771,77 @@ public:
 	{
 		return iterator(super::__get_array(), super::get_num());
 	}
+	class const_iterator {
+	protected:
+		const void **array;
+		const void **cur;
+	public:
+		const_iterator(const void **arg_array)
+			:array(arg_array)
+		{
+			cur = &array[0];
+		}
+		const_iterator(const void **arg_array, int num)
+			:array(arg_array)
+		{
+			cur = &array[num];
+		}
+		void operator ++ ()
+		{
+			cur++;
+		}
+		const_iterator &operator ++ (int)
+		{
+			cur++;
+			return *this;
+		}
+		bool operator != (const const_iterator &o)
+		{
+			return cur!=o.cur;
+		}
+		bool operator != (const T *s)
+		{
+			return (**(tnstrT**)cur) != s;
+		}
+		bool operator == (const const_iterator &o)
+		{
+			return cur==o.cur;
+		}
+		bool operator == (const T *s)
+		{
+			return (**(tnstrT**)cur) == s;
+		}
+		const_iterator &operator = (const const_iterator &o)
+		{
+			array = o.array;
+			cur = o.cur;
+			return *this;
+		}
+		tnstrT *operator -> ()
+		{
+			return *(tnstrT**)cur;
+		}
+		tnstrT &operator * ()
+		{
+			return **(tnstrT**)cur;
+		}
+		operator tnstrT &() const
+		{
+			return **(tnstrT**)cur;
+		}
+		T operator [] (int i) const
+		{
+			return (**(tnstrT**)cur)[i];
+		}
+	};
+	const_iterator begin() const
+	{
+		return const_iterator((const void**)super::__get_array());
+	}
+	const_iterator end() const
+	{
+		return const_iterator((const void**)super::__get_array(), super::get_num());
+	}
 #endif	// !USE_TNSTRVEC_STL
 
 	void split(const T *str, const T *delim);
@@ -880,6 +954,8 @@ public:
 #ifndef foreach
 #define	foreach(obj, it, type) \
 	for (type::iterator it=(obj).begin();it!=(obj).end();it++)
+#define	foreach_const(obj, it, type) \
+	for (type::const_iterator it=(obj).begin();it!=(obj).end();it++)
 #endif
 
 #define	foreach_tnstrA_vec(obj, it) foreach(obj, it, tnstrA_vec)
@@ -887,12 +963,21 @@ public:
 #define	foreach_tnstrA_map(obj, it) foreach(obj, it, tnstrA_map)
 #define	foreach_tnstrW_map(obj, it) foreach(obj, it, tnstrW_map)
 
+#define	foreach_tnstrA_vec_const(obj, it) foreach_const(obj, it, tnstrA_vec)
+#define	foreach_tnstrW_vec_const(obj, it) foreach_const(obj, it, tnstrW_vec)
+#define	foreach_tnstrA_map_const(obj, it) foreach_const(obj, it, tnstrA_map)
+#define	foreach_tnstrW_map_const(obj, it) foreach_const(obj, it, tnstrW_map)
+
 #ifdef _UNICODE
 #define	foreach_tnstr_vec	foreach_tnstrW_vec
+#define	foreach_tnstr_vec_const	foreach_tnstrW_vec_const
 #define	foreach_tnstr_map	foreach_tnstrW_map
+#define	foreach_tnstr_map_const	foreach_tnstrW_map_const
 #else
 #define	foreach_tnstr_vec	foreach_tnstrA_vec
+#define	foreach_tnstr_vec_const	foreach_tnstrA_vec_const
 #define	foreach_tnstr_map	foreach_tnstrA_map
+#define	foreach_tnstr_map_const	foreach_tnstrA_map_const
 #endif
 
 #ifdef __BORLANDC__	

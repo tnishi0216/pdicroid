@@ -27,9 +27,9 @@ typedef vector<int> int_vec;
 #define	foreach_int_map(obj, it) foreach_map(obj, it, int_map)
 
 inline int get_map(int_map &m, const string &key)
-	{ return m.count(key) ? m[key] : 0; }
+	{ return m.find(key) != m.end() ? m[key] : 0; }
 inline int get(int_map &m, const string &key)
-	{ return m.count(key) ? m[key] : 0; }
+	{ return m.find(key) != m.end() ? m[key] : 0; }
 
 #endif	/* DEF_MAP_MACRO */
 
