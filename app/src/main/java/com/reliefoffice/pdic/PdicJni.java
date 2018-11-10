@@ -41,11 +41,21 @@ public class PdicJni {
             int ret = This.initPdic(0, assetManager, appCachePath.getAbsolutePath(), appInternalPath.getAbsolutePath());
             if (ret!=0){
                 This = null;
+                String msg = "Error: initPdic: ret=" + ret;
+                showErrorBox(context, msg);
                 return null;
             }
         }
         refCounter++;
         return This;
+    }
+    static void showErrorBox(Context context, String message)
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        alertDialogBuilder.setTitle("PdicJni");
+        alertDialogBuilder.setMessage( message );
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
     static public void deleteInstance()
     {
