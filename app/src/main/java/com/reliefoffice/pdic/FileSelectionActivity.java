@@ -219,6 +219,7 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
                     public void onTextInputClickCancel() {
                         pathDialog.dismiss();
                         pathDialog = null;
+                        finish();
                     }
                 });
                 pathDialog.show(getFragmentManager(), "test");    //TODO: what is the second argument?
