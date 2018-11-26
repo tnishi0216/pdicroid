@@ -1,8 +1,7 @@
 package com.reliefoffice.pdic;
 
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -12,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.reliefoffice.pdic.text.config;
 
 import java.io.File;
 
@@ -106,18 +107,29 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
         }
     }
 
+    static final int REQUEST_CODE_SELECT_FILE_DBX = 3;
+
     // Dropbox serverからdownloadするファイルを選択する
     //DropboxFileSelectionDialog fileSelectionDialog;
     private void selectDropboxFile(){
-        DropboxFileSelectionDialog dlg = DropboxFileSelectionDialog.createInstance( this, this, ndvFM, false);
-        dlg.setOnCancelListener(new FileSelectionDialog.OnCancelListener() {
-            @Override
-            public void onCancel() {
-                psbmSharing.setChecked(false);
-            }
-        });
-        String[] exts = {".txt"};
-        dlg.show(new File(ndvUtils.getInitialDir()), exts);
+        if (config.useOldFileSelection) {
+            DropboxFileSelectionDialog dlg = DropboxFileSelectionDialog.createInstance(this, this, ndvFM, false);
+            dlg.setOnCancelListener(new FileSelectionDialog.OnCancelListener() {
+                @Override
+                public void onCancel() {
+                    psbmSharing.setChecked(false);
+                }
+            });
+            String[] exts = {".txt"};
+            dlg.show(new File(ndvUtils.getInitialDir()), exts);
+        } else {
+            Intent i = new Intent().setClassName(this.getPackageName(), Dropbox2FileSelectionActivity.class.getName());
+            i.putExtra("onlySelection", true);
+            String[] exts = {".txt"};
+            i.putExtra("exts", exts);
+            i.putExtra("no_encoding", true);
+            startActivityForResult(i, REQUEST_CODE_SELECT_FILE_DBX);
+        }
     }
     @Override
     public void onFileSelect(FileInfo file) {
@@ -130,6 +142,31 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
         psbmSharing.setChecked(true);   // �F�؂��o�R�����check����Ȃ����߁i�ΏǗÖ@�j
 
         ndvUtils.setInitialDir(file.getParent() );
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SELECT_FILE_DBX) {
+            if (resultCode == RESULT_OK) {
+                Bundle bundle = data.getExtras();
+                if (bundle != null) {
+                    String filename = bundle.getString("filename");
+                    if (Utility.isNotEmpty(filename)) {
+                        File file = new File(filename);
+                        String name;
+
+                        // dropbox
+                        //String remotename = bundle.getString("remotename");
+                        // The file is selected to be added.
+                        name = file.getName() + " [Dropbox]";
+
+                        //fileEncoding = bundle.getString("fileEncoding");
+                        FileInfo fileInfo = new FileInfo(name, file);
+                        onFileSelect(fileInfo);
+                    }
+                }
+            }
+        }
     }
 
     void downloadFile(String from, File to){
