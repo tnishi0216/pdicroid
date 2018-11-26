@@ -138,8 +138,6 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
 
         File toFile = new File(fileDir, file.getName());
         downloadFile(file.getAbsolutePath(), toFile);
-        psbmSharing.setSummary(file.getAbsolutePath());
-        psbmSharing.setChecked(true);   // �F�؂��o�R�����check����Ȃ����߁i�ΏǗÖ@�j
 
         ndvUtils.setInitialDir(file.getParent() );
     }
@@ -183,6 +181,8 @@ public class SettingsActivity extends PreferenceActivity implements DropboxFileS
                 PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(This, ndvFM);
                 psbmFM.changeFilename(to.getAbsolutePath(), from, revision);
                 psbmFM.deleteInstance();
+                psbmSharing.setSummary(from);
+                psbmSharing.setChecked(true);
             }
         });
     }
