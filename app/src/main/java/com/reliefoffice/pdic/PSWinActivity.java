@@ -191,6 +191,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
 
         // EditText //
         editText = (EditText) findViewById(R.id.editText);
+        editText.setKeyListener(null);  // Android 8.0でkeyboardを表示させないようにするため
         /*editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
