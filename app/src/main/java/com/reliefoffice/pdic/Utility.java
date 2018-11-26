@@ -1,9 +1,14 @@
 package com.reliefoffice.pdic;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.Selection;
@@ -14,7 +19,6 @@ import android.text.style.CharacterStyle;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -189,4 +193,32 @@ public class Utility {
         }
         return fileDir;
     }
+
+    /*
+    public static final String UriToFile(Uri uri, Context context){
+        String scheme = uri.getScheme();
+        String path = "";
+        if ("file".equals(scheme)) {
+            path = uri.getPath();
+        } else if("content".equals(scheme)) {
+            ContentResolver contentResolver = context.getContentResolver();
+            Cursor cursor = contentResolver.query(uri, new String[] { MediaStore.MediaColumns.DATA }, null, null, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                path = cursor.getString(0);
+                cursor.close();
+            }
+        }
+        return path;
+    }
+    */
+
+    public static final void requestPermision(Activity activity){
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    0);
+        }
+    }
+
 }

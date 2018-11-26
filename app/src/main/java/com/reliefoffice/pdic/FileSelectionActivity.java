@@ -165,6 +165,7 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
     @Override
     protected void onResume(){
         super.onResume();
+        Utility.requestPermision(this);
         if (checkStartSelectFile()){
             startSelectFile();
         }
