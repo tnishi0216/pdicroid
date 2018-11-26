@@ -47,28 +47,13 @@
             android:name=".DicDownloadList"
             android:label="@string/title_activity_dic_download_list" />
         <activity
-            android:name="com.dropbox.client2.android.AuthActivity"
-            android:configChanges="orientation|keyboard"
-            android:launchMode="singleTask">
-            <intent-filter>
-
-                <!-- 以下のxxxxxxに app キー を設定する -->
-                <data android:scheme="db-tz5htk9j7al608e" />
-
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask">
             <intent-filter>
 
                 <!-- 以下のxxxxxxに app キー を設定する -->
-                <data android:scheme="db-tkhiro" />
+                <data android:scheme="db-tz5htk9j7al608e" />
 
                 <action android:name="android.intent.action.VIEW" />
 
