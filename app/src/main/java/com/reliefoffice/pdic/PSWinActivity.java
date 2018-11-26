@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -141,6 +142,8 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         }
     }
     private SwipeMove swipeMove;
+
+    private LinearLayout llEdit;
 
     private EditText editText;
     private int savedEditTextHeight = -1;
@@ -280,6 +283,18 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
                 //closePSBookmarkEditWindow();
             }
         });
+
+        llEdit = (LinearLayout)findViewById(R.id.container_edit);
+        ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener(){
+            @Override
+            public void onGlobalLayout() {
+                if (popupList.getVisibility() == View.GONE) {
+	                int height = llEdit.getHeight();
+                    savedEditTextHeight = height * 2 / 3;
+                }
+            }
+        };
+        llEdit.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
 
         // PopupText //
         //popupText = (TextView)findViewById(R.id.popupText);
