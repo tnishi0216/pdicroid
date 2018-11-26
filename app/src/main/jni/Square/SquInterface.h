@@ -48,7 +48,7 @@ public:
 	bool CanClose(bool withmsg);
 	bool IsTempClosed();
 	bool IsDicOpened();
-	int OpenDictionary(const class DicGroup &dg, class DicNames *dicnames=NULL);
+	int OpenDictionary(const class DicGroup &dg, class DicNames *dicnames=NULL, int *dicno=NULL);
 	void SaveDicProfiles( class TRegKey *section, TRegKey *common);
 	void LoadDicProfiles( class TRegKey *section, TRegKey *common);
 	void Clear();

@@ -474,7 +474,7 @@ bool Squre::CanCloseMessage( )
 #include "DicCreateDlg.h"
 #endif
 
-int Squre::OpenDictionary(const DicGroup &dg, DicNames *dicnamesPtr)
+int Squre::OpenDictionary(const DicGroup &dg, DicNames *dicnamesPtr, int *dicno)
 {
 	Closing = false;
 	Opening = true;
@@ -596,6 +596,7 @@ jretry:;
 					
 				}
 #endif	// !__ANDROID__
+				if (dicno) *dicno = i;
 				ErrorMessage( GetWHandle(), error, dicnames[i].name, MsgDicError );
 			}
 			break;	// オープン出来ない

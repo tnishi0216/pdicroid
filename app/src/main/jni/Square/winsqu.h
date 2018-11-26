@@ -197,7 +197,7 @@ public:
 	int ODACloseReq();
 	bool CanClose( );
 	bool CanCloseMessage( );	// メッセージ付きのCanClose()
-	int OpenDictionary(const class DicGroup &dg, class DicNames *dicnames=NULL);
+	int OpenDictionary(const class DicGroup &dg, class DicNames *dicnames=NULL, int *dicno=NULL);
 protected:
 	void CloseDictionary();
 	bool IsDicOpened();

@@ -107,9 +107,9 @@ bool TSquareIF::IsDicOpened()
 	return squ->IsDicOpenedStable();
 }
 
-int TSquareIF::OpenDictionary(const class DicGroup &dg, DicNames *dicnames)
+int TSquareIF::OpenDictionary(const class DicGroup &dg, DicNames *dicnames, int *dicno)
 {
-	return squ->OpenDictionary(dg, dicnames);
+	return squ->OpenDictionary(dg, dicnames, dicno);
 }
 void TSquareIF::SaveDicProfiles( class TRegKey *section, TRegKey *common)
 {

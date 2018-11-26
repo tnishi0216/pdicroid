@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.reliefoffice.pdic.text.config;
 import com.reliefoffice.pdic.text.pfs;
@@ -211,8 +212,13 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             return;
         }
 
-        dicMan.openDictionary();
+        int nindex = dicMan.openDictionary();
         if (dicMan.isDicOpened()) dicOpened = true;
+        else {
+            String name = dicMan.getDictionaryPath(-nindex-1);
+            Toast ts = Toast.makeText(this, getString(R.string.msg_dic_not_opened) + "\n" + name, Toast.LENGTH_LONG);
+            ts.show();
+        }
     }
 
     void closeDictionary(){

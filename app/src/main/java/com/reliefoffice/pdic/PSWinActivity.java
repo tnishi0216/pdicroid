@@ -477,7 +477,12 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             selectFileDropbox();
         }
 
-        dicMan.openDictionary();
+        int nindex = dicMan.openDictionary();
+        if (nindex < 0){
+            String name = dicMan.getDictionaryPath(-nindex-1);
+            Toast ts = Toast.makeText(this, getString(R.string.msg_dic_not_opened) + "\n" + name, Toast.LENGTH_LONG);
+            ts.show();
+        }
     }
 
     int lastPosition;

@@ -56,15 +56,25 @@ public class DictionaryManager {
         return dicNames.length;
     }
 
-    public void openDictionary(){
+    public String getDictionaryPath(int index){
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        DicPref dicPref = new DicPref(pref);
+        return dicPref.getDictionaryPath(index);
+    }
+
+    // return:
+    //  0 = normal
+    //  -1ˆÈ‰º = ƒGƒ‰[‚Ì‚ ‚Á‚½Ž«‘‚Ì -index-1 (index=0‚Ìê‡‚Í-1)
+    public int openDictionary(){
         if (openCount>0){
             openCount++;
-            return;
+            return 0;
         }
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         DicPref dicPref = new DicPref(pref);
         String[] dicNames = dicPref.getNamesWithParams();
-        if (pdicJni.openDictionary(dicNames.length, dicNames, 0)==0){
+        int ret = pdicJni.openDictionary(dicNames.length, dicNames, 0);
+        if (ret==0){
             openCount = 1;
             // add dropbox files
             for (int i = 0; i < dicNames.length; i++) {
@@ -75,6 +85,7 @@ public class DictionaryManager {
                 }
             }
         }
+        return ret;
     }
 
     void closeDictionary(){

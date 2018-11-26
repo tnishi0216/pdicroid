@@ -71,6 +71,12 @@ public class DicPref {
         return array;
     }
 
+    public String getDictionaryPath(int index){
+        DicInfo info = loadDicInfo(index);
+        if (info==null) return "";
+        return info.filename;
+    }
+
     public void remove(int index){
         int src = 0;
         int dst = 0;

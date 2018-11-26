@@ -340,9 +340,11 @@ JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_config(JNIEnv* env, jo
 //	
 // dictionary options
 // r0: readonly off(writable)
+// -1以下: エラーを起こした辞書index情報 (=-index-1)
+// -999: それ以外のエラー
 JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_openDictionary(JNIEnv* env, jobject thiz, jint num, jobjectArray pathNames, jint param1)
 {
-	if (!Frame) return -1;
+	if (!Frame) return -999;
 
 	DicGroup dg(_t("Sample"));
 	DicNames names;
@@ -401,12 +403,13 @@ JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_openDictionary(JNIEnv*
 		}
 		
 		if (err)
-			return -1;
+			return -i-1;
 	}
 
-	int ret = Frame->squi->OpenDictionary(dg, &names);
+	int dicno = -1;
+	int ret = Frame->squi->OpenDictionary(dg, &names, &dicno);
 	//DBW("openDictionary: ret=%d", ret);
-	return ret;
+	return ret == 0 ? 0 : (dicno >= 0 ? -dicno-1 : -999);
 }
 JNIEXPORT jint JNICALL Java_com_reliefoffice_pdic_PdicJni_closeDictionary(JNIEnv* env, jobject thiz, int param1)
 {

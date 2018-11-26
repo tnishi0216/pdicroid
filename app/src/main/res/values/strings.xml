@@ -107,4 +107,5 @@
     <string name="label_pause">Pause</string>
     <string name="title_enter_path">Enter path due to no file found</string>
     <string name="audio_file_folder">Audio File Folder</string>
+    <string name="msg_dic_not_opened">Dictionary cannot be opened.</string>
 </resources>
