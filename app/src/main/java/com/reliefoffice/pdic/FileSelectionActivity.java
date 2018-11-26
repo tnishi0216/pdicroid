@@ -217,34 +217,37 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
         Log.d("PDD", "fileDirectory = "+m_fileDirectory.getPath());
 
         List<FileInfo> listFileInfo = getListFileInfo(m_fileDirectory.getAbsolutePath());
-        if (listFileInfo == null || listFileInfo.size() <= 1){
-            String rootStr = "/";
+        if (listFileInfo == null){
+            return; // pending
+        }
+        if (listFileInfo.size() < 1){
             //Note: rootStr == m_fileDirectory.getAbsolutePath()では正常に動かない
-            if (rootStr.compareTo(m_fileDirectory.getAbsolutePath())==0
-                    || Utility.initialFileDirectory().compareTo(m_fileDirectory.getAbsolutePath())==0){
-                pathDialog = new TextInputDialog();
-                pathDialog.titleText = getString(R.string.title_enter_path);
-                pathDialog.setText(m_fileDirectory.getPath());
-                pathDialog.setCallback(new TextInputCallback() {
-                    @Override
-                    public void onTextInputClickOk() {
-                        m_fileDirectory = new FileInfo(pathDialog.getText());
-                        pathDialog.dismiss();
-                        pathDialog = null;
-                        startSelectFile();
-                    }
-                    @Override
-                    public void onTextInputClickCancel() {
-                        pathDialog.dismiss();
-                        pathDialog = null;
-                        finish();
-                    }
-                });
-                pathDialog.show(getFragmentManager(), "test");    //TODO: what is the second argument?
+            // initialではない場合、initialにして再度
+            if (Utility.initialFileDirectory().compareTo(m_fileDirectory.getAbsolutePath())!=0){
+                m_fileDirectory = new FileInfo(Utility.initialFileDirectory());
+                startSelectFile();
                 return;
-            } else {
-                return; // error or pending
             }
+            pathDialog = new TextInputDialog();
+            pathDialog.titleText = getString(R.string.title_enter_path);
+            pathDialog.setText(m_fileDirectory.getPath());
+            pathDialog.setCallback(new TextInputCallback() {
+                @Override
+                public void onTextInputClickOk() {
+                    m_fileDirectory = new FileInfo(pathDialog.getText());
+                    pathDialog.dismiss();
+                    pathDialog = null;
+                    startSelectFile();
+                }
+                @Override
+                public void onTextInputClickCancel() {
+                    pathDialog.dismiss();
+                    pathDialog = null;
+                    finish();
+                }
+            });
+            pathDialog.show(getFragmentManager(), "test");    //TODO: what is the second argument?
+            return;
         }
 
         showPost(m_fileDirectory, listFileInfo);
