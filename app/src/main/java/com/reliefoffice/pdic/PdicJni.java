@@ -150,6 +150,9 @@ public class PdicJni {
         }
         return false;
     }
+    public int getPSBookmarkGeneration(){
+        return psbmGeneration;
+    }
 
     private native int xaddPSBookmark(String filename, int position, int length, int style, int color, String marked_word, String comment);
     private native int xdeletePSBookmark(String filename, int position);

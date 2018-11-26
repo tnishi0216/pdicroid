@@ -176,6 +176,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     @Override
     protected void onResume() {
         super.onResume();
+
         //Log.i("PDD", "Main.onResume");
         jniCallback.setWordList(null);
         if (!dicMan.isDicOpened()) {
