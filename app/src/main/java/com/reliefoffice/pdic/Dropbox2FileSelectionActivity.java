@@ -115,7 +115,6 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
             }
             listFileInfo.add( fileInfo );
         }
-        Collections.sort(listFileInfo);
 
         showPost(m_fileDirectory, listFileInfo);
     }

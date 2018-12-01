@@ -304,7 +304,6 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
                 }
                 listFileInfo.add( new FileInfo( fileTemp.getName(), fileTemp, mp3Exists ) );
             }
-            Collections.sort(listFileInfo);
         }
         return listFileInfo;
     }
