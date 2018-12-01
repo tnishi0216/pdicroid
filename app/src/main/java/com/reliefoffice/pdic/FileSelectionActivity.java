@@ -20,7 +20,6 @@ import com.reliefoffice.pdic.text.pfs;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class FileSelectionActivity extends ActionBarActivity implements FileSelectionInterface.FileListListener {
