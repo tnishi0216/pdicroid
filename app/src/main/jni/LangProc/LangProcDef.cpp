@@ -76,7 +76,10 @@ void SortHitWords( MatchArray &ma )
 		}
 		if (m.flag & SLW_PENALTY2){
 			// clicked word‚ª‚È‚¢ê‡‚Ípenalty‘å
-			m.point -= 32;
+			m.point -= 60;
+			// 2018.12.11 ‚±‚±‚Ì’²®‚Í“ï‚µ‚¢
+			// "have reshuffled the deck when it comes to"‚Åreshuffled‚ğclick‚µ‚Ä‚àhit‚µ‚È‚¢‚½‚ßA
+			// 60ˆÈã‚É‚·‚é•K—v‚ ‚è
 		}
 		if (m.flag==0){
 			// none
