@@ -107,6 +107,14 @@ public class DicDownloadList extends ActionBarActivity implements IAsyncFileDown
         });
 
         dicDownMode = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Utility.requestInternetPermision(this);
+
         startFileDownload("list.xml", getString(R.string.dic_list_url));
     }
 

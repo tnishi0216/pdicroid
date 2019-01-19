@@ -221,6 +221,13 @@ public class Utility {
         }
     }
 
+    public static final void requestInternetPermision(Activity activity){
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.INTERNET},
+                    0);
+        }
+    }
     public static final void requestBluetoothPermision(Activity activity){
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity,
