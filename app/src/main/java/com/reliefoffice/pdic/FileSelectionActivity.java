@@ -129,6 +129,9 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
     }
 
     void sortCommon(boolean save){
+        if (fileListAdapter==null)
+            return;
+
         if (lastSortType == SortType.Name){
             fileListAdapter.sortByName();
         } else
