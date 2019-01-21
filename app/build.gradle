@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.reliefoffice.pdic"
-        minSdkVersion 14
+        minSdkVersion 19
         targetSdkVersion 26
         versionCode 701
         versionName "0.7.1 alpha"
