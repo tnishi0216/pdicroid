@@ -9,6 +9,9 @@ build:
 	copy app\build\intermediates\ndk\debug\lib\mips\*.so app\src\main\jniLibs\mips\\
 	copy app\build\intermediates\ndk\debug\lib\x86\*.so app\src\main\jniLibs\x86\\
 
+buildunzip:
+	ndk-build.cmd NDK_PROJECT_PATH=null APP_BUILD_SCRIPT=.\litezip\LiteUnzip\Android.mk APP_PLATFORM=android-21 NDK_OUT=.\litezip\build\obj NDK_LIBS_OUT=.\litezip\build\lib APP_STL=gnustl_shared APP_ABI=armeabi,mips,armeabi-v7a,x86
+
 clean:
 	ndk-build.cmd NDK_PROJECT_PATH=null APP_BUILD_SCRIPT=.\app\build\intermediates\ndk\debug\Android.mk APP_PLATFORM=android-21 NDK_OUT=.\app\build\intermediates\ndk\debug\obj NDK_LIBS_OUT=.\app\build\intermediates\ndk\debug\lib APP_STL=gnustl_shared APP_ABI=armeabi,mips,armeabi-v7a,x86 clean
 
