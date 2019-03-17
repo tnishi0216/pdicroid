@@ -18,7 +18,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -418,6 +417,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             if (popupList.getVisibility() == View.GONE){
                 // popup is visible
                 //TODO: こちらはまだおかしい
+                //y = - ((int)lastY) + fontHeight + 4;
                 y = ((int)lastY) - editText.getHeight() + fontHeight + 4;
             } else {
                 // popup is invisible

@@ -1,4 +1,6 @@
 
+# Android.mkÇÃoriginalÇÕrootÇ…Ç†ÇÈ"Android-local.mk"ÇæÇ¡ÇΩÅI
+
 build:
 	$(MAKE) copymk
 	ndk-build.cmd NDK_PROJECT_PATH=null APP_BUILD_SCRIPT=.\app\build\intermediates\ndk\debug\Android.mk APP_PLATFORM=android-21 NDK_OUT=.\app\build\intermediates\ndk\debug\obj NDK_LIBS_OUT=.\app\build\intermediates\ndk\debug\lib APP_STL=gnustl_shared APP_ABI=armeabi,mips,armeabi-v7a,x86
