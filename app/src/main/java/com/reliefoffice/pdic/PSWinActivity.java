@@ -1488,7 +1488,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
                 if (action.equals(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED)){
                     int state = intent.getIntExtra(BluetoothA2dp.EXTRA_STATE, BluetoothA2dp.STATE_DISCONNECTED);
                     if (state == BluetoothA2dp.STATE_DISCONNECTED){
-                        audioPlayPause();
+                        audioPlayPause(true);
                     }
                 }
             }
