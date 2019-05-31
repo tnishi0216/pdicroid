@@ -69,7 +69,7 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
                 // normal file
                 fileInfo = new FileInfo(file.getName(), file);
             }
-            fileInfo.setReaddate(fileHistory.getDateLong(i));
+            fileInfo.setReadDate(fileHistory.getDateLong(i));
             fileInfo.m_mp3Exists = Utility.mp3Exists(fileInfo.getName(), altAudioFolder);
             listFile.add(fileInfo);
         }

@@ -75,7 +75,7 @@ public class FileInfo implements Comparable<FileInfo> {
     public Long getReadDate() { return m_readDate; }
     public void setFileSize(long size) { m_size = size; }
     public void setModDate(Long date) { m_modDate = date; }
-    public void setReaddate(Long date) { m_readDate = date; }
+    public void setReadDate(Long date) { m_readDate = date; }
 
     public void setRoot(){
         m_strName = "";
