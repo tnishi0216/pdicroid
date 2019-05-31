@@ -28,6 +28,7 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
 
     protected  String[] m_exts = {".dic", ".txt"};
     protected FileInfo m_fileDirectory;
+    protected boolean m_noReadDate = false; // SortType.ReadXは使用しない
     void setFileDirectory(String dir){
         m_fileDirectory = new FileInfo(dir);
     }
@@ -97,17 +98,21 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
             }
         });
         Button btnRead = (Button)findViewById(R.id.btn_read);
-        btnRead.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (lastSortType==SortType.ReadR) {
-                    lastSortType = SortType.Read;
-                } else {
-                    lastSortType = SortType.ReadR;
+        if (m_noReadDate) {
+            btnRead.setVisibility(View.GONE);
+        } else {
+            btnRead.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (lastSortType == SortType.ReadR) {
+                        lastSortType = SortType.Read;
+                    } else {
+                        lastSortType = SortType.ReadR;
+                    }
+                    sortCommon(true);
                 }
-                sortCommon(true);
-            }
-        });
+            });
+        }
         Button btnSize = (Button)findViewById(R.id.btn_size);
         btnSize.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,28 +137,37 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
         if (fileListAdapter==null)
             return;
 
-        if (lastSortType == SortType.Name){
+        SortType sortType = lastSortType;
+        if (m_noReadDate){
+            if (sortType == SortType.Read)
+                sortType = SortType.Name;
+            else
+            if (sortType == SortType.ReadR)
+                sortType = SortType.NameR;
+        }
+        
+        if (sortType == SortType.Name){
             fileListAdapter.sortByName();
         } else
-        if (lastSortType == SortType.NameR){
+        if (sortType == SortType.NameR){
             fileListAdapter.sortByNameR();
         } else
-        if (lastSortType == SortType.Date){
+        if (sortType == SortType.Date){
             fileListAdapter.sortByDate();
         } else
-        if (lastSortType == SortType.DateR){
+        if (sortType == SortType.DateR){
             fileListAdapter.sortByDateR();
         } else
-        if (lastSortType == SortType.Read){
+        if (sortType == SortType.Read){
             fileListAdapter.sortByRead();
         } else
-        if (lastSortType == SortType.ReadR){
+        if (sortType == SortType.ReadR){
             fileListAdapter.sortByReadR();
         } else
-        if (lastSortType == SortType.Size){
+        if (sortType == SortType.Size){
             fileListAdapter.sortBySize();
         } else
-        if (lastSortType == SortType.SizeR){
+        if (sortType == SortType.SizeR){
             fileListAdapter.sortBySizeR();
         }
 

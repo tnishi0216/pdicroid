@@ -22,6 +22,7 @@ public abstract class NetDriveFileSelectionActivity extends FileDirSelectionActi
     public NetDriveFileSelectionActivity(){
         super();
         createNetDriveComponents();
+        m_noReadDate = true;
     }
 
     @Override
