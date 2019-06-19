@@ -663,7 +663,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         int curpos = 0;
         int flags = 0;  // depends on flags in JNI.
         int ret = pdicJni.searchLongestWord(searchText, startPos, curpos, flags);
-        Log.d("PDP", "ret=" + ret);
+        Log.d("PDP", "searchLongestWord ret=" + ret);
         if (ret==0){
             // no hit words
             if (true) {
