@@ -36,7 +36,11 @@ mkpath:
 copymk:
 	-mkdir app\build\intermediates\ndk
 	-mkdir app\build\intermediates\ndk\debug
+	-mkdir app\src\main\jniLibs\armeabi
+	-mkdir app\src\main\jniLibs\armeabi-v7a
 	-mkdir app\src\main\jniLibs\arm64-v8a
+	-mkdir app\src\main\jniLibs\mips
+	-mkdir app\src\main\jniLibs\x86
 	-mkdir app\src\main\jniLibs\x86_64
 	copy Android-local.mk app\build\intermediates\ndk\debug\Android.mk
 
