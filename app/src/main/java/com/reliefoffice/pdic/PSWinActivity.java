@@ -547,13 +547,7 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
 
     @Override
     protected void onStop(){
-        if (mediaPlayer != null && Utility.isNotEmpty(openedFilename)){
-            SharedPreferences.Editor edit = pref.edit();
-            edit.putString(pfs.LAST_AUDIOFILE, openedFilename);
-            edit.putInt(pfs.LAST_AUDIO_MARK_A, markPositionA);
-            edit.putInt(pfs.LAST_AUDIO_MARK_B, markPositionB);
-            edit.commit();
-        }
+        saveMarkPosition();
         super.onStop();
     }
 
@@ -870,6 +864,8 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
     }
 
     void loadFilePost(String filename, String remotename) {
+        saveMarkPosition();
+
         // setup remote filename
         if (Utility.isNotEmpty(remotename)) {
             remoteFilename = remotename;
@@ -1430,6 +1426,28 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
         markState = newMarkState;
         return true;
     }
+
+    void saveMarkPosition(){
+        if (mediaPlayer != null && Utility.isNotEmpty(openedFilename)){
+            if (markState != MarkState.None) {   // mark設定されている場合のみ保存
+                SharedPreferences.Editor edit = pref.edit();
+                edit.putString(pfs.LAST_AUDIOFILE, openedFilename);
+                int markA = markPositionA;
+                int markB = markPositionB;
+                switch (markState) {
+                    case MarkAB:
+                        break;
+                    default:
+                        markA = -1;
+                    case MarkA:
+                        markB = -1;
+                }
+                edit.putInt(pfs.LAST_AUDIO_MARK_A, markA);
+                edit.putInt(pfs.LAST_AUDIO_MARK_B, markB);
+                edit.commit();
+            }
+        }
+    }
     void reloadMarkPosition(){
         String lastAudioFile = pref.getString(pfs.LAST_AUDIOFILE, SettingsActivity.getDefaultAudioFolder());
         if (Utility.isNotEmpty(lastAudioFile)){
@@ -1449,11 +1467,6 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
                         }
                     }
                 }
-
-                // Mark positionを無効化
-                SharedPreferences.Editor edit = pref.edit();
-                edit.remove(pfs.LAST_AUDIOFILE);
-                edit.commit();
             }
         }
     }
