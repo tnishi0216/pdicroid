@@ -37,7 +37,6 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
     }
 
     FileListAdapter fileListAdapter;
-    //FileInfoArrayAdapter fileListAdapter;
 
     TextView textPath;
     RadioGroup rgEncoding;
@@ -284,14 +283,7 @@ public class FileSelectionActivity extends ActionBarActivity implements FileSele
     }
 
     // Cancel Listener //
-    //TODO: cancel要らないかも？
-    interface OnCancelListener {
-        void onCancel();
-    }
     FileSelectionDialog.OnCancelListener onCancelListener;
-    public void setOnCancelListener(FileSelectionDialog.OnCancelListener listener){
-        onCancelListener = listener;
-    }
     // 呼び出し側にcancelをさせる
     protected void cancel(){
         if (onCancelListener!=null) onCancelListener.onCancel();
