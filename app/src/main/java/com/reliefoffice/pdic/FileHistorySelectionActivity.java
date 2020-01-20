@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.view.View;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        textPath.setVisibility(View.GONE);
 
         fileHistory = new FileHistoryManager(this);
     }
