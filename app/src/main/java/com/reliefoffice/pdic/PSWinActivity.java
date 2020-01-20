@@ -553,6 +553,10 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
 
     @Override
     protected void onDestroy() {
+        if (bluetoothManager != null) {
+            bluetoothManager.unregister(this);
+            bluetoothManager = null;
+        }
         closePSBookmarkEditWindow();
         closeAudioPlayer();
         if (PSBookmarkReady) {
@@ -1567,6 +1571,9 @@ public class PSWinActivity extends ActionBarActivity implements FileSelectionDia
             IntentFilter intentFilter = new IntentFilter(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED);
             intentFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
             context.registerReceiver(btReceiver, intentFilter);
+        }
+        public void unregister(Context context){
+            context.unregisterReceiver(btReceiver);
         }
     }
 
