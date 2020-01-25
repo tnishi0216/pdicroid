@@ -38,14 +38,5 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:23.0.0'
-    implementation files('libs/dropbox-android-sdk-1.6.3.jar')
-    implementation files('libs/json_simple-1.1.jar')
-//    implementation files('libs/dropbox-sync-sdk-android.jar')
-    implementation files('libs/juniversalchardet-1.0.3.jar')
     implementation 'com.google.android.gms:play-services-drive:8.4.0'
-    implementation files('libs/dropbox-core-sdk-2.1.2.jar')
-//    implementation files('libs/dropbox-core-sdk-2.0.6.jar')
-//    implementation 'com.dropbox.core:dropbox-core-sdk:2.0.6'
-    implementation files('libs/okhttp-3.4.1.jar')
-    implementation files('libs/jackson-core-2.8.1.jar')
 }
