@@ -1,6 +1,5 @@
 package com.reliefoffice.pdic;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -314,14 +313,12 @@ public class DicDownloadList extends AppCompatActivity implements IAsyncFileDown
     }
 
     AsyncFileDownload asyncFileDownload;
-    ProgressDialog progressDialog;
     ProgressHandler progressHandler;
 
     void startFileDownload(String filename, String url){
         // dictionary list download //
         progressHandler = new ProgressHandler();
         File dicDir = DicUtils.getDictionaryPath(this);
-        //File cacheDir = new File("/sdcard/PdicGui2");
         if (!dicDir.exists()){
             if (!dicDir.mkdir()){
                 Toast ts = Toast.makeText(this, getString(R.string.failed_to_make_dir)+dicDir, Toast.LENGTH_LONG);
@@ -331,13 +328,13 @@ public class DicDownloadList extends AppCompatActivity implements IAsyncFileDown
         }
         dwnFile = new File(dicDir, filename);
         asyncFileDownload = new AsyncFileDownload(this, url, dwnFile);
-        //asyncFileDownload.execute();
         asyncFileDownload.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        showDialog(0);
-        progressHandler.progressDialog = progressDialog;
+
+        createProgressDialog();
+        progressHandler.progressDialog = progress;
         progressHandler.asyncfiledownload = asyncFileDownload;
-        if (progressDialog != null && asyncFileDownload != null){
-            progressDialog.setProgress(0);
+        if (progress != null && asyncFileDownload != null){
+            progress.setProgress(0);
             progressHandler.sendEmptyMessage(0);
         }else{
             Toast ts = Toast.makeText(this, "NULL error", Toast.LENGTH_LONG);
@@ -345,36 +342,39 @@ public class DicDownloadList extends AppCompatActivity implements IAsyncFileDown
         }
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id){
-        switch(id){
-            case 0:
-                progressDialog = new ProgressDialog(this);
-                //progressDialog.setIcon(R.drawable.ic_launcher);
-                progressDialog.setTitle(getString(R.string.title_downloading_file));
-                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Hide",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
+    ProgressDialog progress;
+    void createProgressDialog(){
+        progress = new ProgressDialog(this);
+        progress.setTitle(getString(R.string.title_downloading_file));
+        progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progress.setButton(DialogInterface.BUTTON_POSITIVE, "Hide",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
 
-                progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                cancelLoad();
-                            }
-                        });
-        }
-        return progressDialog;
+        progress.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        cancelLoad();
+                    }
+                });
+        progress.show();
     }
+    void deleteProgressDialog(){
+        if (progress == null) return;
+        progress.dismiss();
+        progress = null;
+    }
+
     private void cancelLoad()
     {
         if(asyncFileDownload != null){
             asyncFileDownload.cancel(true);
         }
+        deleteProgressDialog();
     }
 
     @Override
