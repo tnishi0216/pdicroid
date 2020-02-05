@@ -102,7 +102,7 @@ int PutText( TOFile*file, Japa &japa, BOOL fExtPdicText )
 void SetTextCRLF( _jMixChar &text, const tchar *str )
 {
 	for (;;){
-		const tchar *crptr = _tcsstr( str, EXTCRCHAR );
+		const tchar *crptr = ::_tcsstr( str, EXTCRCHAR );
 		if ( !crptr ){
 			if ( *str )
 				text.cat( str );

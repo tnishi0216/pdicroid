@@ -1376,7 +1376,7 @@ int ExtPdicText::readPare( tnstr &word, Japa &japa )
 			break;
 	}
 	japa.clear();
-	const tchar *p = _tcsstr( line, StrOneLineDelim );
+	const tchar *p = ::_tcsstr( line, StrOneLineDelim );
 	if ( p ){
 		word.set( line, STR_DIFF( p, (const tchar *)line ) );
 		GetMultiPdicText( (tchar*)p + _tcslen(StrOneLineDelim), japa, CFlags & CF_DISTINCT ? TRUE : FALSE );

@@ -28,9 +28,9 @@ tchar FindLastSlash(const tchar *path)
 
 	delim[0] = '\\';
 
-	const tchar *p = _tcsrchr(path, delim[0]);
+	const tchar *p = ::_tcsrchr(path, delim[0]);
 	if ( !p ){
-		p = _tcsrchr( path, delim_alt[0] );
+		p = ::_tcsrchr( path, delim_alt[0] );
 		delim[0] = delim_alt[0];
 	}
 	if (p){
@@ -389,7 +389,7 @@ bool HasFilePath(const tchar *filename)
 // path1‚ğpath2‚©‚çŒ©‚½relative drive‚É•ÏX
 tnstr MakeRelativeDrive(const tchar *path1, const tchar *path2)
 {
-	const tchar *drive_end = _tcsstr(path2, _t(":"));
+	const tchar *drive_end = ::_tcsstr(path2, _t(":"));
 	if (!drive_end){
 		// no drive??
 		// use as is.
@@ -411,12 +411,12 @@ tnstr MakeRelativeDrive(const tchar *path1, const tchar *path2)
 // path1‚Édrive‚ª–³‚¢ê‡‚Ípath2‚ğ‚»‚Ì‚Ü‚Ü•Ô‚·(—vŒŸ“¢)
 tnstr MakeAbsoluteDrive(const tchar *path1, const tchar *path2)
 {
-	const tchar *drive_end = _tcsstr(path2, _t(":"));
+	const tchar *drive_end = ::_tcsstr(path2, _t(":"));
 	if (drive_end){
 		// drive includes
 		return path2;
 	}
-	drive_end = _tcsstr(path1, _t(":"));
+	drive_end = ::_tcsstr(path1, _t(":"));
 	if (!drive_end){
 		// no drive
 		return path2;

@@ -1047,7 +1047,7 @@ static MPdic *GetActiveDic()
 static tnstr getkey(const tchar *s)
 {
 #if EXTENDED
-	const tchar *p = _tcschr(s, '\t');
+	const tchar *p = ::_tcschr(s, '\t');
 	if (!p) return s;
 	return tnstr(s, STR_DIFF(p, s));
 #else

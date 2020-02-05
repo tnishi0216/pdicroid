@@ -281,7 +281,7 @@ tnstr replace(const tchar *str, const tchar *pat, const tchar *sub)
 {
 	tnstr ret;
 	while (*str){
-		const tchar *p = _tcsstr(str, pat);
+		const tchar *p = ::_tcsstr(str, pat);
 		if (!p){
 			ret += str;
 			break;

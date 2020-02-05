@@ -98,12 +98,12 @@ int GetDicFileTypeEx( const tchar *filename, int &dictype_ex )
 	const tchar *p;
 
 	// １行テキスト？
-	if ( _tcsstr( buf1, StrOneLineDelim )
-		&& (!buf2[0] || _tcsstr( buf2, StrOneLineDelim )) ){
+	if ( ::_tcsstr( buf1, StrOneLineDelim )
+		&& (!buf2[0] || ::_tcsstr( buf2, StrOneLineDelim )) ){
 		return DT_EXTPDICTEXT;
 	}
 	// TABで区切られている？
-	if ( _tcschr( buf1, '\t' ) && _tcschr( buf2, '\t' ) ){
+	if ( ::_tcschr( buf1, '\t' ) && ::_tcschr( buf2, '\t' ) ){
 		// WX2,Level-1
 		p = jfstrrchr( buf1, ':' );
 		if ( p ){
@@ -113,8 +113,8 @@ int GetDicFileTypeEx( const tchar *filename, int &dictype_ex )
 				return DT_WX2TEXT;
 			}
 		}
-		p = _tcschr(buf1, '\t');
-		p = _tcschr(p+1, '\t');
+		p = ::_tcschr(buf1, '\t');
+		p = ::_tcschr(p+1, '\t');
 		if (p){
 			// TABが２つ以上ある
 			return DT_TSV;
@@ -123,7 +123,7 @@ int GetDicFileTypeEx( const tchar *filename, int &dictype_ex )
 			// level-1
 			return DT_LEVEL;
 		}
-		if ( _tmbschr( buf1, ',' ) && _tmbschr( buf2, ',' ) ){
+		if ( ::_tmbschr( buf1, ',' ) && ::_tmbschr( buf2, ',' ) ){
 			// level-2
 			return DT_LEVEL;
 		}

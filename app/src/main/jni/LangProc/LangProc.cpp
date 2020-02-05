@@ -292,7 +292,7 @@ bool TLangProc::OpenIrreg()
 				if (Irregs.Read(i, IrregNames[i], line)){
 					do {
 						if (line[0] && line[0]!='#'){
-							tchar *p = _tcschr(line, '\t');	// Separated by '\t'
+							tchar *p = ::_tcschr(line, '\t');	// Separated by '\t'
 							if (p && p[1]){
 								*p = '\0';
 								tnstr nw = Normalize(line);	// to ignore case sense.

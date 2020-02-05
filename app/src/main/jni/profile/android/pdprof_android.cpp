@@ -50,7 +50,7 @@ void TRegKey::Read( const tchar *name, tnstr_vec &items, int delim )
 	tnstr buf = ReadString(name);
 	const tchar *top = &buf[0];
 	do {
-		const tchar *p = _tcschr( top, delim );
+		const tchar *p = ::_tcschr( top, delim );
 		if (!p)
 			break;
 		items.add( new tnstr(top, STR_DIFF(p,top)) );
