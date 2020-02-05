@@ -87,9 +87,9 @@ public class Utility {
 
     // audio folderのpathを返す
     public static String altAudioFolder(SharedPreferences pref){
-        String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity.getDefaultAudioFolder());
+        String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity2.getDefaultAudioFolder());
         if (Utility.isEmpty(altAudioFolder))
-            altAudioFolder = SettingsActivity.getDefaultAudioFolder();
+            altAudioFolder = SettingsActivity2.getDefaultAudioFolder();
         return altAudioFolder;
     }
 

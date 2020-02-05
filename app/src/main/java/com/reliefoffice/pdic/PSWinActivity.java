@@ -748,7 +748,7 @@ public class PSWinActivity extends AppCompatActivity implements FileSelectionDia
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            startActivity(new Intent().setClassName(this.getPackageName(), SettingsActivity.class.getName()));
+            startActivity(new Intent().setClassName(this.getPackageName(), SettingsActivity2.class.getName()));
             return true;
         } else if (id == R.id.action_loadfile) {
             selectFile();
@@ -930,9 +930,9 @@ public class PSWinActivity extends AppCompatActivity implements FileSelectionDia
         String audioFileName = Utility.changeExtension(openedFilename, "mp3");
         boolean audioOk = openAudioPlayer(audioFileName);
         if (!audioOk){
-            String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity.getDefaultAudioFolder());
+            String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity2.getDefaultAudioFolder());
             if (Utility.isEmpty(altAudioFolder))
-                altAudioFolder = SettingsActivity.getDefaultAudioFolder();
+                altAudioFolder = SettingsActivity2.getDefaultAudioFolder();
             audioFileName = Utility.changePath(audioFileName, altAudioFolder);
             audioOk = openAudioPlayer(audioFileName);
         }
@@ -1468,7 +1468,7 @@ public class PSWinActivity extends AppCompatActivity implements FileSelectionDia
         }
     }
     void reloadMarkPosition(){
-        String lastAudioFile = pref.getString(pfs.LAST_AUDIOFILE, SettingsActivity.getDefaultAudioFolder());
+        String lastAudioFile = pref.getString(pfs.LAST_AUDIOFILE, SettingsActivity2.getDefaultAudioFolder());
         if (Utility.isNotEmpty(lastAudioFile)){
             if (Utility.isNotEmpty(openedFilename)){
                 if (lastAudioFile.equals(openedFilename)) {

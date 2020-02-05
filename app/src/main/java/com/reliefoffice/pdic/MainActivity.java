@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             actionDictionarySetting();
         } else
         if (id == R.id.action_settings) {
-            startActivity(new Intent().setClassName(this.getPackageName(), SettingsActivity.class.getName()));
+            startActivity(new Intent().setClassName(this.getPackageName(), SettingsActivity2.class.getName()));
             return true;
         }
 
