@@ -23,10 +23,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
 import com.reliefoffice.pdic.text.pfs;
 
 import java.io.File;
+import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
+
+import javax.net.ssl.SSLContext;
 
 /**
  * Created by nishikawat on 2015/07/29.
@@ -247,4 +253,19 @@ public class Utility {
         return true;
     }
 
+    // Network
+    public static final void initializeSSLContext(Context mContext){
+        try {
+            SSLContext.getInstance("TLSv1.2");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        try {
+            ProviderInstaller.installIfNeeded(mContext.getApplicationContext());
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
 }
