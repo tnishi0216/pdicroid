@@ -378,7 +378,7 @@ public class DicDownloadList extends AppCompatActivity implements IAsyncFileDown
     }
 
     @Override
-    public void finished(boolean result) {
+    public void finished(boolean result, String errMsg) {
         Log.d("PDP", "finished:" + result);
         if (asyncFileDownload.isScceeded()) {
             if (dicDownMode) {
@@ -387,6 +387,10 @@ public class DicDownloadList extends AppCompatActivity implements IAsyncFileDown
                 updateList();
             }
             dwnFile.delete();
+        }
+        if (Utility.isNotEmpty(errMsg)){
+            Toast.makeText(this, errMsg, Toast.LENGTH_LONG).show();
+            Utility.initializeSSLContext(this);
         }
     }
 }

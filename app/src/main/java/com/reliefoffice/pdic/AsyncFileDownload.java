@@ -1,6 +1,6 @@
 package com.reliefoffice.pdic;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -21,7 +21,7 @@ public class AsyncFileDownload extends AsyncTask<String, Void, Boolean> {
     private final int TIMEOUT_READ = 5000;
     private final int TIMEOUT_CONNECT = 30000;
 
-    private  IAsyncFileDownloadNotify notify;
+    private IAsyncFileDownloadNotify notify;
     private boolean succeeded = false;
     private final int BUFFER_SIZE = 1024;
 
@@ -39,6 +39,8 @@ public class AsyncFileDownload extends AsyncTask<String, Void, Boolean> {
     private URL url;
     private URLConnection urlConnection;
 
+    private String errorMsg;
+
     public AsyncFileDownload(IAsyncFileDownloadNotify notify, String url, File oFile) {
         this.notify = notify;
         urlString = url;
@@ -54,7 +56,8 @@ public class AsyncFileDownload extends AsyncTask<String, Void, Boolean> {
         try{
             connect();
         }catch(IOException e){
-            Log.d(TAG, "ConnectError:" + e.toString());
+            errorMsg = "ConnectError:" + e.toString() + " Try again.";
+            Log.d(TAG, errorMsg);
             cancel(true);
         }
 
@@ -96,12 +99,20 @@ public class AsyncFileDownload extends AsyncTask<String, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean result){
         if (notify!=null){
-            notify.finished(result);
+            notify.finished(result, errorMsg);
         }
     }
 
     @Override
     protected void onProgressUpdate(Void... progress){
+    }
+
+    @Override
+    protected void onCancelled(Boolean aBoolean) {
+        super.onCancelled(aBoolean);
+        if (notify!=null){
+            notify.finished(false, errorMsg);
+        }
     }
 
     private void connect() throws IOException

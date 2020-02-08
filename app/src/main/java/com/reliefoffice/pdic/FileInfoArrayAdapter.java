@@ -18,7 +18,7 @@ public class FileInfoArrayAdapter extends ArrayAdapter<FileInfo> {
 
     private List<FileInfo> m_listFileInfo;
 
-    public FileInfoArrayAdapter(	Context context,
+    public FileInfoArrayAdapter(Context context,
                                     List<FileInfo> objects )
     {
         super( context, -1, objects );
