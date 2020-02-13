@@ -105,6 +105,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         private int delta = 0;
         private boolean movingX = false;
         private boolean movingY = false;
+        private int prevMargin = 0;     //TODO: Fragmentにしてから、下スクロールをするとend()の時点で元に戻ってしまう（原因不明）そのための対症療法
         SwipeMove(LinearLayout layout, int moveMarginX){
             this.layout = layout;
             MOVE_MARGIN_X = moveMarginX;
@@ -156,14 +157,20 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             }
         }
         void setLayout(){
-            final int scale = 1;
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    (int) (size.x * scale),
-                    LinearLayout.LayoutParams.WRAP_CONTENT  // important!!
-            );
-            //Log.d("PDD", "marginLeft="+marginLeft+" delta="+delta);
-            params.setMargins(marginLeft+delta, 0, 0, 0);
-            layout.setLayoutParams(params);
+            if (prevMargin != marginLeft + delta) {
+                final int scale = 1;
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        (int) (size.x * scale),
+                        LinearLayout.LayoutParams.WRAP_CONTENT  // important!!
+                );
+                //Log.d("PDD", "marginLeft="+marginLeft+" delta="+delta);
+                prevMargin = marginLeft + delta;
+                int selStart = editText.getSelectionStart();    //TODO: Fragmentにしたらうまくうごかない対症療法(prevMarginと同じ）
+                int selEnd = editText.getSelectionEnd();
+                params.setMargins(prevMargin, 0, 0, 0);
+                layout.setLayoutParams(params);
+                editText.setSelection(selStart, selEnd);
+            }
         }
     }
     private TouchSrchFragment.SwipeMove swipeMove;
