@@ -113,4 +113,5 @@
     <string name="title_dictionary_setting">辞書設定</string>
     <string name="navigation_drawer_open">Navigation Drawerを開く</string>
     <string name="navigation_drawer_close">Navigation Drawerを閉じる</string>
+    <string name="title_clip_srch">クリップ検索</string>
 </resources>

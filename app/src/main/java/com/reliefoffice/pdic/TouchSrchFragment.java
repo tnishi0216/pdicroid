@@ -425,16 +425,16 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         if (Utility.isEmpty(orgTitle)){
             orgTitle = getActivity().getTitle().toString();
         }
-        Intent i = getActivity().getIntent();
-        String word = i.getStringExtra("word");
-        if (Utility.isNotEmpty(word)){
-            String text = i.getStringExtra("text");
-            editText.setText(text);
-            getActivity().setTitle(orgTitle + " - " + word);
+
+        if (mParam1 == "word"){
+            editText.setText(mParam2);
+            getActivity().setTitle(orgTitle + " - " + mParam1);
             drillIntoMode = true;
         } else
-        if (loadClipboardData()) {
-            Toast.makeText(getContext(), getString(R.string.msg_clipboard_loaded), Toast.LENGTH_SHORT).show();
+        if (mParam1 == "clip"){
+            if (loadClipboardData()) {
+                Toast.makeText(getContext(), getString(R.string.msg_clipboard_loaded), Toast.LENGTH_SHORT).show();
+            }
         } else {
             // load the latest opened file
             TouchSrchFragment.HistoryFilename histName = getLatestHistoryName();

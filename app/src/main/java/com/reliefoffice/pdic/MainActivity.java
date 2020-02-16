@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         //TODO: navigationView.setNavigationItemSelectedListener(this);
 
         // Initialize JNI.
@@ -110,7 +110,10 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
                 fragmentClass = IncrSrchFragment.class;
                 break;
             case R.id.nav_touch_search:
-                fragmentClass = TouchSrchFragment.class;
+                fragment = TouchSrchFragment.newInstance(null, null);
+                break;
+            case R.id.nav_clip_search:
+                fragment = TouchSrchFragment.newInstance("clip", null);
                 break;
             case R.id.nav_settings:
                 fragmentClass = SettingsFragmentCompat.class;
@@ -120,10 +123,12 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
                 break;
         }
 
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (fragment == null) {
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // Insert the fragment by replacing any existing fragment
