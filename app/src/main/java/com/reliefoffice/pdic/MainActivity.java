@@ -24,7 +24,7 @@ import android.support.design.widget.NavigationView;
 import com.reliefoffice.pdic.text.config;
 import com.reliefoffice.pdic.text.pfs;
 
-public class MainActivity extends AppCompatActivity implements IncrSrchFragment.OnFragmentInteractionListener, TouchSrchFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements IncrSrchFragment.OnFragmentInteractionListener, TouchSrchFragment.OnFragmentInteractionListener, DicSettingFragment.OnFragmentInteractionListener {
     static final String PFS_RUNNING = "Running";
 
     PdicJni pdicJni;
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
     public void displaySelectedScreen(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
-        Class fragmentClass;
+        Class fragmentClass = null;
 
         switch(menuItem.getItemId()) {
             case R.id.nav_main:
@@ -115,11 +115,11 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
                 fragmentClass = TouchSrchFragment.class;
                 break;
             case R.id.nav_settings:
-                fragmentClass = SettingsFragment.class;
+                fragmentClass = SettingsFragmentCompat.class;
                 break;
             case R.id.nav_dic_setting:
-                actionDictionarySetting();
-                return; //TODO: not return, break
+                fragmentClass = DicSettingFragment.class;
+                break;
         }
 
         try {

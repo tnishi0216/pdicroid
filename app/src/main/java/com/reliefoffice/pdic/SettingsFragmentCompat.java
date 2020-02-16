@@ -4,24 +4,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
+import android.support.v7.preference.CheckBoxPreference;
+import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
 
-public class SettingsFragment extends PreferenceFragment implements DropboxFileSelectionDialog.OnFileSelectListener {
-    private static SettingsFragment This;   // アクセスする方法がわからないので。。
+public class SettingsFragmentCompat extends PreferenceFragmentCompat implements DropboxFileSelectionDialog.OnFileSelectListener {
+    private static SettingsFragmentCompat This;   // アクセスする方法がわからないので。。
     INetDriveFileManager ndvFM;
     INetDriveUtils ndvUtils;
     CheckBoxPreference psbmSharing;
     EditTextPreference AudioFileFolder;
     CheckBoxPreference psbmDefCharset;
 
-    public SettingsFragment(){
+    public SettingsFragmentCompat(){
 
     }
 
@@ -59,7 +59,7 @@ public class SettingsFragment extends PreferenceFragment implements DropboxFileS
                         selectDropboxFile();
                     } else {
                         if (!ndvUtils.appKeysConfirmed) {
-                            SettingsFragment.MyDropboxAppKeysDialog dlg = new SettingsFragment.MyDropboxAppKeysDialog();
+                            SettingsFragmentCompat.MyDropboxAppKeysDialog dlg = new SettingsFragmentCompat.MyDropboxAppKeysDialog();
                             dlg.parent = This;
                             dlg.show(getFragmentManager(), "dbx app keys");
                         } else {
@@ -91,6 +91,11 @@ public class SettingsFragment extends PreferenceFragment implements DropboxFileS
         psbmDefCharset = (CheckBoxPreference) findPreference("DefCharset");
     }
 
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+
+    }
+
     // summaryの動的変更
     private SharedPreferences.OnSharedPreferenceChangeListener listener =
             new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -99,8 +104,8 @@ public class SettingsFragment extends PreferenceFragment implements DropboxFileS
                 }
             };
 
-    public static class MyDropboxAppKeysDialog extends DropboxAppKeysDialog {
-        public SettingsFragment parent;
+    public static class MyDropboxAppKeysDialog extends DropboxAppKeyDialogCompat {
+        public SettingsFragmentCompat parent;
         @Override
         protected void onDropboxAppKeys(DropboxUtils.AppKeys appKeys){
             parent.onDropboxAppKeys(appKeys);
