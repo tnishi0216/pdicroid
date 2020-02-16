@@ -107,7 +107,7 @@
     <string name="msg_dic_not_opened">辞書をオープンできませんでした</string>
     <string name="title_input_path">パスの直接指定</string>
     <string name="msg_file_not_found">ファイルが見つかりません</string>
-    <string name="title_inc_srch">インクリメンタルサーチ</string>
+    <string name="title_inc_srch">メイン検索</string>
     <string name="title_touch_srch">タッチ検索</string>
     <string name="title_settings">設定</string>
     <string name="title_dictionary_setting">辞書設定</string>

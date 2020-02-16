@@ -3,11 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
-        <!--
-        <item name="colorPrimary">#303030</item>
-        <item name="colorPrimaryDark">#000000</item>
-        <item name="colorAccent">#804081</item>
-        -->
+        <item name="colorPrimary">#ADD8E6</item>
+        <item name="colorPrimaryDark">#0073A2</item>
+        <item name="colorAccent">#606060</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

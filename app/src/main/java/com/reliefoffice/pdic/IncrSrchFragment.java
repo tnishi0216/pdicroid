@@ -1,9 +1,11 @@
 package com.reliefoffice.pdic;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +18,8 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import com.reliefoffice.pdic.text.pfs;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -25,14 +29,13 @@ import android.widget.SearchView;
  * create an instance of this fragment.
  */
 public class IncrSrchFragment extends Fragment implements SearchView.OnQueryTextListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    SearchView searchView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -165,14 +168,14 @@ public class IncrSrchFragment extends Fragment implements SearchView.OnQueryText
         }
 
         // Setup Search View
-        SearchView search = view.findViewById(R.id.searchView1);
-        search.setIconifiedByDefault(false);
-        search.setOnQueryTextListener(this);
-        search.setSubmitButtonEnabled(true);
-        search.setQueryHint(getString(R.string.msg_input_word));
+        searchView = view.findViewById(R.id.searchView);
+        searchView.setIconifiedByDefault(false);
+        searchView.setOnQueryTextListener(this);
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setQueryHint(getString(R.string.msg_input_word));
 
         if (res != 0) {
-            search.setQueryHint("JNI init/createFrame: res=" + Integer.toString(res));
+            searchView.setQueryHint("JNI init/createFrame: res=" + Integer.toString(res));
         }
     }
 
@@ -205,6 +208,23 @@ public class IncrSrchFragment extends Fragment implements SearchView.OnQueryText
         super.onResume();
 
         jniCallback.setWordList(null);
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String text = pref.getString(pfs.LAST_SRCH_WORD, "");
+        if (Utility.isNotEmpty(text)) {
+            searchView.setQuery(text, true);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor edit = pref.edit();
+        String text = searchView.getQuery().toString();
+        edit.putString(pfs.LAST_SRCH_WORD, text);
+        edit.commit();
     }
 
     @Override

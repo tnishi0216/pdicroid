@@ -12,7 +12,7 @@
         tools:ignore="MergeRootFrame" >
 
         <SearchView android:layout_width="match_parent"
-            android:id="@+id/searchView1"
+            android:id="@+id/searchView"
             android:layout_height="wrap_content"></SearchView>
         <ListView android:id="@+id/wordList"
             android:layout_height="wrap_content"
