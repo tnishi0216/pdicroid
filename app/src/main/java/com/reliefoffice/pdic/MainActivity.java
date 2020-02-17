@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
 
     SharedPreferences pref;
 
+    int lastNavItem = -1;    // 設定以外の最後の選択item
+
     // NetDrive //
     INetDriveFileManager ndvFM;
 
@@ -79,7 +81,19 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
 
         setupDrawerContent(navigationView);
 
-        displaySelectedScreenById(navigationView, R.id.nav_main);
+        // 起動時の初期選択item
+        int navItem = pref.getInt(pfs.LAST_NAV_ITEM, -1);
+        switch (navItem){
+            case R.id.nav_main:
+            case R.id.nav_touch_search:
+            case R.id.nav_clip_search:
+                break;
+            default:
+                navItem = R.id.nav_main;
+                break;
+        }
+
+        displaySelectedScreenById(navigationView, navItem);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -108,12 +122,15 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
             case R.id.nav_main:
             default:
                 fragmentClass = IncrSrchFragment.class;
+                lastNavItem = menuItem.getItemId();
                 break;
             case R.id.nav_touch_search:
                 fragment = TouchSrchFragment.newInstance(null, null);
+                lastNavItem = menuItem.getItemId();
                 break;
             case R.id.nav_clip_search:
                 fragment = TouchSrchFragment.newInstance("clip", null);
+                lastNavItem = menuItem.getItemId();
                 break;
             case R.id.nav_settings:
                 fragmentClass = SettingsFragmentCompat.class;
@@ -239,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = pref.edit();
         edit.putBoolean(PFS_RUNNING, false);
+        edit.putInt(pfs.LAST_NAV_ITEM, lastNavItem);
         edit.commit();
     }
 

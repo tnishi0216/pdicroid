@@ -14,4 +14,5 @@ public class pfs {
     public static final String LAST_AUDIO_MARK_A = "LastAudioMarkA";
     public static final String LAST_AUDIO_MARK_B = "LastAudioAMarkB";
     public static final String LAST_SRCH_WORD = "LastSearchWord";
+    public static final String LAST_NAV_ITEM = "LastNavItem";
 }
