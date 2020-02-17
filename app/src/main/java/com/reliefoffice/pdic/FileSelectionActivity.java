@@ -18,6 +18,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.reliefoffice.pdic.text.config;
 import com.reliefoffice.pdic.text.pfs;
 
 import java.io.File;
@@ -30,7 +31,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
     static FileSelectionActivity This;
     SharedPreferences pref;
 
-    protected  String[] m_exts = {".dic", ".txt"};
+    protected  String[] m_exts = config.DicTextExtensions;
     protected FileInfo m_fileDirectory;
     protected boolean m_noReadDate = false; // SortType.ReadXは使用しない
     void setFileDirectory(String dir){

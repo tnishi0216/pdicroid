@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.reliefoffice.pdic.text.config;
+
 import java.io.File;
 
 /**
@@ -57,8 +59,7 @@ public class DropboxDownloadActivity extends NetDriveDownloadActivity {
                 finish();
             }
         });
-        String[] exts = {".dic", ".txt"};
-        dlg.show(new File(ndvUtils.getInitialDir()), exts);
+        dlg.show(new File(ndvUtils.getInitialDir()), config.DicTextExtensions);
         fromNetDrive = true;
     }
 

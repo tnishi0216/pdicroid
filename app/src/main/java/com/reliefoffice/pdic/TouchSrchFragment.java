@@ -883,8 +883,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     void selectFile() {
         Intent i = new Intent().setClassName(getContext().getPackageName(), FileDirSelectionActivity.class.getName());
         i.putExtra(pfs.INITIALDIR, pref.getString(pfs.PSINITIALDIR, Utility.initialFileDirectory()));
-        String[] exts = {".txt"};
-        i.putExtra("exts",exts);
+        i.putExtra("exts", config.TextExtensions);
         startActivityForResult(i, REQUEST_CODE_SELECT_FILE);
     }
 
@@ -1148,8 +1147,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     private void selectFileDropbox() {
         Intent i = new Intent().setClassName(getContext().getPackageName(), Dropbox2FileSelectionActivity.class.getName());
         i.putExtra("onlySelection", true);
-        String[] exts = {".txt"};
-        i.putExtra("exts",exts);
+        i.putExtra("exts",config.TextExtensions);
         startActivityForResult(i, REQUEST_CODE_SELECT_FILE_DBX);
         fromDropbox = true;
     }

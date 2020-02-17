@@ -8,4 +8,6 @@ public class config {
     public static final boolean defaultShowPronExp = false; // change R.xml.preference also.
     public static final int swipeMoveMargin = 120;
     public static final int MaxFileHistoryNum = 100;
+    public static final String[] DicTextExtensions = {".dic", ".txt", ".md"};
+    public static final String[] TextExtensions = {".txt", ".md"};
 }

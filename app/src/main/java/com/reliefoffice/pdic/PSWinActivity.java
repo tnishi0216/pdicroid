@@ -782,8 +782,7 @@ public class PSWinActivity extends AppCompatActivity implements FileSelectionDia
     void selectFile() {
         Intent i = new Intent().setClassName(this.getPackageName(), FileDirSelectionActivity.class.getName());
         i.putExtra(pfs.INITIALDIR, pref.getString(pfs.PSINITIALDIR, Utility.initialFileDirectory()));
-        String[] exts = {".txt"};
-        i.putExtra("exts",exts);
+        i.putExtra("exts",config.TextExtensions);
         startActivityForResult(i, REQUEST_CODE_SELECT_FILE);
     }
 
@@ -1045,8 +1044,7 @@ public class PSWinActivity extends AppCompatActivity implements FileSelectionDia
     private void selectFileDropbox() {
         Intent i = new Intent().setClassName(this.getPackageName(), Dropbox2FileSelectionActivity.class.getName());
         i.putExtra("onlySelection", true);
-        String[] exts = {".txt"};
-        i.putExtra("exts",exts);
+        i.putExtra("exts",config.TextExtensions);
         startActivityForResult(i, REQUEST_CODE_SELECT_FILE_DBX);
         fromDropbox = true;
     }

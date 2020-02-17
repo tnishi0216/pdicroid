@@ -22,6 +22,7 @@ import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
+import com.reliefoffice.pdic.text.config;
 
 import java.io.File;
 
@@ -65,8 +66,7 @@ public class GoogleDriveDownloadActivity extends NetDriveDownloadActivity implem
                     finish();
                 }
             });
-            String[] exts = {".dic", ".txt"};
-            dlg.show(new File(ndvUtils.getInitialDir()), exts);
+            dlg.show(new File(ndvUtils.getInitialDir()), config.DicTextExtensions);
         }
         fromNetDrive = true;
     }
