@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
         toggle.syncState();
 
         navigationView = findViewById(R.id.nav_view);
-        //TODO: navigationView.setNavigationItemSelectedListener(this);
 
         // Initialize JNI.
         pdicJni = PdicJni.createInstance(this, getAssets());        // Create JNI callback

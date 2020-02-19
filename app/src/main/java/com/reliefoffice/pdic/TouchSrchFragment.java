@@ -1366,8 +1366,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     private int markPositionA;
     private int markPositionB;
     final int minMarkABDuration = 1000; // [msec]
-    // settings
-    private int stepRewindTime = 5000; // [msec]
 
     private TouchSrchFragment.AudioSliderUpdateThread updateThread;
     void initAudioPlayer(View view){
@@ -1463,7 +1461,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     }
     void audioStepRewind(){
         int pos = mediaPlayer.getCurrentPosition();
-        pos -= stepRewindTime;
+        pos -= config.AudioStepRewindTime;
         if (pos < 0) pos = 0;
         mediaPlayer.seekTo(pos);
         audioSlider.setProgress(pos);

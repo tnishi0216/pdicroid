@@ -66,7 +66,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         // TextView path //
-        textPath = (TextView)findViewById(R.id.text_path);
+        textPath = findViewById(R.id.text_path);
         textPath.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,7 +75,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
         });
 
         // ListView //
-        final ListView fileList = (ListView) findViewById(R.id.fileList);
+        final ListView fileList = findViewById(R.id.fileList);
         fileList.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -86,7 +86,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
         });
 
         // Sort buttons //
-        Button btnName = (Button)findViewById(R.id.btn_name);
+        Button btnName = findViewById(R.id.btn_name);
         btnName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,7 +98,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
                 sortCommon(true);
             }
         });
-        Button btnDate = (Button)findViewById(R.id.btn_date);
+        Button btnDate = findViewById(R.id.btn_date);
         btnDate.setOnClickListener(new View.OnClickListener() {
             @Override
                 public void onClick(View v) {
@@ -110,7 +110,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
                 sortCommon(true);
             }
         });
-        Button btnRead = (Button)findViewById(R.id.btn_read);
+        Button btnRead = findViewById(R.id.btn_read);
         if (m_noReadDate) {
             btnRead.setVisibility(View.GONE);
         } else {
@@ -126,7 +126,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
                 }
             });
         }
-        Button btnSize = (Button)findViewById(R.id.btn_size);
+        Button btnSize = findViewById(R.id.btn_size);
         btnSize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,7 +140,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
             }
         });
 
-        rgEncoding = (RadioGroup)findViewById(R.id.rg_encoding);
+        rgEncoding = findViewById(R.id.rg_encoding);
         rgEncoding.check(R.id.btn_auto);
 
         prepareParams();
@@ -239,9 +239,9 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
 
         // encoding view
         if (i.getBooleanExtra("no_encoding", false)) {
-            LinearLayout llEncoding = (LinearLayout) findViewById(R.id.ll_encoding);
+            LinearLayout llEncoding = findViewById(R.id.ll_encoding);
             llEncoding.setVisibility(View.GONE);
-            LinearLayout llCharcode = (LinearLayout) findViewById(R.id.ll_charcode);
+            LinearLayout llCharcode = findViewById(R.id.ll_charcode);
             llCharcode.setVisibility(View.GONE);
         }
 
@@ -362,7 +362,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
     }
 
     protected void showPost(FileInfo fileDirectory, List<FileInfo> listFileInfo){
-        ListView listview = (ListView) findViewById(R.id.fileList);
+        ListView listview = findViewById(R.id.fileList);
         //listview.setScrollingCacheEnabled(false);
         //listview.setOnItemClickListener( this );
         //fileListAdapter = new FileInfoArrayAdapter(this, listFileInfo);

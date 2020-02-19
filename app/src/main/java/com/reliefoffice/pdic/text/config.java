@@ -10,4 +10,5 @@ public class config {
     public static final int MaxFileHistoryNum = 100;
     public static final String[] DicTextExtensions = {".dic", ".txt", ".md"};
     public static final String[] TextExtensions = {".txt", ".md"};
+    public static final int AudioStepRewindTime = 5000; // [msec]
 }
