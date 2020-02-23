@@ -90,8 +90,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     String remoteFilename;
     String psbmFilename;    // filename for PSBookmark
 
-    boolean drillIntoMode = false;
-
     // swipe for editText
     class SwipeMove {
         int MOVE_MARGIN_X = 80;
@@ -337,7 +335,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 //Log.d("PDD", "onCreateActionMode");
-                if (drillIntoMode)
+                if (getBackStackEntryCount() > 0)
                     return true;
                 if (Utility.isEmpty(openedFilename)){
                     // dialogを閉じても再び呼ばれてしまうため
@@ -450,6 +448,10 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     }
     boolean isClipMode(){
         return mParam1 == "\\\\clip";
+    }
+
+    int getBackStackEntryCount(){
+        return getFragmentManager().getBackStackEntryCount();
     }
 
     class HistoryFilename {
