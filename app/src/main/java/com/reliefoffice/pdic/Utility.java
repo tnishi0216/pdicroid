@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
+import com.reliefoffice.pdic.text.config;
 import com.reliefoffice.pdic.text.pfs;
 
 import java.io.File;
@@ -93,9 +94,9 @@ public class Utility {
 
     // audio folderのpathを返す
     public static String altAudioFolder(SharedPreferences pref){
-        String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity2.getDefaultAudioFolder());
+        String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, config.getDefaultAudioFolder());
         if (Utility.isEmpty(altAudioFolder))
-            altAudioFolder = SettingsActivity2.getDefaultAudioFolder();
+            altAudioFolder = config.getDefaultAudioFolder();
         return altAudioFolder;
     }
 

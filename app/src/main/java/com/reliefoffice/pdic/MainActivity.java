@@ -34,8 +34,6 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
     boolean prevRunning = false;
     boolean openPending = false;
 
-    final Handler handler = new Handler();
-
     SharedPreferences pref;
 
     NavigationView navigationView;
@@ -217,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
             builder.setMessage(getString(R.string.msg_nodictionary))
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            actionDictionarySetting();
+                            displaySelectedScreenById(navigationView, R.id.nav_dic_setting);
                         }
                     });
             builder.show();
@@ -298,40 +296,6 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
             pdicJni.deleteInstance();
             pdicJni = null;
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id==R.id.action_pswin){
-            startTouchSearch();
-        } else
-        if (id==R.id.action_dictionary){
-            actionDictionarySetting();
-        } else
-        if (id == R.id.action_settings) {
-            startSettings();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    private final void startTouchSearch(){
-        startActivity(new Intent().setClassName(this.getPackageName(), PSWinActivity.class.getName()));
-    }
-
-    private final void startSettings(){
-        startActivity(new Intent().setClassName(this.getPackageName(), SettingsActivity2.class.getName()));
-    }
-
-    void actionDictionarySetting(){
-        startActivity(new Intent().setClassName(this.getPackageName(), DicSettingActivity.class.getName()));
     }
 
     @Override

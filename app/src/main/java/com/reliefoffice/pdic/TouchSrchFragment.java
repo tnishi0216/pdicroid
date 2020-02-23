@@ -873,10 +873,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            startActivity(new Intent().setClassName(getContext().getPackageName(), SettingsActivity2.class.getName()));
-            return true;
-        } else if (id == R.id.action_loadfile) {
+        if (id == R.id.action_loadfile) {
             selectFile();
         } else if (id == R.id.action_loadfile_history) {
             selectFileFromHistory();
@@ -1057,9 +1054,9 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         String audioFileName = Utility.changeExtension(openedFilename, "mp3");
         boolean audioOk = openAudioPlayer(audioFileName);
         if (!audioOk){
-            String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, SettingsActivity2.getDefaultAudioFolder());
+            String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, config.getDefaultAudioFolder());
             if (Utility.isEmpty(altAudioFolder))
-                altAudioFolder = SettingsActivity2.getDefaultAudioFolder();
+                altAudioFolder = config.getDefaultAudioFolder();
             audioFileName = Utility.changePath(audioFileName, altAudioFolder);
             audioOk = openAudioPlayer(audioFileName);
         }
@@ -1592,7 +1589,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         }
     }
     void reloadMarkPosition(){
-        String lastAudioFile = pref.getString(pfs.LAST_AUDIOFILE, SettingsActivity2.getDefaultAudioFolder());
+        String lastAudioFile = pref.getString(pfs.LAST_AUDIOFILE, config.getDefaultAudioFolder());
         if (Utility.isNotEmpty(lastAudioFile)){
             if (Utility.isNotEmpty(openedFilename)){
                 if (lastAudioFile.equals(openedFilename)) {
@@ -1788,8 +1785,6 @@ class PSWordListAdapter extends ArrayAdapter<WordItem> {
 }
 */
 
-/*
-//TODO: あとで別クラス化
 class TWordListAdapter implements IWordListAdapter {
 
     //private TextView popupText;
@@ -1809,4 +1804,3 @@ class TWordListAdapter implements IWordListAdapter {
         popupListAdapter.add(item);
     }
 }
-*/

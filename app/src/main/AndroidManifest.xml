@@ -21,15 +21,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PSWinActivity"
-            android:label="@string/title_activity_pswin" />
-        <activity
-            android:name=".DicSettingActivity"
-            android:label="@string/title_activity_dic_setting" />
-        <activity
-            android:name=".SettingsActivity2"
-            android:label="@string/title_activity_settings" />
-        <activity
             android:name=".DropboxDownloadActivity"
             android:label="@string/title_activity_dropbox_download" />
         <activity
