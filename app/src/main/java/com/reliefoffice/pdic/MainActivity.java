@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
                 super.onBackPressed();
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();

@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 import com.reliefoffice.pdic.R;
 
-public     class TextLoadTask extends AsyncTask<String, Integer, StringBuilder>{
+public class TextLoadTask extends AsyncTask<String, Integer, StringBuilder>{
 
     OnFileLoadListener mFileLoadListener=null;
     private int mLineToChar=-1;
@@ -43,7 +43,6 @@ public     class TextLoadTask extends AsyncTask<String, Integer, StringBuilder>{
         void onPreFileLoad();
         void onFileLoaded( StringBuilder result , String filename , String charset , int linebreak , int mOffset );
     }
-
 
     public TextLoadTask( Activity activity , OnFileLoadListener postProc , int initline, String defCharset )
     {
