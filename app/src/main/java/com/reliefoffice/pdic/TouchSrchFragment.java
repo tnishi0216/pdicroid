@@ -278,24 +278,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         // EditText //
         editText = view.findViewById(R.id.editText);
         editText.setKeyListener(null);  // Android 8.0でkeyboardを表示させないようにするため
-        /*editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                System.out.println("onEditorAction");
-                return false;
-            }
-        });*/
-        /*editText.setOnTouchListener(new TextView.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction()==MotionEvent.ACTION_DOWN){
-                    Log.i("PDP","onTouch - "+editText.getSelectionStart() + " " + editText.getSelectionEnd());
-                }
-                //System.out.println("onTouchListener");
-                //Log.i("PDP","onTouchListener "+event.getAction());
-                return false;
-            }
-        });*/
         editText.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View view) {
