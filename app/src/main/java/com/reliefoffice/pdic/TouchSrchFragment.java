@@ -89,6 +89,8 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     String remoteFilename;
     String psbmFilename;    // filename for PSBookmark
 
+    static boolean cancel = false;
+
     // swipe for editText
     class SwipeMove {
         int MOVE_MARGIN_X = 80;
@@ -444,6 +446,10 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         return getFragmentManager().getBackStackEntryCount();
     }
 
+    static public void setCancel(boolean cancel){
+        TouchSrchFragment.cancel = cancel;
+    }
+
     class HistoryFilename {
         String filename;
         String remoteName;
@@ -574,8 +580,11 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             selectFileDropbox();
         }
 
+        if (cancel)
+            return;
+
         if (getBackStackEntryCount() > 0 && !isWordMode()){
-            // タッチ検索/クリップ検索で深い検索に入り、そこから別画面に映り、戻ってきた場合
+            // タッチ検索/クリップ検索で深い検索に入り、そこから別画面に移り、戻ってきた場合
             faked = true;
             mParam1 = pref.getString(pfs.LAST_TOUCH_SRCH_WORD, null);
             mParam2 = pref.getString(pfs.LAST_TOUCH_SRCH_TRANS, null);

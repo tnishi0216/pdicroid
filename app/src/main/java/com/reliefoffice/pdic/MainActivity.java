@@ -121,6 +121,8 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
             setupViewFlags();
         lastNavSetting = false;
 
+        boolean needAllPop = false;
+
         switch(menuItem.getItemId()) {
             case R.id.nav_main:
             default:
@@ -129,10 +131,12 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
                 break;
             case R.id.nav_touch_search:
                 fragment = TouchSrchFragment.newInstance(null, null);
+                if (lastNavItem == R.id.nav_clip_search) needAllPop = true;
                 lastNavItem = menuItem.getItemId();
                 break;
             case R.id.nav_clip_search:
                 fragment = TouchSrchFragment.newInstance("\\\\clip", null);
+                if (lastNavItem == R.id.nav_touch_search) needAllPop = true;
                 lastNavItem = menuItem.getItemId();
                 break;
             case R.id.nav_settings:
@@ -155,6 +159,16 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
 
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if (needAllPop){
+            // タッチ検索→drill mode→クリップ検索にした場合、popBackStackImmediate()でタッチ検索が再生成され、非同期なfile loadが走り、ここでの切り替え処理が終わった後、タッチ検索のfile load完了処理が走るため
+            TouchSrchFragment.setCancel(true);
+            while (fragmentManager.getBackStackEntryCount()>0) {
+                fragmentManager.popBackStackImmediate();
+            }
+            TouchSrchFragment.setCancel(false);
+        }
+
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
         // Highlight the selected item has been done by NavigationView
