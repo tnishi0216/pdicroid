@@ -75,9 +75,11 @@ import static java.lang.Math.abs;
 public class TouchSrchFragment extends Fragment implements FileSelectionDialog.OnFileSelectListener, TextLoadTask.OnFileLoadListener, SaveFileTask.SaveFileTaskDone, GotoDialog.Listener, SeekBar.OnSeekBarChangeListener, FragmentManager.OnBackStackChangedListener {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM3 = "param3";
 
     private String mParam1;
     private String mParam2;
+    private boolean fromMain;   //TODO: 動作未確認
 
     private OnFragmentInteractionListener mListener;
 
@@ -218,11 +220,12 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
      * @return A new instance of fragment TouchSrchFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TouchSrchFragment newInstance(String param1, String param2) {
+    public static TouchSrchFragment newInstance(String param1, String param2, boolean fromMain) {
         TouchSrchFragment fragment = new TouchSrchFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
+        args.putBoolean(ARG_PARAM3, fromMain);
         fragment.setArguments(args);
         return fragment;
     }
@@ -236,6 +239,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            fromMain = getArguments().getBoolean(ARG_PARAM3);
         }
     }
 
@@ -628,6 +632,8 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
         // Bluetooth Manager //
         Utility.requestBluetoothPermision(getActivity());
+
+        fromMain = false;
     }
 
     @Override
@@ -1389,7 +1395,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
         if(fragmentManager != null){
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.content_frame, this.newInstance(item.word, item.trans));
+            fragmentTransaction.replace(R.id.content_frame, this.newInstance(item.word, item.trans, false));
             fragmentTransaction.addToBackStack(null);   // BackStackを設定
             fragmentTransaction.commit();
         }
