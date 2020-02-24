@@ -64,7 +64,6 @@ import java.io.InputStream;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static java.lang.Math.abs;
 
-
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -73,7 +72,7 @@ import static java.lang.Math.abs;
  * Use the {@link TouchSrchFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TouchSrchFragment extends Fragment implements FileSelectionDialog.OnFileSelectListener, TextLoadTask.OnFileLoadListener, SaveFileTask.SaveFileTaskDone, GotoDialog.Listener, SeekBar.OnSeekBarChangeListener {
+public class TouchSrchFragment extends Fragment implements FileSelectionDialog.OnFileSelectListener, TextLoadTask.OnFileLoadListener, SaveFileTask.SaveFileTaskDone, GotoDialog.Listener, SeekBar.OnSeekBarChangeListener, FragmentManager.OnBackStackChangedListener {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -429,6 +428,11 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         bluetoothManager = new TouchSrchFragment.BluetoothManager();
     }
 
+    boolean faked = false;
+
+    boolean isNormalMode(){
+        return Utility.isEmpty(mParam1) && Utility.isEmpty(mParam2);
+    }
     boolean isWordMode(){
         return Utility.isNotEmpty(mParam1) && !isClipMode();
     }
@@ -569,8 +573,24 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         if (ndvFM.authComplete(getContext())) {
             selectFileDropbox();
         }
+
+        if (getBackStackEntryCount() > 0 && !isWordMode()){
+            // タッチ検索/クリップ検索で深い検索に入り、そこから別画面に映り、戻ってきた場合
+            faked = true;
+            mParam1 = pref.getString(pfs.LAST_TOUCH_SRCH_WORD, null);
+            mParam2 = pref.getString(pfs.LAST_TOUCH_SRCH_TRANS, null);
+
+            getFragmentManager().addOnBackStackChangedListener(this);
+        }
+
         if (isWordMode()){
             editText.setText(mParam1 + " " + mParam2);
+            if (getBackStackEntryCount() > 0){
+                SharedPreferences.Editor edit = pref.edit();
+                edit.putString(pfs.LAST_TOUCH_SRCH_WORD, mParam1);
+                edit.putString(pfs.LAST_TOUCH_SRCH_TRANS, mParam2);
+                edit.commit();
+            }
         } else
         if (isClipMode()){
             int len = loadClipboardData();
@@ -588,14 +608,12 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 }
             }
         } else {
-            if (getBackStackEntryCount() == 0){
-                // load the latest opened file
-                TouchSrchFragment.HistoryFilename histName = getLatestHistoryName();
-                if (histName!=null){
-                    fileEncoding = histName.encoding;
-                    autoStartPlayMode = false;
-                    loadFile(histName.filename, histName.remoteName);
-                }
+            // load the latest opened file
+            TouchSrchFragment.HistoryFilename histName = getLatestHistoryName();
+            if (histName!=null){
+                fileEncoding = histName.encoding;
+                autoStartPlayMode = false;
+                loadFile(histName.filename, histName.remoteName);
             }
         }
 
@@ -603,10 +621,18 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         Utility.requestBluetoothPermision(getActivity());
     }
 
+    @Override
+    public void onBackStackChanged() {
+        getFragmentManager().beginTransaction().remove(this).commit();
+    }
+
     int lastPosition;
 
     @Override
     public void onPause() {
+        if (faked){
+            getFragmentManager().removeOnBackStackChangedListener(this);
+        }
         if (Utility.isNotEmpty(openedFilename)) {
             INetDriveFileInfo info = ndvFM.findByLocalName(openedFilename);
             if (info != null) {
@@ -852,7 +878,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (!isClipMode() && !isWordMode())
+        if (isNormalMode())
             inflater.inflate(R.menu.menu_touch_srch, menu);
     }
 

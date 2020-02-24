@@ -17,4 +17,6 @@ public class pfs {
     public static final String LAST_NAV_ITEM = "LastNavItem";
     public static final String LAST_CURSOR_POS = "LastCursorPos";
     public static final String LAST_CLIP_LENGTH = "LastClipLength";
+    public static final String LAST_TOUCH_SRCH_WORD = "LastTouchSrchWord";
+    public static final String LAST_TOUCH_SRCH_TRANS = "LastTouchSrchTrans";
 }
