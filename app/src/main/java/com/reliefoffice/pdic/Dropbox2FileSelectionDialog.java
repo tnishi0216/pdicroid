@@ -79,7 +79,7 @@ public class Dropbox2FileSelectionDialog extends DropboxFileSelectionDialog {
             }
             File file = new File(md.getPathDisplay());
             String path = file.getParent();
-            if (path != "/") path += "/";
+            if (!path.equals("/")) path += "/";
             listFileInfo.add( new FileInfo( md.getName(), md instanceof FolderMetadata, path ) );
         }
         Collections.sort(listFileInfo);

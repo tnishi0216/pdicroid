@@ -110,7 +110,7 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
             }
             File file = new File(md.getPathDisplay());
             String path = file.getParent();
-            if (path != "/") path += "/";
+            if (!path.equals("/")) path += "/";
             FileInfo fileInfo = new FileInfo( md.getName(), md instanceof FolderMetadata, path, mp3Exists );
             if (md instanceof FileMetadata){
                 FileMetadata fm = (FileMetadata)md;
