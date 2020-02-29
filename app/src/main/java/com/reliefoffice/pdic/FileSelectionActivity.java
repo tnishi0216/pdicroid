@@ -290,10 +290,13 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
         pathDialog.setCallback(new TextInputCallback() {
             @Override
             public void onTextInputClickOk() {
-                m_fileDirectory = new FileInfo(pathDialog.getText());
+                String path = pathDialog.getText();
                 pathDialog.dismiss();
                 pathDialog = null;
-                startSelectFile();
+                if (Utility.isNotEmpty(path)) {
+                    m_fileDirectory = new FileInfo(path);
+                    startSelectFile();
+                }
             }
             @Override
             public void onTextInputClickCancel() {
