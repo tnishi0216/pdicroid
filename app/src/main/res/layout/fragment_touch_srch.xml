@@ -69,6 +69,7 @@
                 android:id="@+id/editText"
                 android:scrollbars="vertical"
                 android:fadeScrollbars="true"
+                android:autoLink="all"
                 />
 
         </LinearLayout>
