@@ -37,6 +37,7 @@ public class FileItemLayout extends LinearLayout {
     public void bindView(FileInfo item){
         if (item.isDirectory()) {
             imageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_folder));
+            fileSize.setText("");
         } else {
             if (item.m_mp3Exists) {
                 imageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_textmp3_file));
@@ -51,11 +52,15 @@ public class FileItemLayout extends LinearLayout {
         textView.setText(item.getName());
         if (item.m_nrBM>0){
             nrBM.setText(" ["+String.valueOf(item.m_nrBM)+"BM]");
+        } else {
+            nrBM.setText("");
         }
         if (item.getModDate()!=null) {
             SimpleDateFormat sdf = new SimpleDateFormat(" HH:mm:ss");
             DateFormat df = android.text.format.DateFormat.getDateFormat(getContext());
             modDate.setText(df.format(item.getModDate()) + sdf.format(item.getModDate()));
+        } else {
+            modDate.setText("");
         }
     }
 }
