@@ -109,6 +109,8 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int num = adpDicList.getCount();
+                final boolean debug = pref.getBoolean(pfs.DEBUG, false);
+                if (!debug) num++;
                 if (position == num - 3) {
                     // download
                     actionDownload();
