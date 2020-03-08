@@ -44,42 +44,48 @@ public class SettingsFragmentCompat extends PreferenceFragmentCompat implements 
 
         addPreferencesFromResource(R.xml.preference);
 
-        //pref = PreferenceManager.getDefaultSharedPreferences(this);
         ndvFM = DropboxFileManager.createInstance(getActivity());
         ndvUtils = DropboxUtils.getInstance(getActivity());
 
-        psbmSharing = (CheckBoxPreference)findPreference("PSBookmarkSharing");
-        psbmSharing.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                if (psbmSharing.isChecked()) {
-                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-                    boolean debug = pref.getBoolean(pfs.DEBUG, false);
-                    if (debug) {
-                        if (ndvFM.startAuth(false)) {
-                            selectDropboxFile();
-                        } else {
-                            if (!ndvUtils.appKeysConfirmed) {
-                                SettingsFragmentCompat.MyDropboxAppKeysDialog dlg = new SettingsFragmentCompat.MyDropboxAppKeysDialog();
-                                dlg.parent = This;
-                                dlg.show(getFragmentManager(), "dbx app keys");
+        psbmSharing = (CheckBoxPreference) findPreference("PSBookmarkSharing");
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        final boolean debug = pref.getBoolean(pfs.DEBUG, false);
+        if (debug) {
+            psbmSharing.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    if (psbmSharing.isChecked()) {
+                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        boolean debug = pref.getBoolean(pfs.DEBUG, false);
+                        if (debug) {
+                            if (ndvFM.startAuth(false)) {
+                                selectDropboxFile();
                             } else {
-                                startAuth();
+                                if (!ndvUtils.appKeysConfirmed) {
+                                    SettingsFragmentCompat.MyDropboxAppKeysDialog dlg = new SettingsFragmentCompat.MyDropboxAppKeysDialog();
+                                    dlg.parent = This;
+                                    dlg.show(getFragmentManager(), "dbx app keys");
+                                } else {
+                                    startAuth();
+                                }
                             }
                         }
+                    } else {
+                        PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(getActivity(), ndvFM);
+                        psbmFM.changeFilename(null, null, null);
+                        psbmFM.deleteInstance();
                     }
-                } else {
-                    PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(getActivity(), ndvFM);
-                    psbmFM.changeFilename(null, null, null);
-                    psbmFM.deleteInstance();
+                    return true;
                 }
-                return true;
+            });
+            if (psbmSharing.isChecked()) {
+                PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(getActivity(), ndvFM);
+                psbmSharing.setSummary(psbmFM.getRemoteFilename());
+                psbmFM.deleteInstance();
             }
-        });
-        if (psbmSharing.isChecked()) {
-            PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(getActivity(), ndvFM);
-            psbmSharing.setSummary(psbmFM.getRemoteFilename());
-            psbmFM.deleteInstance();
+        } else {
+            psbmSharing.setVisible(false);
         }
 
         AudioFileFolder = (EditTextPreference) findPreference("AudioFileFolder");
