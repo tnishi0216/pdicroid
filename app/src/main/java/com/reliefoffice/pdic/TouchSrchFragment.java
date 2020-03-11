@@ -488,6 +488,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
     int lastClipLength = 0;
 
+    // 語数を返す
     int loadClipboardData(){
         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData cd = cm.getPrimaryClip();
@@ -495,7 +496,13 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             ClipData.Item item = cd.getItemAt(0);
             CharSequence text = item.getText();
             editText.setText(text);
-            return lastClipLength = text.length();
+            lastClipLength = text.length();
+            if (lastClipLength <= config.AutoClipMaxTextLen){
+                int wordCount = Utility.getWordCount(text.toString());
+                return wordCount == 0 ? 1 : wordCount;
+            } else {
+                return config.AutoClipMaxWordCount+1;
+            }
         }
         return 0;
     }
@@ -600,18 +607,23 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
         if (isClipMode()) {
             // 他のアプリからの切り替えに対応するため、onCreateではなくここで。
-            int len = loadClipboardData();
-            if (len > 0) {
+            int wordCount = loadClipboardData();
+            if (wordCount > 0) {
                 Toast.makeText(getContext(), getString(R.string.msg_clipboard_loaded), Toast.LENGTH_LONG).show();
                 // 前回と長さが同じ場合はpositionを移動
                 int lastLength = pref.getInt(pfs.LAST_CLIP_LENGTH, 0);
-                if (lastLength == len) {
+                if (lastLength == lastClipLength) {
                     int position = pref.getInt(pfs.LAST_CURSOR_POS, 0);
                     try {
                         editText.setSelection(position);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                }
+                // config.AutoClipWordCount以下の場合は自動的に検索開始
+                if (wordCount <= config.AutoClipMaxWordCount){
+                    savedEditTextHeight = 200;  //TODO: タイミングの違いにより正しい値を取得できないため、ここで固定値を設定
+                    popupWordText(0, 0);
                 }
             } else {
                 editText.setText(R.string.msg_need_clipboard_data);

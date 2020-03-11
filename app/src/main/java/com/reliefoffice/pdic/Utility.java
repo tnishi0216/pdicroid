@@ -54,6 +54,11 @@ public class Utility {
         return NumberFormat.getNumberInstance().format(value);
     }
 
+    public static final int getWordCount(String words){
+        final String SEPARATOR = "(\\s+?|\\.|,|;)";
+        return words.split(SEPARATOR).length;
+    }
+
     public static String initialFileDirectory(){
         //return "/storage/emulated/0";
         return Environment.getExternalStorageDirectory().getAbsolutePath();
