@@ -61,6 +61,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static java.lang.Math.abs;
@@ -207,6 +208,9 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     TouchSrchFragment.BluetoothManager bluetoothManager;
 
     int prevStart, prevEnd;
+
+    static boolean newPSWindow;
+    static ArrayList<Integer> lastWordModePositions = new ArrayList<>();
 
     public TouchSrchFragment() {
         // Required empty public constructor
@@ -605,6 +609,24 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             selectFileDropbox();
         }
 
+        if (isWordMode()){
+            if (newPSWindow){
+                editText.setSelection(0);
+                newPSWindow = false;
+            } else {
+                int size = lastWordModePositions.size();
+                if (size > 0){
+                    int pos = lastWordModePositions.get(size-1);
+                    try {
+                        editText.setSelection(pos);
+                    } catch(Exception e){
+                        Log.e("PDP", "out of selection");
+                    }
+                    // pop last position
+                    lastWordModePositions.remove(size - 1);
+                }
+            }
+        } else
         if (isClipMode()) {
             // 他のアプリからの切り替えに対応するため、onCreateではなくここで。
             int wordCount = loadClipboardData();
@@ -674,6 +696,13 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             int position = editText.getSelectionStart();
             edit.putInt(pfs.LAST_CURSOR_POS, position);
             edit.commit();
+        }
+
+        if (isWordMode()){
+            if (newPSWindow) {
+                int pos = editText.getSelectionStart();
+                lastWordModePositions.add(pos);
+            }
         }
 
         super.onPause();
@@ -1425,6 +1454,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             fragmentTransaction.replace(R.id.content_frame, this.newInstance(item.word, item.trans, false));
             fragmentTransaction.addToBackStack(null);   // BackStackを設定
             fragmentTransaction.commit();
+            newPSWindow = true;
         }
     }
 
