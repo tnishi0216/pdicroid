@@ -785,6 +785,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 int pos = start - start0;
                 pdicJni.getLPWords(picked_text, pos, longest, maxwords, about);
                 Log.d("PDP", "start=" + pdicJni.startPos + " end=" + pdicJni.endPos + " prevstart=" + pdicJni.prevStartPos + " picked_text="+picked_text.length());
+                if (pdicJni.endPos > picked_text.length()) pdicJni.endPos = picked_text.length();   // 改行の数え方の違いなのか、overするときがあるため、その対症療法
                 searchText = picked_text.substring(pdicJni.prevStartPos, pdicJni.endPos);
                 startPos = pdicJni.startPos - pdicJni.prevStartPos;
 
