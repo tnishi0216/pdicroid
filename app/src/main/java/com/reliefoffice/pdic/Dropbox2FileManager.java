@@ -92,7 +92,7 @@ public class Dropbox2FileManager extends DropboxBaseFileManager {
         // Required to complete auth, sets the access token on the session
         String token = Auth.getOAuth2Token();
         if (Utility.isEmpty(token)) {
-            Log.i("PDP", "Access Token is null!?");
+            // Log.i("PDP", "Access Token is null!?");
             return false;
         }
         dbxUtils.storeOauth2AccessToken(token);
