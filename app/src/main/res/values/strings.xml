@@ -55,6 +55,7 @@
     <string name="label_shortcut_jota">Open by Jota Text Editor</string>
     <string name="toast_saved_message">Saved the file \\\"%1$s\\\"</string>
     <string name="toast_save_failed">Couldn\'t save the file.</string>
+    <string name="toast_cannot_get_clipboard">Couldn\'t get the clipboard text.</string>
     <string name="msg_bookmark_file_downloaded">Bookmark file downloaded : </string>
     <string name="msg_dictionary_removed">Dictionary be removed.</string>
     <string name="msg_file_load_failed">File load failed.</string>

@@ -54,6 +54,7 @@
     <string name="label_shortcut_jota">Open by Jota Text Editor</string>
     <string name="toast_saved_message">ファイルを保存しました。 \\\"%1$s\\\"</string>
     <string name="toast_save_failed">ファイルを保存できませんでした</string>
+    <string name="toast_cannot_get_clipboard">クリップボードテキストを取得できませんでした</string>
     <string name="msg_bookmark_file_downloaded">ブックマークファイルをダウンロードしました : </string>
     <string name="msg_dictionary_removed">辞書を削除しました</string>
     <string name="msg_file_load_failed">ファイルの読み込みに失敗しました</string>

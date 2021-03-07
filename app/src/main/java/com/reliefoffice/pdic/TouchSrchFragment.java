@@ -505,13 +505,17 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         if(cd != null){
             ClipData.Item item = cd.getItemAt(0);
             CharSequence text = item.getText();
-            editText.setText(text);
-            lastClipLength = text.length();
-            if (lastClipLength <= config.AutoClipMaxTextLen){
-                int wordCount = Utility.getWordCount(text.toString());
-                return wordCount == 0 ? 1 : wordCount;
+            if (text != null) {
+                editText.setText(text);
+                lastClipLength = text.length();
+                if (lastClipLength <= config.AutoClipMaxTextLen) {
+                    int wordCount = Utility.getWordCount(text.toString());
+                    return wordCount == 0 ? 1 : wordCount;
+                } else {
+                    return config.AutoClipMaxWordCount + 1;
+                }
             } else {
-                return config.AutoClipMaxWordCount+1;
+                Toast.makeText(getContext(), getString(R.string.toast_cannot_get_clipboard), Toast.LENGTH_LONG).show();
             }
         }
         return 0;
