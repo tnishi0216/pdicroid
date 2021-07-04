@@ -137,7 +137,10 @@ int GetDicFileTypeEx( const tchar *filename, int &dictype_ex )
 			Japa japa;
 			int i;
 			for (i=0;i<4;i++){
-				if (csv.readPare(word, japa)!=0){
+				int r = csv.readPare(word, japa);
+				if (r != 0){
+					if (r==-1 && i>0)	// EOF
+						return DT_CSV;
 					break;
 				}
 				if (word.empty()) break;
