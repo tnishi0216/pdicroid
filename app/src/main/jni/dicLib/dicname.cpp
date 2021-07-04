@@ -72,6 +72,7 @@ DICNAME::DICNAME( const DICNAME &dn )
 {
 	name = dn.name;
 	readonly = dn.readonly;
+	nosearch = dn.nosearch;
 #ifdef USE_COMP
 	comp = dn.comp;
 #endif
