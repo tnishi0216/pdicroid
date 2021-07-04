@@ -151,25 +151,30 @@ _fchar *jfstristr( const _fchar *s1, int n1, FS_NAME(FindStr) &fs )
 
 #if USE_QS
 #error	// not implemented.
-	const _fchar *e1 = s1 + n1 - fs.n2 + 1;
+	const _fchar *e1 = s1 + n1 - fs.n2;
 
-	while ( s1 <= e1 ){
-		_fuchar c;
-		const _fuchar *s2 = fs.s2;
-		const _fuchar *size = fs.size_e;	//TODO: これがよくわからない。。そもそも分ける必要あり？
-		for (int j=0;;){
-			if ( *size )
-				c = _flower(*s1);
-			else
-				c = *s1;
-			if ( c != *s2 )
-				break;
-			if (j==fs.n2)
-				return (_fchar*)s1;
-			s2++;
-		}
-		c = s1[fs.n2];
-		s1 += fs.skip[ *size ? _flower(c) : c ];	//TODO: *size
+	if ( s1 <= e1 ){
+		do {
+			_fuchar c;
+			const _fuchar *s2 = fs.s2;
+			const _fuchar *size = fs.size_e;	//TODO: これがよくわからない。。そもそも分ける必要あり？
+			for (int j=0;;){
+				if ( *size )
+					c = _flower(*s1);
+				else
+					c = *s1;
+				j++;
+				if ( c != *s2 )
+					break;
+				if (j==fs.n2)
+					return (_fchar*)s1;
+				s2++;
+				size++;
+			}
+			if (s1 >= e1) break;
+			c = s1[fs.n2];
+			s1 += fs.skip[ *size ? _flower(c) : c ];	//TODO: *size
+		} while(1);
 	}
 #else
 	const _fchar *e1 = s1 + n1;
@@ -224,20 +229,23 @@ _fchar *jfstrstr( const _fchar *s1, int n1, FS_NAME(FindStr) &fs )
 
 #if USE_QS
 #error	// not implemented
-	const _fchar *e1 = s1 + n1 - fs.n2 + 1;
+	const _fchar *e1 = s1 + n1 - fs.n2;
 
-	while ( s1 <= e1 ){
-		_fuchar c;
-		const _fuchar *s2 = fs.s2;
-		for (int j=0;;){
-			c = s1[j++];
-			if ( c != *s2 )
-				break;
-			if (j==fs.n2)
-				return (_fchar*)s1;
-			s2++;
-		}
-		s1 += fs.skip[s1[fs.n2]];
+	if ( s1 <= e1 ){
+		do {
+			_fuchar c;
+			const _fuchar *s2 = fs.s2;
+			for (int j=0;;){
+				c = s1[j++];
+				if ( c != *s2 )
+					break;
+				if (j==fs.n2)
+					return (_fchar*)s1;
+				s2++;
+			}
+			if (s1 >= e1) break;
+			s1 += fs.skip[s1[fs.n2]];
+		} while(1);
 	}
 #else
 	const _fchar *e1 = s1 + n1;
@@ -415,20 +423,23 @@ _fchar *fstristr( const _fchar *s1, int n1, FS_NAME(FindStr) &fs )
 	}
 #else
 #if USE_QS
-	const _fchar *e1 = s1 + n1 - fs.n2 + 1;
+	const _fchar *e1 = s1 + n1 - fs.n2;
 
-	while ( s1 <= e1 ){
-		_fuchar c;
-		const _fuchar *s2 = fs.s2_single;
-		for (int j=0;;){
-			c = A_lower(s1[j++]);
-			if ( c != *s2 )
-				break;
-			if (j==fs.n2)
-				return (_fchar*)s1;
-			s2++;
-		}
-		s1 += fs.skip_single[A_lower(s1[fs.n2])];
+	if ( s1 <= e1 ){
+		do {
+			_fuchar c;
+			const _fuchar *s2 = fs.s2_single;
+			for (int j=0;;){
+				c = A_lower(s1[j++]);
+				if ( c != *s2 )
+					break;
+				if (j==fs.n2)
+					return (_fchar*)s1;
+				s2++;
+			}
+			if (s1 >= e1) break;
+			s1 += fs.skip_single[A_lower(s1[fs.n2])];
+		} while(1);
 	}
 #else
 	const _fchar *e1 = s1 + n1;
@@ -499,20 +510,23 @@ _fchar *fstrstr( const _fchar *s1, int n1, FS_NAME(FindStr) &fs )
 	}
 #else
 #if USE_QS
-	const _fchar *e1 = s1 + n1 - fs.n2 + 1;
+	const _fchar *e1 = s1 + n1 - fs.n2;
 
-	while ( s1 <= e1 ){
-		_fuchar c;
-		const _fuchar *s2 = fs.s2_single;
-		for (int j=0;;){
-			c = s1[j++];
-			if ( c != *s2 )
-				break;
-			if (j==fs.n2)
-				return (_fchar*)s1;
-			s2++;
-		}
-		s1 += fs.skip_single[s1[fs.n2]];
+	if ( s1 <= e1 ){
+		do {
+			_fuchar c;
+			const _fuchar *s2 = fs.s2_single;
+			for (int j=0;;){
+				c = s1[j++];
+				if ( c != *s2 )
+					break;
+				if (j==fs.n2)
+					return (_fchar*)s1;
+				s2++;
+			}
+			if (s1 >= e1) break;
+			s1 += fs.skip_single[s1[fs.n2]];
+		} while (1);
 	}
 #else
 	const _fchar *e1 = s1 + n1;
