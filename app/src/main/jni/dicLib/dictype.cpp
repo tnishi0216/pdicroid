@@ -145,6 +145,7 @@ int GetDicFileTypeEx( const tchar *filename, int &dictype_ex )
 				}
 				if (word.empty()) break;
 				if (japa.japa.empty()) break;
+				if (word[0] == _T('■') && word[1] == '"') break;	// 辞郎形式の可能性が高い
 			}
 			if (i>=4){
 				return DT_CSV;
