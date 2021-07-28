@@ -32,7 +32,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_remove">Remove</string>
     <string name="action_close">Close</string>
-    <string name="action_google_translate">Google Translate</string>
+    <string name="action_google_translate">Google Trans</string>
     <string name="action_edit_comment">Edit Comment</string>
     <string name="title_input_comment">Input Comment</string>
     <string name="title_activity_loadfile_history">File History</string>

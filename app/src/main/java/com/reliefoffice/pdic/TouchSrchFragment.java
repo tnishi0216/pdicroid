@@ -215,6 +215,8 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     static boolean newPSWindow;
     static ArrayList<Integer> lastWordModePositions = new ArrayList<>();
 
+    final static int id_google_translate = 111;
+
     public TouchSrchFragment() {
         // Required empty public constructor
     }
@@ -330,6 +332,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 //Log.d("PDD", "onCreateActionMode");
+                menu.add(Menu.NONE, id_google_translate, Menu.NONE, getString(R.string.action_google_translate));
                 if (getBackStackEntryCount() > 0)
                     return true;
                 if (Utility.isEmpty(openedFilename)){
@@ -359,6 +362,14 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                int id = item.getItemId();
+                switch (id){
+                    case id_google_translate:
+                        closePSBookmarkEditWindow();
+                        String text = Utility.getSelectedText(This.editText);
+                        doGoogleTranslate(text);
+                        return true;
+                }
                 return false;
             }
 
@@ -531,10 +542,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 }
                 @Override
                 void closeNotify(){
-                    if (psbEditWindow.isGoogleTranslate()){
-                        String text = Utility.getSelectedText(This.editText);
-                        doGoogleTranslate(text);
-                    }
                     psbEditWindow = null;
                     This.editText.requestFocus(View.FOCUS_UP);
                 }

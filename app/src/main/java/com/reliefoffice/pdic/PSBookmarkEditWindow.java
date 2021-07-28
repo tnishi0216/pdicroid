@@ -25,10 +25,6 @@ abstract public class PSBookmarkEditWindow {
     PopupWindow popupWindow;
     private PdicJni pdicJni;
 
-    boolean googleTranslate = false;
-    public boolean isGoogleTranslate()
-        { return googleTranslate; }
-
     //Note: editFilename should be dbx:/dropbox/... if remote file exists.
     public PSBookmarkEditWindow(Activity activity, PSBookmarkItem item, String editFilename) {
         this.activity = activity;
@@ -96,13 +92,6 @@ abstract public class PSBookmarkEditWindow {
                 if (popupWindow.isShowing()) {
                     close();
                 }
-            }
-        });
-        view.findViewById(R.id.google_translate_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                googleTranslate = true;
-                close();
             }
         });
 
