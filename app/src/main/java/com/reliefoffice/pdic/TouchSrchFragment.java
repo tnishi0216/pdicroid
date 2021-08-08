@@ -344,10 +344,12 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                     prevStart = start;
                     prevEnd = end;
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage(getString(R.string.msg_need_save_for_psbm))
-                            .setPositiveButton("OK", null);
-                    builder.show();
+                    if (false) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setMessage(getString(R.string.msg_need_save_for_psbm))
+                                .setPositiveButton("OK", null);
+                        builder.show();
+                    }
                     return true;
                 }
                 prevStart = prevEnd = 0;
