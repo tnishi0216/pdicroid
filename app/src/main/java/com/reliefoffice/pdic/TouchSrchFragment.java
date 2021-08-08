@@ -1167,7 +1167,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
         // set title
         File file = new File(filename);
-        getActivity().setTitle(orgTitle + " - " + file.getName());
+        getActivity().setTitle(file.getName());
 
         // load PSBookmark
         PdicJni.PSFileInfo info = loadPSBookmarks(psbmFilename);
