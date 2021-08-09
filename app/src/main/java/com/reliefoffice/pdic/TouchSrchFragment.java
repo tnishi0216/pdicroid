@@ -256,13 +256,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             mParam2 = getArguments().getString(ARG_PARAM2);
             fromMain = getArguments().getBoolean(ARG_PARAM3);
         }
-
-        tts = new TextToSpeech(getActivity(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int i) {
-
-            }
-        });
     }
 
     @Override
@@ -346,6 +339,11 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 //Log.d("PDD", "onCreateActionMode");
                 menu.add(Menu.NONE, id_google_translate, Menu.NONE, getString(R.string.action_google_translate));
                 menu.add(Menu.NONE, id_tts, Menu.NONE, getString(R.string.action_tts));
+                if (tts == null) {
+                    // なるべく必要なときだけ生成するように
+                    // 本当は再生直前にnewしたいが、初期化処理がbackgroundのようで、すぐには再生開始できない
+                    tts = new TextToSpeech(getActivity(), null);
+                }
                 if (getBackStackEntryCount() > 0)
                     return true;
                 if (Utility.isEmpty(openedFilename)){
@@ -757,6 +755,10 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
     @Override
     public void onDestroyView() {
+        if (tts != null) {
+            tts.shutdown();
+            tts = null;
+        }
         if (bluetoothManager != null) {
             bluetoothManager.unregister(getContext());
             bluetoothManager = null;
@@ -783,7 +785,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
     @Override
     public void onDestroy() {
-        tts.shutdown();
         super.onDestroy();
     }
 
