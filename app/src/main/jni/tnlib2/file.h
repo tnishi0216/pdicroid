@@ -32,10 +32,16 @@ enum eTEXTFILEMODE {
 #define	S_IWRITE	0
 #ifdef __UTF8
 #define	_topen		open
+#define	_tchmod		chmod
+#define	_tremove	remove
 #else
 #define	_topen		wopen
+#define	_tchmod		wchmod
+#define	_tremove	wremove
 int wopen(const tchar*  path, int  flags);
 int wopen(const tchar*  path, int  flags, mode_t mode);
+int wchmod(const wchar_t *filename, mode_t mode);
+int wremove(const wchar_t *pathname);
 #endif
 inline int _close( int handle )
 	{ return close( handle ); }

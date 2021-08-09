@@ -152,12 +152,24 @@ int wopen(const wchar_t *filename, int flags, mode_t mode)
 {
 	__cstr sfilename(filename);
 	return open((const char*)sfilename, flags, mode);
-
 }
+
 int _wmkdir(const wchar_t *dirname)
 {
 	__cstr sdirname(dirname);
 	return mkdir(sdirname, 0777);
+}
+
+int wchmod(const wchar_t *filename, mode_t mode)
+{
+	__cstr sfilename(filename);
+	return chmod((const char*)sfilename, mode);
+}
+
+int wremove(const wchar_t*pathname)
+{
+	__cstr spathname(pathname);
+	return remove((const char*)spathname);
 }
 
 wchar_t *_wfullpath(wchar_t *absPath, const wchar_t *relPath, size_t maxLength)
