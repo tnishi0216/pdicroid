@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
 
     PdicJni pdicJni;
 
+    Fragment curFragment;
+
     boolean prevRunning = false;
     boolean openPending = false;
 
@@ -52,6 +54,12 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onToolbarClicked();
+            }
+        });
 
         // Navigation Drawere //
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -169,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
             TouchSrchFragment.setCancel(false);
         }
 
+        curFragment = fragment;
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
         // Highlight the selected item has been done by NavigationView
@@ -178,6 +187,14 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
         // Close the navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawers();
+    }
+
+    // fragmentÇ≈toolbar(actionbar) clickÇéÛÇØéÊÇÈê≥éÆÇ»ï˚ñ@Ç™å©Ç¬Ç©ÇÁÇ»Ç©Ç¡ÇΩÇÃÇ≈
+    void onToolbarClicked()
+    {
+        if (curFragment != null && curFragment.getClass() == TouchSrchFragment.class){
+            ((TouchSrchFragment)curFragment).onToolbarClicked();
+        }
     }
 
     @Override

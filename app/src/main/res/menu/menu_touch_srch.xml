@@ -40,6 +40,5 @@
     <item android:id="@+id/action_wpm"
         android:title="@string/action_wpm"
         android:orderInCategory="100"
-        android:checkable="true"
         app:showAsAction="never"/>
 </menu>

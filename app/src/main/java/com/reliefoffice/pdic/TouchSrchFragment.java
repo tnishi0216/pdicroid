@@ -93,6 +93,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     String openedFilename;
     String remoteFilename;
     String psbmFilename;    // filename for PSBookmark
+    String lastFileName;
 
     static boolean cancel = false;
 
@@ -259,18 +260,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             mParam2 = getArguments().getString(ARG_PARAM2);
             fromMain = getArguments().getBoolean(ARG_PARAM3);
         }
-
-        // WPM
-        wpm = new WpmController() {
-            @Override
-            protected void updateProcess(int wpm, int wordCount)
-            {
-                // String wpms = wpmRunning ? "---" : Integer.toString(wpm);
-                String wpms = Integer.toString(wpm);
-                String title = "WPM: " + wpms + "  (" + wordCount + "words)";
-                getActivity().setTitle(title);
-            }
-        };
     }
 
     @Override
@@ -450,6 +439,20 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             pdicJni.setCallback(jniCallback, 0);
         }
 
+        // WPM
+        wpm = new WpmController(editText) {
+            @Override
+            protected void updateProcess(int wpm, int wordCount)
+            {
+                String wpms = Integer.toString(wpm);
+                String title = "WPM: ";
+                if (running && !paused)
+                    title += " << ";
+                title += wpms + "  (" + wordCount + "words)";
+                getActivity().setTitle(title);
+            }
+        };
+
         // Dropbox //
         ndvUtils = DropboxUtils.getInstance(getContext());
         ndvFM = DropboxFileManager.createInstance(getContext());
@@ -499,6 +502,24 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
         // Bluetooth Manager //
         bluetoothManager = new TouchSrchFragment.BluetoothManager();
+    }
+
+    public void onToolbarClicked()
+    {
+        if (wpm == null || !isNormalMode())
+            return;
+        if (wpm.isRunning()){
+            if (wpm.isPaused()){
+                wpm.stop();
+                if (Utility.isNotEmpty(lastFileName)){
+                    getActivity().setTitle(lastFileName);
+                }
+            } else {
+                wpm.pause();
+            }
+        } else {
+            wpm.start();
+        }
     }
 
     boolean faked = false;
@@ -772,6 +793,9 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
     @Override
     public void onDestroyView() {
+        if (wpm != null){
+            wpm.clear();
+        }
         if (tts != null) {
             tts.shutdown();
             tts = null;
@@ -1072,12 +1096,10 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         } else if (id == R.id.action_viewpsb) {
             viewPSBookmarkList();
         } else if (id == R.id.action_wpm) {
-            boolean checked = item.isChecked();
-            if (checked)
+            if (wpm.isRunning())
                 wpm.stop();
             else
-                wpm.start(editText.getText().toString());
-            item.setChecked(wpm.isRunning());
+                wpm.start();
         }
 
         return super.onOptionsItemSelected(item);
@@ -1228,7 +1250,8 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
         // set title
         File file = new File(filename);
-        getActivity().setTitle(file.getName());
+        lastFileName = file.getName();
+        getActivity().setTitle(lastFileName);
 
         // load PSBookmark
         PdicJni.PSFileInfo info = loadPSBookmarks(psbmFilename);
