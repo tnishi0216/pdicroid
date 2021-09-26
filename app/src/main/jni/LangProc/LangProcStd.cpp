@@ -948,7 +948,7 @@ int TLangProcStd::SearchStd( COMPARE_STRUCT &cs, const tchar *words, tchar *str,
 					tchar *last_spc = NULL;
 					while ( *dp ){
 						tchar c = *dp;
-						if (IsWordChar(c)){
+						if (IsWordChar(c) || c == '~'){ // ~が対象外だと "make ~ a breeze"のような熟語が対象外になってしまう(ヒットしない）ため
 							last_spc = NULL;
 						} else {
 							if (c == ' '){
