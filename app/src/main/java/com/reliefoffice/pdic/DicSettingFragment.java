@@ -68,8 +68,6 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
         return fragment;
     }
 
-    static DicSettingFragment This;
-
     SharedPreferences pref;
     DicPref dicPref;
     ListView lvDicList;
@@ -98,8 +96,6 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        This = this;
 
         lvDicList = view.findViewById(R.id.dicList);
         adpDicList = new ArrayAdapter<String>(getContext(), android.R.layout.simple_selectable_list_item);
