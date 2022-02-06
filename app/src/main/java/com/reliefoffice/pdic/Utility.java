@@ -151,7 +151,11 @@ public class Utility {
     // setup view style for EditText
     public static final void setTextStyle(EditText editText, int start, int end, int style, int color, String text) {
         if (text == null) {
-            text = editText.getText().toString().substring(start, end);
+            try {
+                text = editText.getText().toString().substring(start, end);
+            } catch(IndexOutOfBoundsException e){
+                return;
+            }
         }
         Spannable word = getStyleSpan(style, color, text);
 
