@@ -94,7 +94,6 @@ int TDataBufMemMap::seek_alloc(t_pbn2 pbn, int offs)
 {
 	if (MM->size()<pbn*BlockSize+offs){
 		assert(offs==0);
-		int size = MM->size();
 		unsigned offs = (unsigned)DataBuf - (unsigned)BaseAddr;
 		// Not enough space
 		MM->unmap();
