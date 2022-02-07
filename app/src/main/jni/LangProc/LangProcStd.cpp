@@ -29,9 +29,6 @@ inline bool IsPhaseDelim(tchar c)
 	return c=='.' || c==',' || c=='"' || c=='(' || c==')';
 }
 
-//TODO: move to common
-void trimright(tnstr &s);
-
 //---------------------------------------------------------------------------
 //	TLangProcStd
 //---------------------------------------------------------------------------
@@ -48,7 +45,6 @@ bool TLangProcStd::Open()
 	tnstr path = MakePath(prof.GetCTTPath(), DEF_LANGPROC_FILE);
 	return super::Open(path);
 }
-
 bool TLangProcStd::OpenIrreg()
 {
 	AddIrregFile(prof.GetDefIrregDicName());
@@ -78,6 +74,7 @@ bool TLangProcStd::CompareStd( COMPARE_STRUCT &cs, const int _flags )
 {
 	tuchar c;
 	int convf = 0;
+	int point = 0;	// point微調整用
 	tchar *dp, *tdp;
 	tchar dp1, dp3, dp4;
 	dl_def(dicflag);
@@ -93,6 +90,14 @@ bool TLangProcStd::CompareStd( COMPARE_STRUCT &cs, const int _flags )
 				return true;
 			*dp++ = '~';
 			*dp = '\0';
+		} else {
+jrep:
+			// 連続する省略形は同じ結果になる
+			const tchar c = dp[-1];	// may be space
+			dp[-1] = '\0';
+			cs.dstpart->AddComp( cs.str, cs.srcflags, cs.orgnumword, point );
+			dp[-1] = c;
+			return true;
 		}
 		convf |= SLW_REPLACEANY;
 		goto jsrch;
@@ -109,6 +114,8 @@ bool TLangProcStd::CompareStd( COMPARE_STRUCT &cs, const int _flags )
 			*dp++ = '_';
 			*dp++ = '_';
 			*dp = '\0';
+		} else {
+			goto jrep;
 		}
 		convf |= SLW_REPLACEANY3;
 		goto jsrch;
@@ -119,20 +126,20 @@ bool TLangProcStd::CompareStd( COMPARE_STRUCT &cs, const int _flags )
 
 	if ( _flags & SLW_REPLACEANY2 ){
 		// ~の追加
-		if ( *(dp-2) != '~' ){
-			*dp++ = '~';
-			*dp++ = ' ';
-		}
+		if ( *(dp-2) == '~' )
+			return true;
+		*dp++ = '~';
+		*dp++ = ' ';
 		convf |= SLW_REPLACEANY2;
 	}
 
 	if ( _flags & SLW_REPLACEANY4 ){
 		// __の追加
-		if ( *(dp-2) != '_' ){
-			*dp++ = '_';
-			*dp++ = '_';
-			*dp++ = ' ';
-		}
+		if ( *(dp-2) == '_' )
+			return true;
+		*dp++ = '_';
+		*dp++ = '_';
+		*dp++ = ' ';
 		convf |= SLW_REPLACEANY4;
 	}
 
@@ -741,13 +748,13 @@ bool TLangProcStd::CompareStd( COMPARE_STRUCT &cs, const int _flags )
 			NULL
 		};
 		for ( int i=0;wordlist[i];i++ ){
-			if (_tcscmp(cs.dp,wordlist[i])==0){
+			if (_tcscmp(tdp,wordlist[i])==0){
 				// 削除対象単語→完全一致と同じ扱い
 				convf |= SLW_REPLACEDEL;
-				c = cs.dp[-1];	// save
-				cs.dp[-1] = '\0';
-				cs.dstpart->Add( cs.str, convf|cs.srcflags, cs.numword );
-				cs.dp[-1] = c;
+				c = tdp[-1];	// save
+				tdp[-1] = '\0';
+				cs.dstpart->AddComp( cs.str, convf|cs.srcflags, cs.numword, point );
+				tdp[-1] = c;
 				return true;
 			}
 		}
@@ -762,7 +769,14 @@ jsrch:
 		return true;
 	}
 	D("str=%ws %04X",cs.str, convf);
-	switch ( cs.dic->FindPart( cs.str, dicflag ) )
+	int ret;
+	if (map_find(cs.searchResults, cs.str)){
+		ret = cs.searchResults[cs.str];
+	} else {
+		ret = cs.dic->FindPart( cs.str, dicflag );
+		cs.searchResults[cs.str] = ret;
+	}
+	switch ( ret )
 	{
 		case -1:	// error
 			return false;
@@ -784,7 +798,7 @@ jsrch:
 					//** これは優先順位を低くしたいなぁ
 					//Note: ...,ABC#2, ABC#1と数値逆順にするためにreversed adding.
 					for (int i=fwords.size()-1;i>=0;i--){
-						cs.dstcomp2->Add( fwords[i], convf|cs.srcflags, cs.numword );
+						cs.dstcomp2->AddComp( fwords[i], convf|cs.srcflags, cs.numword, point );
 					}
 					//** 順位記録
 					D("Hit-2-1:%ws",cs.str);
@@ -793,9 +807,9 @@ jsrch:
 			}
 			D("Hit-2-2:%ws _flags=%X",cs.str, _flags);
 			if ( _flags == 0 ){
-				cs.notrans_part->Add( cs.str, convf|cs.srcflags, cs.numword );
+				cs.notrans_part->AddComp( cs.str, convf|cs.srcflags, cs.numword, point );
 			}
-			cs.dstpart->Add( cs.str, convf|cs.srcflags, convf & SLW_REPLACEANYx ? cs.orgnumword : cs.numword );
+			cs.dstpart->AddComp( cs.str, convf|cs.srcflags, convf & SLW_REPLACEANYx ? cs.orgnumword : cs.numword, point );
 			// 2017.2.22 SLW_REPLACEANYxでヒットした場合、numwordは増えないため、orgnumwordを使用する
 			break;
 		case 3: // 完全一致
@@ -813,10 +827,10 @@ jsrch:
 						compword_index = i;
 						continue;
 					}
-					cs.dstcomp->AddCompLast(words[i], convf|cs.srcflags, cs.numword);
+					cs.dstcomp->AddCompLast(words[i], convf|cs.srcflags, cs.numword, point);
 				}
 				if (compword_index!=-1){
-					cs.dstcomp->AddCompLast(words[compword_index], convf|cs.srcflags, cs.numword);
+					cs.dstcomp->AddCompLast(words[compword_index], convf|cs.srcflags, cs.numword, point);
 				}
 				//** 順位記憶
 			}
@@ -830,7 +844,7 @@ jsrch:
 		tnstr trsword;
 		if ( cs.dic->SearchIrreg( _kwstr(cs.str, cs.dic->GetKCodeTrans()), trsword) ){
 			if ( cs.dic->Find( trsword, NULL, dicflag ) == 1 ){
-				cs.dstcomp->Add( trsword, convf, cs.numword );
+				cs.dstcomp->AddComp( trsword, convf, cs.numword, point );
 			}
 		}
 	}
@@ -858,7 +872,7 @@ int TLangProcStd::SearchStd( COMPARE_STRUCT &cs, const tchar *words, tchar *str,
 	MatchArray comp2( MAX_COMP );
 	int compindex = 0;
 	srccomp = comp[0];
-	comp[0]->Add(_T(""),0,0);
+	comp[0]->Add(_T(""),0,0,0);
 
 	const tchar *sp = words;
 	cs.dstcomp2 = &comp2;
@@ -950,27 +964,20 @@ int TLangProcStd::SearchStd( COMPARE_STRUCT &cs, const tchar *words, tchar *str,
 					tchar *last_spc = NULL;
 					while ( *dp ){
 						tchar c = *dp;
-						if (IsWordChar(c) || c == '~'){ // ~が対象外だと "make ~ a breeze"のような熟語が対象外になってしまう(ヒットしない）ため
+						if (IsWordChar(c)){
 							last_spc = NULL;
 						} else {
 							if (c == ' '){
 								last_spc = dp;
-							} else {
-								if (last_spc)
-									*last_spc = '\0';
-								else
-									*dp = '\0';
-								break;
 							}
 						}
 						dp++;
 					}
-					// 区切り文字移行を削除するとすでにヒットしている文字と同じ場合が有り、無駄な検索となるため対象外とする
-					for (int j=0;j<srccomp->get_num();j++){
-						if (j==ci) continue;
-						if (_tcscmp(str, find_cword_pos((*srccomp)[j].word)) != 0) continue;
-						goto jnext;
-					}
+					if (last_spc)
+						*last_spc = '\0';
+					// 区切り文字以降を削除するとすでにヒットしている文字と同じ場合が有り、無駄な検索となるため対象外とする
+					//→ここでやるには複雑になってしまうので、srccompのloop前にflagを考慮したmergeを行う（べき）
+					// 上記区切り文字削除で重複する分は仕方なしにする(cacheがあるのでそれほど無駄にはならないはず）
 				}
 			}
 			if ( str[0] ){
@@ -1000,7 +1007,7 @@ int TLangProcStd::SearchStd( COMPARE_STRUCT &cs, const tchar *words, tchar *str,
 				cs.dstpart = dstpart;
 				cs.orgnumword = (*srccomp)[ci].numword;
 
-				//DBW("s:%ws src=%ws", cs.str, cs.sp);
+				D("s:%ws src=%ws", cs.str, cs.sp);
 				r = this->FindLoop(cs);
 				if (r>0){
 					maxlen = STR_DIFF(cs.nextsp,words);
@@ -1050,11 +1057,14 @@ jnext:;
 				maxlen = STR_DIFF(sp,words);
 				if ( HitWords ){
 					for ( i=0;i<dstcomp->get_num();i++ ){
-						MATCHINFO &mi = (*dstcomp)[i];
+						const MATCHINFO &mi = (*dstcomp)[i];
 						HitWords->AddComp( new MATCHINFO( mi ) );
 					}
 				}
 			}
+
+			// 前回の無変換のみ継続する
+			MergeNoTransWords(*dstcomp, *srccomp);
 			srccomp = dstcomp;
 			if ( notrans_part.get_num() ){
 				for ( ;notrans_part.get_num(); ){
@@ -1115,11 +1125,7 @@ jnext:;
 					//	bitcountでinsert先を探す必要あり(bitcountでいいのかという問題もあり）
 					//	同一単語があるか調べる必要あり
 					// ※無変換なら最後に追加するだけ、重複する単語（熟語）は無いはず
-					for (i=0;i<srccomp->size();i++){
-						if ((*srccomp)[i].flag == 0){
-							dstpart->AddCompLast(new MATCHINFO((*srccomp)[i]));
-						}
-					}
+					MergeNoTransWords(*dstpart, *srccomp);
 					srccomp = dstpart;
 				}
 				if (skip_retry==-1) skip_retry = 0;

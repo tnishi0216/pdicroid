@@ -67,14 +67,27 @@ struct MATCHINFO {
 	int flag;		// 変換フラグ
 	int numword;	// 検索語単語数
 	int start;		// optional. 開始位置情報
+	int addpoint;	// point微調整用
 	int point;		// SortHitWord用
-	MATCHINFO( const tchar *_word, int _flag, int _numword, const tchar *_ext=NULL, int _start=0 )
+	MATCHINFO( const tchar *_word, int _flag, int _numword, int _addpoint )
+		:word( _word )
+		,ext(NULL)
+	{
+		flag = _flag;
+		numword = _numword;
+		start = 0;
+		addpoint = _addpoint;
+		point = 0;
+	}
+	MATCHINFO( const tchar *_word, int _flag, int _numword, const tchar *_ext, int _start )
 		:word( _word )
 		,ext(_ext)
 	{
 		flag = _flag;
 		numword = _numword;
 		start = _start;
+		addpoint = 0;
+		point = 0;
 	}
 	MATCHINFO( const MATCHINFO &mi )
 		:word( mi.word )
@@ -83,7 +96,25 @@ struct MATCHINFO {
 		flag = mi.flag;
 		numword = mi.numword;
 		start = mi.start;
+		addpoint = mi.addpoint;
+		point = mi.point;
 	}
+	MATCHINFO &operator = (const MATCHINFO &mi)
+	{
+		word = mi.word;
+		ext = mi.ext;
+		flag = mi.flag;
+		numword = mi.numword;
+		start = mi.start;
+		addpoint = mi.addpoint;
+		point = mi.point;
+		return *this;
+	}
+	int GetCalcPoint();
+	int CalcPoint() const;
+	int ComparePoint(MATCHINFO &mi);
+	int cComparePoint(const MATCHINFO &mi) const;
+	int CompareFlag(const MATCHINFO &mi) const;
 };
 
 class MatchArray : public FlexObjectArray<MATCHINFO> {
@@ -92,14 +123,14 @@ public:
 	MatchArray( int slotsize=10 )
 		:inherited( slotsize )
 		{}
-	void AddComp( const tchar *word, int flag, int numword );
+	void AddComp( const tchar *word, int flag, int numword, int point );
 	int AddComp( MATCHINFO *mi, bool first_pri=true );
-	int AddCompLast( const tchar *word, int flag, int numword )
-		{ return AddCompLast( new MATCHINFO(word, flag, numword) ); }
+	int AddCompLast( const tchar *word, int flag, int numword, int point )
+		{ return AddCompLast( new MATCHINFO(word, flag, numword, point) ); }
 	int AddCompLast( MATCHINFO *mi );
 	int FindWord(const tchar *word);
-	void Add( const tchar *word, int flag, int numword )
-		{ inherited::add( new MATCHINFO( word, flag, numword ) ); }
+	void Add( const tchar *word, int flag, int numword, int point )
+		{ inherited::add( new MATCHINFO( word, flag, numword, point ) ); }
 	// 一番近い単語を返す
 	const tchar *GetTopWord()
 		{ return get_num() ? (const tchar*)((*this)[ get_num()-1 ].word) : (const tchar*)NULL; }
@@ -115,6 +146,7 @@ struct COMPARE_STRUCT {
 	bool fWordDelim;
 	class MultiPdic *dic;
 	int srcflags;				// srccompのflag
+	map<tnstr, int> searchResults;	// strをdic.FindPart()したときの結果(cache)
 	MatchArray *notrans_part;
 	MatchArray *dstpart;
 	MatchArray *dstcomp;
@@ -151,5 +183,6 @@ void SortHitWords( MatchArray &ma );
 void InsertHitWords2( MatchArray &dest, MatchArray &src );
 void InsertHitWords3( MatchArray &dest, MatchArray &src );
 void MergeHitWords(MatchArray &dst, MatchArray &src);
+void MergeNoTransWords(MatchArray &dst, MatchArray &src);
 
 #endif

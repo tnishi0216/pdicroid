@@ -618,7 +618,7 @@ void TPopupSearch::Open( TPopupSearch *parent, const tchar *word, bool tmp_fixed
 	// ポップアップ検索表示
 	Japa *japa = new Japa;
 	if ( HitWords->get_num() == 0 )
-		HitWords->Add( word, 0, 0 );
+		HitWords->Add( word, 0, 0, 0 );
 	HitWordIndex = HitWords->get_num()-1;
 
 	int AddStyle = GetBaseStyle();

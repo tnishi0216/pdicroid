@@ -11,6 +11,93 @@
 
 #pragma package(smart_init)
 
+// すでにpointが計算されている場合はそれを返す
+int MATCHINFO::GetCalcPoint()
+{
+	if (point!=0)
+		return point;
+	return point = CalcPoint();
+}
+
+int MATCHINFO::CalcPoint() const
+{
+	const tchar *cword = find_cword_pos(word);
+	int _numword = WordCount(cword);
+	bool numsub = false;
+	int _point = addpoint + _numword << 6;	// 64倍
+	if (_numword < numword){
+		// this->numwordは検索に使用した単語数であるため
+		// この値とWordCount()との乖離で減点
+		_point -= (numword - _numword)*1;
+		numsub = true;	// 2011.2.2 added
+	}
+	if (flag & SLW_PENALTY2){
+		// clicked wordがない場合はpenalty大
+		_point -= 60;
+		// 2018.12.11 ここの調整は難しい
+		// "have reshuffled the deck when it comes to"でreshuffledをclickしてもhitしないため、
+		// 60以上にする必要あり
+	}
+	if ((flag & SLW_ENGLISH) && cword[0] >= 'A' && cword[0] <= 'Z'){
+		_point -= 16;	// 先頭が大文字の場合は固有名詞であるため変化形によるヒットはpenalty
+	}
+	if (flag==0){
+		// none
+		//_point += 64-1;	// premium point
+		_point += 32-1;	// 2011.2.2 value changed.
+	} else
+	if (flag==SLW_PENALTY){
+		// penaltyのみである場合はpremiumも減点も無し 2009.12.29
+	} else
+	if (flag&(SLW_ELIMHYPHEN2|SLW_ELIMHYPHEN3|SLW_PENALTY)){
+		// -以前、以降の削除がある
+		// ペナルティが大きい
+		_point -= 64+1;	// １つ語数の少ない完全ヒット単語に劣る
+	} else
+	if ((flag&~(SLW_ELIMHYPHEN1|SLW_ELIMHYPHEN4|SLW_ENGLISH|SLW_SYMBOLS|SLW_REPLACEIRREG))==0){
+		// 完全一致とほぼ同等
+		_point--;
+	} else {
+		_point -= 16+BitCount(flag)*4;	// フラグのビット数に応じて減点
+		if ((flag & SLW_REPLACEANY) && !numsub){
+			_point -= 32;	// replace anyはさらに減点
+							// ただし、すでに語数違いで引かれている場合は対象外(2011.2.2 added)
+		}
+	}
+	return _point;
+}
+
+int MATCHINFO::ComparePoint(MATCHINFO &mi)
+{
+	return this->GetCalcPoint() - mi.GetCalcPoint();
+}
+// すでに計算されている場合は無駄な計算が発生する
+int MATCHINFO::cComparePoint(const MATCHINFO &mi) const
+{
+	return this->CalcPoint() - mi.CalcPoint();
+}
+int MATCHINFO::CompareFlag(const MATCHINFO &mi) const
+{
+	return BitCount(this->point) - BitCount(mi.point);
+}
+
+void MatchArray::AddComp( const tchar *word, int flag, int numword, int point )
+{
+	MATCHINFO *mi = new MATCHINFO( word, flag, numword, point );
+
+	int index = FindWord(word);
+	if (index != -1){
+		if ((*this)[index].ComparePoint(*mi) >= 0){
+			// thisのほうがhigher point
+			delete mi;
+			return;
+		}
+		replace(index, mi);
+	} else {
+		inherited::add(mi);
+	}
+}
+
 // return:
 //	added/replaced index, otherwise -1.
 int MatchArray::AddComp( MATCHINFO *mi, bool first_pri )
@@ -65,46 +152,8 @@ void SortHitWords( MatchArray &ma )
 {
 	for ( int i=0;i<ma.get_num();i++ ){
 		MATCHINFO &m = ma[i];
-		int numword = WordCount(find_cword_pos(m.word));
-		bool numsub = false;
-		m.point = numword << 6;	// 64倍
-		if (numword<m.numword){
-			// m.numwordは検索に使用した単語数であるため
-			// この値とWordCount()との乖離で減点
-			m.point -= (m.numword-numword)*1;
-			numsub = true;	// 2011.2.2 added
-		}
-		if (m.flag & SLW_PENALTY2){
-			// clicked wordがない場合はpenalty大
-			m.point -= 60;
-			// 2018.12.11 ここの調整は難しい
-			// "have reshuffled the deck when it comes to"でreshuffledをclickしてもhitしないため、
-			// 60以上にする必要あり
-		}
-		if (m.flag==0){
-			// none
-			//m.point += 64-1;	// premium point
-			m.point += 32-1;	// 2011.2.2 value changed.
-		} else
-		if (m.flag==SLW_PENALTY){
-			// penaltyのみである場合はpremiumも減点も無し 2009.12.29
-		} else
-		if (m.flag&(SLW_ELIMHYPHEN2|SLW_ELIMHYPHEN3|SLW_PENALTY)){
-			// -以前、以降の削除がある
-			// ペナルティが大きい
-			m.point -= 64+1;	// １つ語数の少ない完全ヒット単語に劣る
-		} else
-		if ((m.flag&~(SLW_ELIMHYPHEN1|SLW_ELIMHYPHEN4|SLW_ENGLISH|SLW_SYMBOLS|SLW_REPLACEIRREG))==0){
-			// 完全一致とほぼ同等
-			m.point--;
-		} else {
-			m.point -= 16+BitCount(m.flag)*4;	// フラグのビット数に応じて減点
-			if ((m.flag & SLW_REPLACEANY) && !numsub){
-				m.point -= 32;	// replace anyはさらに減点
-								// ただし、すでに語数違いで引かれている場合は対象外(2011.2.2 added)
-			}
-		}
-		m.point = (m.point<<16) | i;	// 同じpoint同士で順番を維持するため
+		const int point = m.CalcPoint();
+		m.point = (point<<16) | i;	// 同じpoint同士で順番を維持するため
 		//DBW("i=%d p=%08X f=%08X numword=%d : %ws", i, m.point, m.flag, numword, find_cword_pos(m.word));
 	}
 	ma.sort( compSortHitWords );
@@ -264,3 +313,21 @@ jnext:;
 	}
 }
 
+// srcにあるitemのうち、flag=0のみdstへmergeする
+void MergeNoTransWords(MatchArray &dst, MatchArray &src)
+{
+	for (int i=0;i<src.size();i++){
+		MATCHINFO &mi = src[i];
+		if (mi.flag == 0 && mi.word.exist()){
+			int index = dst.FindWord(mi.word);
+			if (index >= 0){
+				// すでに同じ単語がある
+				if (dst[index].ComparePoint(mi) >= 0)
+					continue;	// dstのほうがhigh priority
+				dst[index] = mi;	// dst側を上書き
+			} else {
+				dst.AddCompLast(new MATCHINFO(mi));
+			}
+		}
+	}
+}
