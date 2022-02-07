@@ -630,11 +630,14 @@ inline char *NEXT_CHAR( const char *str ){ if ( _ismbblead( *str ) ) return (cha
 
 #define	_delete( obj )	delete obj; obj = 0
 #define	_delete_( obj )	delete[] obj; obj = 0
-#define	__delete( obj )	if ( obj ){ delete obj; obj=0; }
-#define	__delete_( obj )	if ( obj ){ delete[] obj; obj=0; }
+#define	__delete( obj )	_delete( obj )	// deprecated
+#define	__delete_( obj )	_delete_( obj )	// deprecated
 
 int __wcsicmp(const wchar_t *str1, const wchar_t *str2);
 int __wcsnicmp(const wchar_t *str1, const wchar_t *str2, int n);
+
+#define	map_find(obj, key) \
+	( obj.find(key) != obj.end() )
 
 #if 1
 #ifndef _EXPLICIT
