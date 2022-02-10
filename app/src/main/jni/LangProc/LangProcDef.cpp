@@ -28,15 +28,16 @@ int MATCHINFO::CalcPoint() const
 	if (_numword < numword){
 		// this->numwordは検索に使用した単語数であるため
 		// この値とWordCount()との乖離で減点
-		_point -= (numword - _numword)*1;
+		_point -= (numword - _numword)*4;
 		numsub = true;	// 2011.2.2 added
 	}
 	if (flag & SLW_PENALTY2){
 		// clicked wordがない場合はpenalty大
-		_point -= 60;
+		_point -= 61;
 		// 2018.12.11 ここの調整は難しい
 		// "have reshuffled the deck when it comes to"でreshuffledをclickしてもhitしないため、
 		// 60以上にする必要あり
+		// 2022.2.9 一つ増やした。"and multi-tenancy allow diverse and changing"でtenancyをclickしたときに"and change"がtopになるため
 	}
 	if ((flag & SLW_ENGLISH) && cword[0] >= 'A' && cword[0] <= 'Z'){
 		_point -= 16;	// 先頭が大文字の場合は固有名詞であるため変化形によるヒットはpenalty
@@ -153,8 +154,8 @@ void SortHitWords( MatchArray &ma )
 	for ( int i=0;i<ma.get_num();i++ ){
 		MATCHINFO &m = ma[i];
 		const int point = m.CalcPoint();
-		m.point = (point<<16) | i;	// 同じpoint同士で順番を維持するため
-		//DBW("i=%d p=%08X f=%08X numword=%d : %ws", i, m.point, m.flag, numword, find_cword_pos(m.word));
+		m.point = ((point+0x10)<<16) | i;	// 同じpoint同士で順番を維持するため。+0x10は負になることがあるため
+		// DBW("i=%d p=%08X f=%08X numword=%d : %ws", i, m.point, m.flag, WordCount(find_cword_pos(m.word)), find_cword_pos(m.word));
 	}
 	ma.sort( compSortHitWords );
 }

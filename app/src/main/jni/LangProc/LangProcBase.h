@@ -14,7 +14,6 @@
 class TLangProcBase : public TLangProc {
 typedef TLangProc super;
 public:
-public:
 	TLangProcBase();
 	//__override bool Open();	// should override
 	__override bool GetWord( const tchar *str, int pos, int &start, int &end, int &prevstart, bool fLongest, int wordcount=10, bool about=false );

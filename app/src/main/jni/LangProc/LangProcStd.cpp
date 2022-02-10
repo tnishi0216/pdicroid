@@ -189,7 +189,7 @@ jrep:
 			}
 		}
 		if ( c == '-' ){
-			cs.FoundHyphen = true;
+			cs.FoundHyphen = sp;
 			if ( _flags & SLW_ELIMHYPHEN1 ){
 				// ハイフン除去
 				convf |= SLW_ELIMHYPHEN1;
@@ -797,7 +797,10 @@ jsrch:
 					// 完全一致と同じ扱い
 					//** これは優先順位を低くしたいなぁ
 					//Note: ...,ABC#2, ABC#1と数値逆順にするためにreversed adding.
+					int len = _tcslen(cs.str);
+					const int MAX_SUFFIX_LEN = 4+1;	// #以降が4文字以降は除外
 					for (int i=fwords.size()-1;i>=0;i--){
+						if (_tcslen(find_cword_pos(fwords[i]+len)) > MAX_SUFFIX_LEN) continue;	// #以降が長い場合は除外
 						cs.dstcomp2->AddComp( fwords[i], convf|cs.srcflags, cs.numword, point );
 					}
 					//** 順位記録
@@ -932,6 +935,10 @@ int TLangProcStd::SearchStd( COMPARE_STRUCT &cs, const tchar *words, tchar *str,
 		comp2.clear();
 		tchar *dp;
 		cs.numword++;
+#if USEDBW
+		for (int i=0;i<srccomp->size();i++)
+			DBW("srcc: %d: %X %ws", i, ((*srccomp)[i]).flag, find_cword_pos(((*srccomp)[i]).word.c_str()));
+#endif
 		for ( int ci=0;ci<srccomp->get_num();ci++ )
 		{
 			cs.srcflags = (*srccomp)[ci].flag;
@@ -1031,7 +1038,13 @@ jnext:;
 			// 2017.2.21 "on ~"などのように、onが前置単語で、clicked wordが含まれずにhitした場合はpenalty2
 			for (i=0;i<dstpart->get_num();i++){
 				MATCHINFO &mi = (*dstpart)[i];
-				if (mi.flag & (SLW_REPLACEANY|SLW_REPLACEANY2|SLW_REPLACEANY3|SLW_REPLACEANY4)){
+				if (mi.flag & SLW_REPLACEANYx){
+					mi.flag |= SLW_PENALTY2;
+				}
+			}
+			for (i=0;i<dstcomp->get_num();i++){
+				MATCHINFO &mi = (*dstcomp)[i];
+				if (mi.flag & SLW_REPLACEANYx){
 					mi.flag |= SLW_PENALTY2;
 				}
 			}

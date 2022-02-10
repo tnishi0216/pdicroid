@@ -156,7 +156,7 @@ struct COMPARE_STRUCT {
 	int orgnumword;			// ÅŒã‚ÉŒŸõŒê‚Ég—p‚³‚ê‚½‚Æ‚«‚Ìnumword
 
 	// “à•”ì‹Æ•Ï” //
-	bool FoundHyphen;
+	const tchar *FoundHyphen;	// hyphen‚ªŒ©‚Â‚©‚Á‚½spã‚Ìpointer
 };
 
 // Search Longest Word external //
