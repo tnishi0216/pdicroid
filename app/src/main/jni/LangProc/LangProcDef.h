@@ -9,16 +9,17 @@
 #define	SLW_ELIMHYPHEN1		0x00000001	// ハイフンを削除して単語を結合
 #define	SLW_ELIMHYPHEN2		0x00000002	// ハイフン以降を削除
 #define	SLW_ELIMHYPHEN3		0x00000004	// ハイフン前半の単語を削除(ハイフンを削除)
+#define	SLW_ELIMHYPHEN23	0x00000006	// clickした単語の前後のハイフン結合単語を削除（３語以上連結の場合の中間単語のみ）
 #define	SLW_ELIMHYPHEN4		0x00000008	// ハイフンを半角スペースに変換
 #define	SLW_ELIMHYPHEN5		0x00000200	// ハイフン前半の単語を削除（ハイフンを残す）
 
-#define	SLW_REPLACE			0x000003F0
+#define	SLW_REPLACE			0x000005F0
 #define	SLW_REPLACEANY		0x00000010	// 置換チルダに対応
 #define	SLW_REPLACEANY2		0x00000020	// 追加チルダに対応
 #define	SLW_REPLACEIRREG	0x00000040	// 不規則変化辞書
 #define	SLW_REPLACEDEL		0x00000080	// 一般的な単語を削除（a,anなど）
 #define	SLW_REPLACEANY3		0x00000100	// 置換__に対応
-#define	SLW_REPLACEANY4		0x00000200	// 追加__に対応
+#define	SLW_REPLACEANY4		0x00000400	// 追加__に対応
 #define	SLW_REPLACEANYx		(SLW_REPLACEANY|SLW_REPLACEANY2|SLW_REPLACEANY3|SLW_REPLACEANY4)
 
 #if 0
@@ -157,6 +158,7 @@ struct COMPARE_STRUCT {
 
 	// 内部作業変数 //
 	const tchar *FoundHyphen;	// hyphenが見つかったsp上のpointer
+	int click_pos;				// sp上のclick位置 for hyphen
 };
 
 // Search Longest Word external //

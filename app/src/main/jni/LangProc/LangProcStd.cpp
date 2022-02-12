@@ -189,38 +189,58 @@ jrep:
 			}
 		}
 		if ( c == '-' ){
+			const tchar *prev_hyphen = cs.FoundHyphen;
 			cs.FoundHyphen = sp;
-			if ( _flags & SLW_ELIMHYPHEN1 ){
-				// ハイフン除去
-				convf |= SLW_ELIMHYPHEN1;
-				sp++;
-				continue;
-			} else
-			if ( _flags & SLW_ELIMHYPHEN2 ){
-				convf |= SLW_ELIMHYPHEN2;
-				sp++;
-				break;
-			} else
-			if ( _flags & SLW_ELIMHYPHEN3 ){
-				convf |= SLW_ELIMHYPHEN3;
-				dp = tdp;
-				sp++;
-				continue;
-			} else
-			if ( _flags & SLW_ELIMHYPHEN4 ){
-				convf |= SLW_ELIMHYPHEN4;
-				*dp++ = ' ';
-				sp++;
-				continue;
-			} else
-			if ( _flags & SLW_ELIMHYPHEN5 ){
-				convf |= SLW_ELIMHYPHEN5;
-				dp = tdp;
-				*dp++ = '-';
-				sp++;
-				while (*sp=='-') sp++;
-				continue;
+			bool endf = true;
+			switch (_flags & SLW_ELIMHYPHEN){
+				case 0:
+					endf = false;
+					break;
+				case SLW_ELIMHYPHEN1:
+					// ハイフン除去
+					convf |= SLW_ELIMHYPHEN1;
+					sp++;
+					continue;
+				case SLW_ELIMHYPHEN2:
+					convf |= SLW_ELIMHYPHEN2;
+					sp++;
+					break;
+				case SLW_ELIMHYPHEN3:
+					convf |= SLW_ELIMHYPHEN3;
+					dp = tdp;
+					sp++;
+					continue;
+				case SLW_ELIMHYPHEN23:
+					//Note: clicked wordが先頭単語にある場合、SLW_ELIMHYPHEN2と重複するなどがあるけど許容範囲のoverheadだろう
+					if (prev_hyphen)
+						convf |= SLW_ELIMHYPHEN23;	// ２つ以上のハイフンがあった
+					if (sp < cs.sp+cs.click_pos){
+						// sp以前を削除
+						dp = tdp;
+						sp++;
+						continue;
+					} else {
+						// if (cs.sp+cs.click_pos < sp)
+						// sp以降を削除
+						sp++;
+					}
+					break;
+				case SLW_ELIMHYPHEN4:
+					convf |= SLW_ELIMHYPHEN4;
+					*dp++ = ' ';
+					sp++;
+					continue;
+				case SLW_ELIMHYPHEN5:
+					convf |= SLW_ELIMHYPHEN5;
+					dp = tdp;
+					*dp++ = '-';
+					sp++;
+					while (*sp=='-') sp++;
+					continue;
+				default:
+					__assert__;
 			}
+			if (endf) break;	// end loop
 		}
 		if ( _flags & SLW_APOSTROPHE ){
 			if ( c == '\'' || c == CODE_APOSTROPHE){
@@ -889,6 +909,7 @@ int TLangProcStd::SearchStd( COMPARE_STRUCT &cs, const tchar *words, int curpos,
 	//TLangProc &langproc = *cs.dic->GetLangProc();
 
 	cs.numword = 0;		// 検索語の単語数
+	cs.click_pos = curpos;
 
 	bool preword_exist = str[0]!='\0';
 	uint maxlen = 0;
@@ -1054,13 +1075,13 @@ jnext:;
 			for (i=0;i<dstcomp->get_num();i++){
 				MATCHINFO &mi = (*dstcomp)[i];
 				if (cs.FoundHyphen){
-					if (mi.flag & SLW_ELIMHYPHEN2){
+					if ((mi.flag & SLW_ELIMHYPHEN) == SLW_ELIMHYPHEN2){
 						if ((cs.FoundHyphen < clicked_ptr) && (clicked_ptr < sp)){
 							// ハイフン結合単語の後半削除時、clicked_ptrがハイフンより後ろ、次の単語より前にある場合
 							mi.flag |= SLW_PENALTY2;
 						}
 					} else
-					if (mi.flag & SLW_ELIMHYPHEN3){
+					if ((mi.flag & SLW_ELIMHYPHEN) == SLW_ELIMHYPHEN3){
 						if (cs.FoundHyphen > clicked_ptr){
 							// ハイフン結合単語の前半削除時、clicked_ptrがハイフンより前にある場合
 							mi.flag |= SLW_PENALTY2;
@@ -1299,6 +1320,9 @@ int TLangProcStd::FindLoop(COMPARE_STRUCT &cs)
 									}
 									if ( cs.FoundHyphen ){
 										if ( !Compare( cs, _flags | SLW_ELIMHYPHEN2 ) ){
+											return -1;
+										}
+										if ( !Compare( cs, _flags | SLW_ELIMHYPHEN23 ) ){
 											return -1;
 										}
 										if ( !Compare( cs, _flags | SLW_ELIMHYPHEN4 ) ){
