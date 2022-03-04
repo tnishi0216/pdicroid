@@ -48,9 +48,10 @@ zip:
 	zip -r src . -i *.java *.c *.cpp *.h *.xml *.png Makefile *.mk *.gradle *.properties *.bat
 
 deploy:
-	copy app\build\outputs\apk\app-debug.apk pdicroid.apk
-	perl -S deploy.pl pdicroid.apk -vapp/build.gradle -hs:\web\NIFTY\android\index.html -zr @sakura
-	pause zip‚µ‚Ü‚·
-	make zip
-	zr.bat
-	del zr.bat
+	copy app\release\app-release.apk pdicroid.apk
+	perl -S deploy.pl pdicroid.apk -vapp/build.gradle -hs:\web\NIFTY\android\index.html -hkey:Apk @sakura
+	perl -S deploy.pl pdicroid.apk -vapp/build.gradle -rename -copy release
+#	pause zip‚µ‚Ü‚·
+#	make zip
+#	zr.bat
+#	del zr.bat
