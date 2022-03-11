@@ -1081,7 +1081,7 @@ jnext:;
 							mi.flag |= SLW_PENALTY2;
 						}
 					} else
-					if ((mi.flag & SLW_ELIMHYPHEN) == SLW_ELIMHYPHEN3){
+					if (((mi.flag & SLW_ELIMHYPHEN) == SLW_ELIMHYPHEN3) || (mi.flag & SLW_ELIMHYPHEN5)){
 						if (cs.FoundHyphen > clicked_ptr){
 							// ハイフン結合単語の前半削除時、clicked_ptrがハイフンより前にある場合
 							mi.flag |= SLW_PENALTY2;

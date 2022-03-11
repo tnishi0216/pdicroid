@@ -51,7 +51,7 @@ int MATCHINFO::CalcPoint() const
 	if (flag==SLW_PENALTY){
 		// penaltyのみである場合はpremiumも減点も無し 2009.12.29
 	} else
-	if (flag&(SLW_ELIMHYPHEN2|SLW_ELIMHYPHEN3|SLW_PENALTY)){
+	if (flag&(SLW_ELIMHYPHEN2|SLW_ELIMHYPHEN3|SLW_ELIMHYPHEN5|SLW_PENALTY)){
 		// -以前、以降の削除がある
 		// ペナルティが大きい
 		_point -= 64+1;	// １つ語数の少ない完全ヒット単語に劣る
