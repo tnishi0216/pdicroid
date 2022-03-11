@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.dropbox.core.DbxException;
+import com.dropbox.core.InvalidAccessTokenException;
 import com.dropbox.core.v2.files.DeletedMetadata;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
@@ -81,8 +82,12 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
         if( null == metadataTask.children || metadataTask.exception) {
             // illegal directory?
             showErrorMessage();
-            if (!retryFromRoot()) {
-                cancel();
+            if (metadataTask.exception && metadataTask.authError){
+                showAppKeyDialog();
+            } else {
+                if (!retryFromRoot()) {
+                    cancel();
+                }
             }
             return;
         }
@@ -132,6 +137,7 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
         String path;
         public TreeMap<String,Metadata> children;
         boolean exception;
+        boolean authError;
         String exceptionMessage;
         public MetadataTask(Dropbox2FileManager dbxFM, String path){
             super();
@@ -144,6 +150,7 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
 
             // Get the folder listing from Dropbox.
 
+            authError = false;
             ListFolderResult result;
             try {
                 try {
@@ -191,6 +198,9 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
             catch (DbxException e) {
                 //common.handleDbxException(response, user, e, "listFolder(" + jq(path) + ")");
                 exception = true;
+                if (e instanceof InvalidAccessTokenException){
+                    authError = true;
+                }
                 e.printStackTrace();
                 exceptionMessage = e.getMessage();
                 Log.e("PDD", "DropboxException3: " + e.getMessage());
