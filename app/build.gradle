@@ -8,8 +8,8 @@ android {
         minSdkVersion 21
         compileSdkVersion 30
         targetSdkVersion 30
-        versionCode 820
-        versionName "0.8.20 alpha"
+        versionCode 821
+        versionName "0.8.21 alpha"
         ndk {
             moduleName "pdjni"
             stl "gnustl_shared"
