@@ -83,7 +83,9 @@ public class Dropbox2FileSelectionActivity extends NetDriveFileSelectionActivity
             // illegal directory?
             showErrorMessage();
             if (metadataTask.exception && metadataTask.authError){
-                showAppKeyDialog();
+                Dropbox2Utils dbxUtils = Dropbox2Utils.getInstance(this);
+                dbxUtils.clearToken();
+                ndvFM.startAuth(false);
             } else {
                 if (!retryFromRoot()) {
                     cancel();
