@@ -2,6 +2,7 @@ package com.reliefoffice.pdic;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,6 +39,7 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
@@ -271,6 +273,26 @@ public class Utility {
         return path;
     }
     */
+
+    // 自分のアプリが最前面にあるかどうかをチェックするメソッド
+    public static boolean isAppInForeground(Context context) {
+        // アクティビティマネージャーを取得
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        // 実行中のアプリの情報を取得
+        List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = activityManager.getRunningAppProcesses();
+
+        // プロセスが存在する場合、最初のプロセスのパッケージ名を取得
+        if (runningAppProcesses != null && !runningAppProcesses.isEmpty()) {
+            String packageName = runningAppProcesses.get(0).processName;
+
+            // パッケージ名が自分のアプリのものと一致するかどうかをチェック
+            return packageName.equals(context.getPackageName());
+        }
+
+        // プロセスが存在しない場合や情報が取得できない場合はfalseを返す
+        return false;
+    }
 
     public static final int REQUEST_CODE_PERMISSION = 181;
     public static final boolean permissionGranted(int[] grantResults){

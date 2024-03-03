@@ -265,6 +265,28 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             mParam2 = getArguments().getString(ARG_PARAM2);
             fromMain = getArguments().getBoolean(ARG_PARAM3);
         }
+
+        // 画面ON/OFFのBroadcastReceiverを登録
+        screenOnReceiver = new ScreenOnReceiver();
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        getContext().registerReceiver(screenOnReceiver, filter);
+    }
+
+    private ScreenOnReceiver screenOnReceiver;
+    // 画面ONのBroadcastReceiverクラス
+    private class ScreenOnReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                // 画面がONになったときの処理をここに記述
+                // 例えば、最前面に自分のアプリがあるかどうかをチェックし、あれば処理を実行
+                if (Utility.isAppInForeground(getContext())) {
+                    // 自分のアプリが最前面にある場合の処理
+                    // LLMファイルである場合、現在再生中のところへカーソル移動
+                    moveCursorPlayingLine();
+                }
+            }
+        }
     }
 
     @Override
@@ -885,6 +907,11 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     public void onDestroy() {
         closeAudioPlayer();
         super.onDestroy();
+
+        // BroadcastReceiverの解除
+        if (screenOnReceiver != null) {
+            getContext().unregisterReceiver(screenOnReceiver);
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
