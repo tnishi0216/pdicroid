@@ -178,6 +178,28 @@ public class Utility {
         }
         editText.setSelection(position, pos2);
     }
+    // 指定行へ移動＆行選択
+    // 論理行指定ができないため、テキストによる移動を追加
+    public static final void setCursorLineSelect(EditText editText, int line, String topOfLineText){
+        Layout layout = editText.getLayout();
+        int position;
+        int pos2;
+        try {
+            while (true){
+                position = layout.getOffsetForHorizontal(line, 0);
+                pos2 = layout.getOffsetForHorizontal(line+1, 0);
+                String s = editText.getText().toString().substring(position, pos2);
+                if (s.startsWith(topOfLineText)){
+                    break;
+                }
+                line++;
+            }
+        } catch(IndexOutOfBoundsException e){
+            position = editText.length();
+            pos2 = position;
+        }
+        editText.setSelection(position, pos2);
+    }
 
     public static final String getSelectedText(EditText editText){
         final int start = editText.getSelectionStart();

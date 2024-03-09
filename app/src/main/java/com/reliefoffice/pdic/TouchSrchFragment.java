@@ -1596,7 +1596,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         if (!isLLMode() || mediaPlayer == null) return;
         int linenum = llmManager.timestampToLine(mediaPlayer.getCurrentPosition());
         if (linenum < 0) return;
-        Utility.setCursorLineSelect(editText, linenum);
+        Utility.setCursorLineSelect(editText, linenum, llmManager.getLineText(linenum));
     }
 
     // --------------------------------------- //

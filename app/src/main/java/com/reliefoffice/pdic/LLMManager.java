@@ -4,19 +4,20 @@ import java.util.Arrays;
 
 public class LLMManager {
     int[] timestamps;
+
+    //TODO: EditTextに論理行への移動、あるいは何か論理行返還の妙案がない限り、テキストによる比較検索
+    String[] shortLines;
+    final int numShortChar = 10;    // 10文字で比較
+
     LLMManager()
     {
-
-    }
-    public void setup(int[] timestamps)
-    {
-        this.timestamps = timestamps;
     }
     // LLM fileのdurationを読み込みtimestamp - 行番号 mapを作成
     String setup(String text)
     {
         String[] lines = text.split("\n");
         timestamps = new int[lines.length];
+        shortLines = new String[lines.length];
         int index = 0;
         int timestamp = 0;
         int linenum = 0;
@@ -26,12 +27,15 @@ public class LLMManager {
             int dur = 0;
             if (pos>=1){
                 dur = Integer.parseInt(line.substring(0, pos));
-                newtext += line.substring(pos+1);
+                pos++;
+                newtext += line.substring(pos);
             } else {
                 newtext += line;
+                pos = 0;
             }
             newtext += "\n";
             timestamps[index] = timestamp;  // msec単位のtimestamp
+            shortLines[index] = line.substring(pos, pos+numShortChar);
             timestamp += dur;
             index++;
             linenum++;
@@ -41,6 +45,7 @@ public class LLMManager {
     public void clear()
     {
         timestamps = null;
+        shortLines = null;
     }
     public int timestampToLine(int timestamp)
     {
@@ -51,5 +56,9 @@ public class LLMManager {
             if (index >= 1) index--;
         }
         return index;
+    }
+    public String getLineText(int line)
+    {
+        return shortLines[line];
     }
 }
