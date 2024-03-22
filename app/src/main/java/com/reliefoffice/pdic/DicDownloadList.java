@@ -112,7 +112,7 @@ public class DicDownloadList extends AppCompatActivity implements IAsyncFileDown
     protected void onResume() {
         super.onResume();
 
-        if (!Utility.requestInternetPermision(this)){
+        if (!Utility.requestInternetPermission(this)){
             return;
         }
 

@@ -321,7 +321,7 @@ public class Utility {
         return grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
     }
 
-    public static final boolean requestStoragePermision(Activity activity){
+    public static final boolean requestStoragePermission(Activity activity){
         if (Build.VERSION.SDK_INT >= 30){
             if(!Environment.isExternalStorageManager()){
                 try {
@@ -345,7 +345,7 @@ public class Utility {
         return true;
     }
 
-    public static final boolean requestInternetPermision(Activity activity){
+    public static final boolean requestInternetPermission(Activity activity){
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.INTERNET},
@@ -354,7 +354,7 @@ public class Utility {
         }
         return true;
     }
-    public static final boolean requestBluetoothPermision(Activity activity){
+    public static final boolean requestBluetoothPermission(Activity activity){
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.BLUETOOTH},

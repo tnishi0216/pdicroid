@@ -196,7 +196,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
     @Override
     protected void onResume(){
         super.onResume();
-        if (!Utility.requestStoragePermision(this)){
+        if (!Utility.requestStoragePermission(this)){
             return;
         }
         if (checkStartSelectFile()){

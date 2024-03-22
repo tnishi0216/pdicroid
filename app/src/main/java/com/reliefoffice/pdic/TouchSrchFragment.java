@@ -761,7 +761,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         }
 
         // Bluetooth Manager //
-        Utility.requestBluetoothPermision(getActivity());
+        Utility.requestBluetoothPermission(getActivity());
 
         fromMain = false;
 
