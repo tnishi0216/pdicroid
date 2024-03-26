@@ -35,7 +35,10 @@ public class LLMManager {
             }
             newtext += "\n";
             timestamps[index] = timestamp;  // msec単位のtimestamp
-            shortLines[index] = line.substring(pos, pos+numShortChar);
+            int sublen = numShortChar;
+            if (sublen > line.length() - pos)
+                sublen = line.length() - pos;
+            shortLines[index] = line.substring(pos, pos+sublen);
             timestamp += dur;
             index++;
             linenum++;
