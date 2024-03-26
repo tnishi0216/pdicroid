@@ -956,6 +956,8 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        // 動的に切り替わるメニュー
+        menu.findItem(R.id.action_goto_play_line).setVisible(isLLMode());
     }
 
     private String popupWordText(int start, int end) {
@@ -1156,9 +1158,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 menu.findItem(R.id.action_loadfile_dropbox).setVisible(false);
                 menu.findItem(R.id.action_savefile).setVisible(false);
                 menu.findItem(R.id.action_sleep_timer).setVisible(false);
-            }
-            if (!isLLMode()){
-                menu.findItem(R.id.action_goto_play_line).setVisible(false);
             }
         }
     }
