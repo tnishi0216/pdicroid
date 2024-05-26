@@ -2358,6 +2358,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             try {
                 while (runnable){
                     if (use_service){
+                        if (!audioPlayService.isPlayerOpened()) break;  // 非同期で終了した？
                         int currentPosition = getAudioCurrentPosition();
                         Message msg = new Message();
                         msg.what = currentPosition;

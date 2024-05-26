@@ -198,6 +198,8 @@ public class AudioPlayService extends Service {
     }
 
     void notifyPlayPosition(){
+        if (mediaPlayer == null) return;
+
         // Service内で再生中の位置を取得
         int currentPosition = mediaPlayer.getCurrentPosition();
 
