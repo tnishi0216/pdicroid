@@ -2257,7 +2257,9 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                     edit.remove(pfs.LAST_AUDIO_MARK_B);
                 }
                 edit.putString(pfs.LAST_AUDIOFILE_FOR_POS, openedFilename);
-                edit.putInt(pfs.LAST_AUDIO_POS, getAudioCurrentPosition());
+                if (isPlayerOpened()){
+                    edit.putInt(pfs.LAST_AUDIO_POS, getAudioCurrentPosition());
+                }
                 markPositionHistory.remove(openedFilename);
             }
             edit.commit();
