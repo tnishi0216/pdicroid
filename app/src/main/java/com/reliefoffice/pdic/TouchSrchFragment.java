@@ -1460,6 +1460,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 audioOk = openAudioPlayer(audioFileName);
             }
         } else {
+            reopenAudioPlayer();
             updatePlayPause();
         }
         showAudio(audioOk);
@@ -1961,7 +1962,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 return false;
             }
             audioPlayService.openAudioPlayer(filename);
-            audioDuration = audioPlayService.getAudioDuration();
         } else {
             mediaPlayer = new MediaPlayer();
             try {
@@ -1978,10 +1978,25 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 closeAudioPlayer();
                 return false;
             }
-            audioDuration = mediaPlayer.getDuration();
-
             if (!autoLooping)
                 mediaPlayer.setLooping(true);
+        }
+
+        reopenAudioPlayer();
+
+        audioPlayPause(!autoStartPlayMode && !autoStartPlay);
+
+        clearAudioMark();
+
+        return true;
+    }
+    // openはすでにしているけど、open状態にしたい場合
+    void reopenAudioPlayer()
+    {
+        if (use_service){
+            audioDuration = audioPlayService.getAudioDuration();
+        } else {
+            audioDuration = mediaPlayer.getDuration();
         }
 
         audioSlider.setProgress(lastPlayPosition);
@@ -1991,13 +2006,8 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         updateThread = new AudioSliderUpdateThread();
         updateThread.start();
         tvPosition.setText("sss");
-
-        audioPlayPause(!autoStartPlayMode && !autoStartPlay);
-
-        clearAudioMark();
-
-        return true;
     }
+
     // viewは破棄、serviceは終了しない
     void releaseAudioPlayer(){
         if (use_service){
