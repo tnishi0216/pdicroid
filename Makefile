@@ -1,4 +1,8 @@
 
+# 初期設定：
+#  - Android-local.mkは環境に合わせて修正せよ！
+#  - APP_STLはc++_sharedにする必要があるかもしれない
+#  - armeabi, mipsはいずれ削除
 # Android.mkのoriginalはrootにある"Android-local.mk"だった！
 
 build:
@@ -36,6 +40,7 @@ mkpath:
 copymk:
 	-mkdir app\build\intermediates\ndk
 	-mkdir app\build\intermediates\ndk\debug
+	-mkdir app\src\main\jniLibs
 	-mkdir app\src\main\jniLibs\armeabi
 	-mkdir app\src\main\jniLibs\armeabi-v7a
 	-mkdir app\src\main\jniLibs\arm64-v8a
