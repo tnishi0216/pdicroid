@@ -2195,19 +2195,19 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         switch (getMarkState()){
             case None:
             default:
-                setAudioMark(MarkState.MarkA, getAudioCurrentPosition(), -1);
+                setAudioMark(MarkState.MarkA, getAudioCurrentPosition(), -1, false);
                 break;
             case MarkA:
-                setAudioMark(MarkState.MarkAB, getMarkPositionA(), getAudioCurrentPosition());
+                setAudioMark(MarkState.MarkAB, getMarkPositionA(), getAudioCurrentPosition(), false);
                 break;
             case MarkAB:
                 clearAudioMark();
                 break;
         }
     }
-    boolean setAudioMark(MarkState newMarkState, int newMarkA, int newMarkB){
+    boolean setAudioMark(MarkState newMarkState, int newMarkA, int newMarkB, boolean force){
         if (isPlayerClosed()) return false;
-        if (getMarkState() == newMarkState) return false;
+        if (!force && getMarkState() == newMarkState) return false;
         int markPositionA = getMarkPositionA();
         int markPositionB = getMarkPositionB();
         switch (newMarkState){
@@ -2320,7 +2320,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             } else {
                 markState = MarkState.MarkA;
             }
-            if (setAudioMark(markState, markA, markB)) {
+            if (setAudioMark(markState, markA, markB, true)) {
                 seekAudioPosition(markPositionA);
             }
             return markA;
