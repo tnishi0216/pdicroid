@@ -2248,7 +2248,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 // mark設定されている場合
                 int markA = getMarkPositionA();
                 int markB = getMarkPositionB();
-                switch (markState) {
+                switch (getMarkState()) {
                     case MarkAB:
                         break;
                     default:
