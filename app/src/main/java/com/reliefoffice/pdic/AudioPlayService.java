@@ -101,7 +101,7 @@ public class AudioPlayService extends Service {
 
         // Android 8.0 以降では必ず通知チャネルを作成する必要がある
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-             String channel_name = "PdicAudioChannel";
+             String channel_name = getString(R.string.audio_channel_name);
              NotificationChannel mChannel =
                     new NotificationChannel(CHANNEL_ID, channel_name, NotificationManager.IMPORTANCE_DEFAULT);
              NotificationManager manager = getSystemService(NotificationManager.class);
