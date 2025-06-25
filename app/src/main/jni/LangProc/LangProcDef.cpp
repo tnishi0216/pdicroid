@@ -316,11 +316,12 @@ jnext:;
 }
 
 // src‚É‚ ‚éitem‚Ì‚¤‚¿Aflag=0‚Ì‚İdst‚Ömerge‚·‚é
+// ‚½‚¾‚µASLW_DESINENCEx‚Ì‚İ‚Ì•ÏŠ·‚Í–³•ÏŠ·ˆµ‚¢‚Æ‚·‚é
 void MergeNoTransWords(MatchArray &dst, MatchArray &src)
 {
 	for (int i=0;i<src.size();i++){
 		MATCHINFO &mi = src[i];
-		if (mi.flag == 0 && mi.word.exist()){
+		if ( (mi.flag & ~(SLW_DESINENCE1|SLW_DESINENCE2|SLW_DESINENCE1)) == 0 && mi.word.exist()){
 			int index = dst.FindWord(mi.word);
 			if (index >= 0){
 				// ‚·‚Å‚É“¯‚¶’PŒê‚ª‚ ‚é
