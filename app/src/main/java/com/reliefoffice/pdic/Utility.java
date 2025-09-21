@@ -180,7 +180,7 @@ public class Utility {
     }
     // 指定行へ移動＆行選択
     // 論理行指定ができないため、テキストによる移動を追加
-    public static final void setCursorLineSelect(EditText editText, int line, String topOfLineText){
+    public static final int setCursorLineSelect(EditText editText, int line, String topOfLineText){
         Layout layout = editText.getLayout();
         int position;
         int pos2;
@@ -199,6 +199,7 @@ public class Utility {
             pos2 = position;
         }
         editText.setSelection(position, pos2);
+        return line;
     }
 
     public static final String getSelectedText(EditText editText){

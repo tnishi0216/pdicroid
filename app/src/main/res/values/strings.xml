@@ -136,4 +136,5 @@
     <string name="action_wpm">Start/Stop WPM</string>
     <string name="action_sleep_timer">Sleep/Wakeup Timer</string>
     <string name="audio_channel_name">Audio Playback</string>
+    <string name="action_toggle_follow_play_line">Follow playing line</string>
 </resources>

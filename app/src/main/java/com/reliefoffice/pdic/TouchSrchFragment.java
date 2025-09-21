@@ -291,7 +291,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 if (Utility.isAppInForeground(getContext())) {
                     // 自分のアプリが最前面にある場合の処理
                     // LLMファイルである場合、現在再生中のところへカーソル移動
-                    moveCursorPlayingLine();
+                    moveCursorPlayingLine(false);
                 }
             }
         }
@@ -982,6 +982,13 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             // 動的に切り替わるメニュー
             item.setVisible(isLLMode());
         }
+        item = menu.findItem(R.id.action_toggle_follow_play_line);
+        // fragmentの切替え時、このitemがnullになるときがあるため（原因不明）
+        if (item != null) {
+            // 動的に切り替わるメニュー
+            item.setVisible(isLLMode());
+            item.setChecked(FollowPlayingLineEnabled);
+        }
     }
 
     private String popupWordText(int start, int end) {
@@ -1207,7 +1214,10 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         } else if (id == R.id.action_goto){
             moveCursor();
         } else if (id == R.id.action_goto_play_line){
-            moveCursorPlayingLine();
+            moveCursorPlayingLine(true);
+        } else if (id == R.id.action_toggle_follow_play_line){
+            toggleFollowPlayingLine();
+            item.setChecked(FollowPlayingLineEnabled);
         } else if (id == R.id.action_viewpsb) {
             viewPSBookmarkList();
         } else if (id == R.id.action_wpm) {
@@ -1655,12 +1665,29 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             Utility.setCursorLine(editText, value);
         }
     }
-    void moveCursorPlayingLine()
+
+    int lastPlayingLineNum = -1;
+    void moveCursorPlayingLine(boolean debug)
     {
         if (!isLLMode() || !isPlayerOpened()) return;
         int linenum = llmManager.timestampToLine(getAudioCurrentPosition());
         if (linenum < 0) return;
-        Utility.setCursorLineSelect(editText, linenum, llmManager.getLineText(linenum));
+        if (lastPlayingLineNum == linenum){
+            return;
+        }
+        lastPlayingLineNum = linenum;
+        long startTime = System.currentTimeMillis();
+        int movedline = Utility.setCursorLineSelect(editText, linenum, llmManager.getLineText(linenum));
+        long endTime = System.currentTimeMillis();
+        Log.d("PDD", "moveCursorPlayingLine: time=" + (endTime - startTime) + "ms pos="+getAudioCurrentPosition());
+        if (debug){
+            Toast.makeText(getContext(), "linenum="+linenum+" pos="+getAudioCurrentPosition()+" "+llmManager.getLineText(linenum), Toast.LENGTH_LONG).show();
+        }
+    }
+    boolean FollowPlayingLineEnabled = false;
+    void toggleFollowPlayingLine()
+    {
+        FollowPlayingLineEnabled = !FollowPlayingLineEnabled;
     }
 
     // --------------------------------------- //
@@ -2374,19 +2401,27 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 while (runnable){
                     if (use_service){
                         if (!audioPlayService.isPlayerOpened()) break;  // 非同期で終了した？
-                        int currentPosition = getAudioCurrentPosition();
-                        Message msg = new Message();
-                        msg.what = currentPosition;
-                        threadHandler.sendMessage(msg);                        //ハンドラへのメッセージ送信
-                    } else {
-                        if (mediaPlayer != null) {
-                            int currentPosition = mediaPlayer.getCurrentPosition();    //現在の再生位置を取得
+                        if (isPlaying()){
+                            int currentPosition = getAudioCurrentPosition();
                             Message msg = new Message();
                             msg.what = currentPosition;
                             threadHandler.sendMessage(msg);                        //ハンドラへのメッセージ送信
                         }
+                    } else {
+                        if (mediaPlayer != null) {
+                            if (isPlaying()) {
+                                int currentPosition = mediaPlayer.getCurrentPosition();    //現在の再生位置を取得
+                                Message msg = new Message();
+                                msg.what = currentPosition;
+                                threadHandler.sendMessage(msg);                        //ハンドラへのメッセージ送信
+                            }
+                        }
                     }
-                    Thread.sleep(200);
+                    if (isPlaying()){
+                        Thread.sleep(200);
+                    } else {
+                        Thread.sleep(1000);
+                    }
                 }
             } catch (InterruptedException e) {
                 //return;
@@ -2421,6 +2456,9 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 String text = String.format("%d:%02d/%d:%02d", sec/60, sec % 60, audioDurationSec/60, audioDurationSec%60);
                 tvPosition.setText(text);
                 //tvPosition.setText( Integer.toString(sec/60) + ":" + Integer.toString(sec % 60) + "/" + Integer.toString(audioDurationSec/60) + ":" + Integer.toString(audioDurationSec%60));
+            }
+            if (FollowPlayingLineEnabled){
+                moveCursorPlayingLine(true);
             }
 
             if (!use_service){
