@@ -11,8 +11,10 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.storage.StorageManager;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.Layout;
@@ -36,10 +38,15 @@ import com.reliefoffice.pdic.text.config;
 import com.reliefoffice.pdic.text.pfs;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 import javax.net.ssl.SSLContext;
 
@@ -69,7 +76,8 @@ public class Utility {
 
     public static String initialFileDirectory(){
         //return "/storage/emulated/0";
-        return Environment.getExternalStorageDirectory().getAbsolutePath();
+        // return Environment.getExternalStorageDirectory().getAbsolutePath();
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();
     }
 
     public static String getFileExtension(String filename)
@@ -180,7 +188,7 @@ public class Utility {
     }
     // 指定行へ移動＆行選択
     // 論理行指定ができないため、テキストによる移動を追加
-    public static final void setCursorLineSelect(EditText editText, int line, String topOfLineText){
+    public static final int setCursorLineSelect(EditText editText, int line, String topOfLineText){
         Layout layout = editText.getLayout();
         int position;
         int pos2;
@@ -199,6 +207,7 @@ public class Utility {
             pos2 = position;
         }
         editText.setSelection(position, pos2);
+        return line;
     }
 
     public static final String getSelectedText(EditText editText){
@@ -322,6 +331,16 @@ public class Utility {
     }
 
     public static final boolean requestStoragePermission(Activity activity){
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_CODE_PERMISSION);
+            return false;
+        }
+        return true;
+    }
+
+    public static final boolean requestStorageAllPermission(Activity activity){
         if (Build.VERSION.SDK_INT >= 30){
             if(!Environment.isExternalStorageManager()){
                 try {
@@ -378,6 +397,222 @@ public class Utility {
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
         }
+    }
+
+    // File Selector //
+    public static void showSelectSAFFile(Fragment fragment, int requestId, boolean isText){
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        if (isText) {
+            intent.setType("text/plain"); // テキストファイルを対象
+        } else {
+            // intent.setType("*/*");  // すべてのファイルを対象
+            // または
+            intent.setType("application/octet-stream"); // .dic を含むバイナリファイルを対象
+        }
+        fragment.startActivityForResult(intent, requestId);
+    }
+    /**
+     * SAFで取得したUriからファイル名を取得する
+     */
+    public static String getFileNameFromUri(Uri uri, Context context) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            try (android.database.Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);
+                    if (nameIndex >= 0) {
+                        result = cursor.getString(nameIndex);
+                    }
+                }
+            }
+        }
+        if (result == null) {
+            // contentスキームで取得できなかった場合はパスから取得
+            result = uri.getLastPathSegment();
+        }
+        return result;
+    }
+
+    /**
+     * SAFで取得したUriからフルパスを推測して取得する（取得できない場合はnull）
+     */
+    public static String getFullPathNameFromUri(Uri uri, Context context) {
+        if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = { android.provider.MediaStore.MediaColumns.DATA };
+            try (android.database.Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int columnIndex = cursor.getColumnIndexOrThrow(android.provider.MediaStore.MediaColumns.DATA);
+                    return cursor.getString(columnIndex);
+                }
+            } catch (Exception e) {
+                // 取得できない場合はnull
+            }
+        }
+        // 取得できない場合はnull
+        return null;
+    }
+
+    /**
+     * SAFで取得したUriからファイルサイズ（バイト数）を取得する
+     * 取得できない場合は-1を返す
+     */
+    public static long getFileSizeFromUri(Uri uri, Context context) {
+        long size = -1;
+        if ("content".equals(uri.getScheme())) {
+            try (android.database.Cursor cursor = context.getContentResolver().query(
+                    uri, new String[]{android.provider.OpenableColumns.SIZE}, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int sizeIndex = cursor.getColumnIndex(android.provider.OpenableColumns.SIZE);
+                    if (sizeIndex >= 0) {
+                        size = cursor.getLong(sizeIndex);
+                    }
+                }
+            }
+        }
+        return size;
+    }
+
+
+    //TODO: by GitHub Copilot, Please check.
+    public static String getFileEncodingFromUri(Uri uri, Context context) {
+        InputStream is = null;
+        try {
+            is = context.getContentResolver().openInputStream(uri);
+            if (is == null) return null;
+            // BOMチェック
+            byte[] bom = new byte[3];
+            int read = is.read(bom, 0, 3);
+            if (read >= 2) {
+                if (bom[0] == (byte)0xFF && bom[1] == (byte)0xFE) {
+                    return "utf-16le";
+                }
+                if (bom[0] == (byte)0xFE && bom[1] == (byte)0xFF) {
+                    return "utf-16be";
+                }
+            }
+            if (read == 3) {
+                if (bom[0] == (byte)0xEF && bom[1] == (byte)0xBB && bom[2] == (byte)0xBF) {
+                    return "utf-8";
+                }
+            }
+            // BOMがなければ、UTF-8かShift_JISかを簡易判定
+            // 先頭数KBだけ読む
+            int size = 4096;
+            byte[] buf = new byte[size];
+            System.arraycopy(bom, 0, buf, 0, read);
+            int n = is.read(buf, read, size - read);
+            int total = (n > 0 ? n : 0) + read;
+            String encoding = detectEncoding(buf, total);
+            return encoding;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (is != null) {
+                try { is.close(); } catch (IOException e) {}
+            }
+        }
+    }
+    
+    //TODO: by GitHub Copilot, Please check.
+    // 簡易エンコーディング判定（UTF-8判定のみ、他はShift_JISとする）
+    public static String detectEncoding(byte[] buf, int len) {
+        int i = 0;
+        boolean utf8 = false;
+        while (i < len) {
+            byte b = buf[i];
+            if ((b & 0x80) == 0) {
+                i++;
+                continue;
+            }
+            if ((b & 0xE0) == 0xC0 && i + 1 < len &&
+                (buf[i + 1] & 0xC0) == 0x80) {
+                utf8 = true;
+                i += 2;
+                continue;
+            }
+            if ((b & 0xF0) == 0xE0 && i + 2 < len &&
+                (buf[i + 1] & 0xC0) == 0x80 &&
+                (buf[i + 2] & 0xC0) == 0x80) {
+                utf8 = true;
+                i += 3;
+                continue;
+            }
+            // それ以外はShift_JISとみなす
+            return "ShiftJIS";
+        }
+        return utf8 ? "utf-8" : "ShiftJIS";
+    }
+
+    // SAFで取得したファイルを一時ファイルにコピーする関数
+    // コピーされたファイルは最終的に削除する必要あり
+    public static String copySAFToTemporaryFile(Uri safUri, Context context)
+    {
+        String safFileName = getFileNameFromUri(safUri, context);
+        long filesize = getFileSizeFromUri(safUri, context);
+
+        boolean use_external_storage = false;
+        if (filesize > 0){
+            // 空き容量のチェック
+            try {
+                StorageManager storageManager = context.getSystemService(StorageManager.class);
+                UUID appSpecificInternalDirUuid = storageManager.getUuidForPath(context.getFilesDir());
+                long availableBytes = storageManager.getAllocatableBytes(appSpecificInternalDirUuid);
+                if (filesize > availableBytes) {
+                    UUID appSpecificExternalDirUuid = storageManager.getUuidForPath(context.getExternalFilesDir(null));
+                    availableBytes = storageManager.getAllocatableBytes(appSpecificExternalDirUuid);
+                    if (filesize > availableBytes) {
+                        Toast.makeText(context, context.getString(R.string.msg_not_enough_space), Toast.LENGTH_SHORT).show();
+                        return null;
+                    }
+                    use_external_storage = true;  // 外部ストレージにコピーする
+                }
+            } catch (Exception e) {
+                // e.printStackTrace();
+                // Toast.makeText(getContext(), getString(R.string.msg_failed_to_check_available_space) + e.getMessage(), Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        }
+
+        // SAF stream open
+        InputStream in;
+        try {
+            in = context.getContentResolver().openInputStream(safUri);
+            if (in == null) {
+                Toast.makeText(context, context.getString(R.string.msg_failed_to_open_temporary_file) + safUri, Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(context, context.getString(R.string.msg_failed_to_open_temporary_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        File tempFile = new File(use_external_storage ? context.getExternalFilesDir(null) : context.getFilesDir(), safFileName);  // 一時ファイルのパス：
+        if (tempFile.exists()) {
+            tempFile.delete();
+        }
+        try (OutputStream out = new FileOutputStream(tempFile)) {
+            byte[] buf = new byte[8192];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(context, context.getString(R.string.msg_failed_to_open_temporary_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return null;
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return tempFile.getAbsolutePath();  // copyされた一時的なfull pathを返す
     }
 
     // Debug

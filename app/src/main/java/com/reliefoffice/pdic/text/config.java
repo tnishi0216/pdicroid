@@ -6,6 +6,7 @@ import android.os.Environment;
  * Created by nishikawat on 2015/12/17.
  */
 public class config {
+    public static final boolean isRestrictedMode = true; // true: GooglePlay公開版, false: 野良版
     public static final String defaultCharsetEncoding = "ShiftJIS";
     public static final boolean defaultShowPronExp = false; // change R.xml.preference also.
     public static final int swipeMoveMargin = 120;

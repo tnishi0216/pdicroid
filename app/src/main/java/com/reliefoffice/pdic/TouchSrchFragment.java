@@ -1195,7 +1195,11 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_loadfile) {
-            selectFile();
+            if (config.isRestrictedMode){
+                selectSAFFile();
+            } else {
+                selectFile();
+            }
         } else if (id == R.id.action_loadfile_history) {
             selectFileFromHistory();
         } else if (id == R.id.action_loadfile_dropbox) {
@@ -1242,6 +1246,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     static final int REQUEST_CODE_SAVE = 1;
     static final int REQUEST_CODE_SELECT_FILE = 2;
     static final int REQUEST_CODE_SELECT_FILE_DBX = 3;
+    static final int REQUEST_CODE_SELECT_SAF_FILE = 4;
 
     boolean fromDropbox = false;
     private String m_strInitialDir;
@@ -1258,6 +1263,9 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             i.putExtra("exts", config.TextExtensions);
             startActivityForResult(i, REQUEST_CODE_SELECT_FILE);
         }
+    }
+    void selectSAFFile() {
+        Utility.showSelectSAFFile(this, REQUEST_CODE_SELECT_SAF_FILE, true);
     }
 
     String downloadedRemoteName;
@@ -1660,7 +1668,8 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         if (!isLLMode() || !isPlayerOpened()) return;
         int linenum = llmManager.timestampToLine(getAudioCurrentPosition());
         if (linenum < 0) return;
-        Utility.setCursorLineSelect(editText, linenum, llmManager.getLineText(linenum));
+        int movedline = Utility.setCursorLineSelect(editText, linenum, llmManager.getLineText(linenum));
+        Toast.makeText(getContext(), "linenum="+linenum+" moved line="+movedline, Toast.LENGTH_LONG).show();
     }
 
     // --------------------------------------- //
@@ -1752,6 +1761,24 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                         fileEncoding = bundle.getString("fileEncoding");
                         FileInfo fileInfo = new FileInfo(name, file);
                         onFileSelect(fileInfo);
+                    }
+                }
+            }
+        } else
+        if (requestCode == REQUEST_CODE_SELECT_SAF_FILE) {
+            // SAF (Storage Access Framework) file selection
+            if (resultCode == Activity.RESULT_OK) {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    // SAFから取得したファイルを一時ファイルにコピーして、fullpathを取得
+                    //TODO: temp fileを自動削除する機能が必要？
+                    String filename = Utility.getFileNameFromUri(uri, getContext());
+                    String fullpath = Utility.copySAFToTemporaryFile(uri, getContext());
+                    if (Utility.isNotEmpty(fullpath)) {
+                        File file = new File(fullpath);
+                        String name = filename;
+                        fileEncoding = Utility.getFileEncodingFromUri(uri, getContext());
+                        loadFile(fullpath, null);
                     }
                 }
             }

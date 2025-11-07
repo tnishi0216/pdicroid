@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.storage.StorageManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,10 +20,16 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.reliefoffice.pdic.text.config;
 import com.reliefoffice.pdic.text.pfs;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -112,7 +119,11 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
                     actionDownload();
                 } else if (position == num - 2) {
                     // add file
-                    actionAddFile();
+                    if (config.isRestrictedMode){
+                        actionAddFileBySAF();
+                    } else {
+                        actionAddFile();
+                    }
                 } else if (position == num - 1) {
                     // add file from dropbox
                     actionAddFileFromDropbox();
@@ -234,6 +245,7 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
     static final int REQUEST_CODE_ADD_FILE = 1;
     static final int REQUEST_CODE_ADD_FILE_DBX = 2;
     static final int REQUEST_CODE_ADD_FILE_GDV = 3;
+    static final int REQUEST_CODE_ADD_FILE_SAF = 4;
     void actionAddFile(){
         Intent i = new Intent().setClassName(getActivity().getPackageName(), FileDirSelectionActivity.class.getName());
         i.putExtra(pfs.INITIALDIR, m_strInitialDir);
@@ -247,26 +259,48 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
         Intent i = new Intent().setClassName(getActivity().getPackageName(), GoogleDriveDownloadActivity.class.getName());
         startActivityForResult(i, REQUEST_CODE_ADD_FILE_GDV);
     }
+    void actionAddFileBySAF(){
+        Utility.showSelectSAFFile(this, REQUEST_CODE_ADD_FILE_SAF, false);
+    }
 
     // Activity result handler //
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            Bundle bundle = data.getExtras();
-            if (bundle != null) {
-                String filename = bundle.getString("filename");
-                if (Utility.isNotEmpty(filename)) {
-                    if (requestCode == REQUEST_CODE_ADD_FILE) {
-                        FileInfo fileInfo = new FileInfo(filename);
-                        onFileSelect(fileInfo);
-                    } else
-                    if (requestCode == REQUEST_CODE_ADD_FILE_DBX) {
-                        //String remotename = bundle.getString("remotename");
-                        // The file is selected to be added.
-                        File file = new File(filename);
-                        String name = file.getName() + " [Dropbox]";
-                        addDictionaryFile(filename, name);
+            if (requestCode == REQUEST_CODE_ADD_FILE_SAF) {
+                // SAF (Storage Access Framework) file selection
+                Uri uri = data.getData();
+                if (uri != null) {
+                    String fileName = getFileNameFromUri(uri);
+                    if (fileName != null && fileName.endsWith(".dic")) {
+                        String fullpath = copySAFToTemporaryFile(uri);
+                        if (Utility.isNotEmpty(fullpath)) {
+                            // SAFから取得したファイルを一時ファイルにコピーして、fullpathを取得
+                            File file = new File(fullpath);
+                            String name = fileName;
+                            addDictionaryFile(fullpath, name, true);
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "拡張子 .dic のファイルを選んでください", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } else {
+                Bundle bundle = data.getExtras();
+                if (bundle != null) {
+                    String filename = bundle.getString("filename");
+                    if (Utility.isNotEmpty(filename)) {
+                        if (requestCode == REQUEST_CODE_ADD_FILE) {
+                            FileInfo fileInfo = new FileInfo(filename);
+                            onFileSelect(fileInfo);
+                        } else
+                        if (requestCode == REQUEST_CODE_ADD_FILE_DBX) {
+                            //String remotename = bundle.getString("remotename");
+                            // The file is selected to be added.
+                            File file = new File(filename);
+                            String name = file.getName() + " [Dropbox]";
+                            addDictionaryFile(filename, name, false);
+                        }
                     }
                 }
             }
@@ -275,7 +309,7 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
 
     @Override
     public void onFileSelect(FileInfo file) {
-        addDictionaryFile(file.getPath(), file.getName());
+        addDictionaryFile(file.getPath(), file.getName(), false);
 
         m_strInitialDir = file.getParent();
         SharedPreferences.Editor edit = pref.edit();
@@ -283,7 +317,7 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
         edit.commit();
     }
 
-    void addDictionaryFile(String filename, String name){
+    void addDictionaryFile(String filename, String name, boolean isTemp){
         DicInfo info = new DicInfo();
         info.filename = filename;
         info.name = name;
@@ -296,7 +330,6 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
         //adpDicList.insert(0, file.getParent());
         updateList();
     }
-
 
     void showDicInfo(int index){
         DicInfo info = dicPref.loadDicInfo(index);
@@ -320,4 +353,33 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
         dicPref.exchange(index, index+1);
         updateList();
     }
+
+    /**
+     * SAFで取得したUriからファイル名を取得する
+     */
+    private String getFileNameFromUri(Uri uri) {
+        return Utility.getFileNameFromUri(uri, getContext());
+    }
+
+    /**
+     * SAFで取得したUriからフルパスを推測して取得する（取得できない場合はnull）
+     */
+    private String getFullPathNameFromUri(Uri uri) {
+        return Utility.getFullPathNameFromUri(uri, getContext());
+    }
+
+    /**
+     * SAFで取得したUriからファイルサイズ（バイト数）を取得する
+     * 取得できない場合は-1を返す
+     */
+    private long getFileSizeFromUri(Uri uri) {
+        return Utility.getFileSizeFromUri(uri, getContext());
+    }
+
+    // SAFで取得したファイルを一時ファイルにコピーする関数
+    // コピーされたファイルは最終的に削除する必要あり
+    String copySAFToTemporaryFile(Uri safUri) {
+        return Utility.copySAFToTemporaryFile(safUri, getContext());
+    }
 }
+

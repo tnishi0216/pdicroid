@@ -136,4 +136,6 @@
     <string name="action_wpm">Start/Stop WPM</string>
     <string name="action_sleep_timer">Sleep/Wakeup Timer</string>
     <string name="audio_channel_name">Audio Playback</string>
+    <string name="msg_failed_to_open_temporary_file">"Failed to open temporary file: "</string>
+    <string name="msg_not_enough_space">Not enough storage space for file copy.</string>
 </resources>

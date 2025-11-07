@@ -112,7 +112,7 @@ public class TextLoadTask extends AsyncTask<String, Integer, StringBuilder>{
             nread = is.read(buff);
 
             if ( nread <= 0 ){
-                if ( encode!=null && encode.length() != 0 ){
+                if ( Utility.isNotEmpty(encode) ){
                     mCharset = encode;
                 }
                 return new StringBuilder("");
