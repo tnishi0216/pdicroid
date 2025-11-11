@@ -1308,6 +1308,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             //editText.setChanged(false);
             loadFilePost(filename, downloadedRemoteName);
         }
+        deleteProgressDialog();
     }
 
     // my original load file task
