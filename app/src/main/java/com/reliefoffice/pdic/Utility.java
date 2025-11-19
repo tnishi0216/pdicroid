@@ -19,6 +19,8 @@ import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
 import android.text.style.StrikethroughSpan;
@@ -38,7 +40,9 @@ import com.reliefoffice.pdic.text.pfs;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -142,6 +146,40 @@ public class Utility {
     }
 
     // general purpose for EditText
+    // EditTextから表示行番号 → cursor offsetの変換用listを作成する（動作未確認）
+    private List<Integer> buildDisplayLineHead(EditText editText) {
+
+        CharSequence text = editText.getText();
+        TextPaint paint = editText.getPaint();
+
+        int contentWidth = editText.getWidth()
+                - editText.getPaddingLeft()
+                - editText.getPaddingRight();
+
+        if (contentWidth <= 0) return Collections.emptyList();
+
+        // ★ StaticLayout で全文表示行をレイアウト
+        StaticLayout layout = StaticLayout.Builder
+                .obtain(text, 0, text.length(), paint, contentWidth)
+                .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                .setLineSpacing(
+                        editText.getLineSpacingExtra(),
+                        editText.getLineSpacingMultiplier()
+                )
+                .setIncludePad(false)
+                .build();
+
+        int lineCount = layout.getLineCount();
+        List<Integer> displayLineHead = new ArrayList<>(lineCount);
+
+        for (int line = 0; line < lineCount; line++) {
+            int offset = layout.getLineStart(line);
+            displayLineHead.add(offset);
+        }
+
+        return displayLineHead;
+    }
+
     // 現在行を返す
     //TODO: 動作未確認
     public static final int getCurrentCursorLine(EditText editText){
