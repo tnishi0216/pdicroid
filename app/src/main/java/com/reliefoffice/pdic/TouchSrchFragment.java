@@ -1403,7 +1403,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             return;
         }
 
-        audioPause();
         saveMarkPosition();
         savePSBookmark();
 
