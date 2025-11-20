@@ -42,7 +42,13 @@ public class AudioPlayService extends Service {
     }
     public int getCurrentPosition(){
         if (mediaPlayer == null) return 0;
-        return mediaPlayer.getCurrentPosition();
+        try {
+            return mediaPlayer.getCurrentPosition();
+        } catch (IllegalStateException e){
+            // MediaPlayer may be in a transient state while opening/closing.
+            // Return last known position (best-effort) to avoid crashing callers.
+            return lastPlayPosition;
+        }
     }
     public void seekAudioPosition(int pos){
         if (mediaPlayer == null) return;
@@ -240,7 +246,12 @@ public class AudioPlayService extends Service {
         stopForegroundNotification(true);
     }
     void audioStepRewind(){
-        int pos = mediaPlayer.getCurrentPosition();
+        int pos;
+        try {
+            pos = mediaPlayer.getCurrentPosition();
+        } catch (IllegalStateException e){
+            pos = lastPlayPosition;
+        }
         pos -= config.AudioStepRewindTime;
         if (pos < 0) pos = 0;
         mediaPlayer.seekTo(pos);
@@ -273,9 +284,12 @@ public class AudioPlayService extends Service {
 
     void notifyPlayPosition(){
         if (mediaPlayer == null) return;
-
-        // Service内で再生中の位置を取得
-        int currentPosition = mediaPlayer.getCurrentPosition();
+        int currentPosition;
+        try {
+            currentPosition = mediaPlayer.getCurrentPosition();
+        } catch (IllegalStateException e){
+            currentPosition = lastPlayPosition;
+        }
 
         // Broadcastを作成して位置情報をセット
         Intent intent = new Intent("music_position");
@@ -342,7 +356,12 @@ public class AudioPlayService extends Service {
             try {
                 while (runnable){
                     if (mediaPlayer != null) {
-                        int currentPosition = mediaPlayer.getCurrentPosition();    //現在の再生位置を取得
+                        int currentPosition;
+                        try {
+                            currentPosition = mediaPlayer.getCurrentPosition();    //現在の再生位置を取得
+                        } catch (IllegalStateException e){
+                            currentPosition = lastPlayPosition;
+                        }
                         Message msg = new Message();
                         msg.what = currentPosition;
                         threadHandler.sendMessage(msg);                        //ハンドラへのメッセージ送信
@@ -357,6 +376,8 @@ public class AudioPlayService extends Service {
     private Handler threadHandler = new Handler() {
         public void handleMessage(Message msg) {
             int position = msg.what;
+            // remember last known position to use as fallback when MediaPlayer is not available
+            lastPlayPosition = position;
             if (lastPlaying){
                 if (autoLooping) {
                     if (position >= audioDuration) {

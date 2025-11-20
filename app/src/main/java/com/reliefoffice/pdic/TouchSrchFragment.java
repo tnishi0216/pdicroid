@@ -2133,7 +2133,13 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             if (audioPlayService == null) return 0;
             return audioPlayService.getCurrentPosition();
         } else {
-            return mediaPlayer.getCurrentPosition();
+            if (mediaPlayer == null) return 0;
+            try {
+                return mediaPlayer.getCurrentPosition();
+            } catch (IllegalStateException e){
+                // MediaPlayer may be transiently unavailable while opening/closing
+                return 0;
+            }
         }
     }
     void seekAudioPosition(int pos){
@@ -2452,7 +2458,12 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                     } else {
                         if (mediaPlayer != null) {
                             if (isPlayingSafe()) {
-                                int currentPosition = mediaPlayer.getCurrentPosition();    //現在の再生位置を取得
+                                int currentPosition;
+                                try {
+                                    currentPosition = mediaPlayer.getCurrentPosition();    //現在の再生位置を取得
+                                } catch (IllegalStateException e){
+                                    currentPosition = 0;
+                                }
                                 Message msg = new Message();
                                 msg.what = currentPosition;
                                 threadHandler.sendMessage(msg);                        //ハンドラへのメッセージ送信
