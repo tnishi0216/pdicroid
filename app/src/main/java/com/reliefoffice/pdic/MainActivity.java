@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -160,10 +161,24 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
 
         if (fragment == null) {
             try {
-                fragment = (Fragment) fragmentClass.newInstance();
+                // Prefer explicit construction for known fragments to avoid reflection issues (byAI)
+                if (fragmentClass == IncrSrchFragment.class) {
+                    fragment = new IncrSrchFragment();
+                } else if (fragmentClass == DicSettingFragment.class) {
+                    fragment = new DicSettingFragment();
+                } else if (fragmentClass != null) {
+                    // Fallback to reflection only for unknown classes
+                    fragment = (Fragment) fragmentClass.newInstance();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        // Guard: if fragment is still null, avoid passing null into FragmentManager (byAI)
+        if (fragment == null) {
+            Log.e("PDD", "displaySelectedScreen: failed to create fragment for menuItem id=" + (menuItem==null?"null":menuItem.getItemId()) + ", using PlaceholderFragment as fallback");
+            fragment = new PlaceholderFragment();
         }
 
         // Insert the fragment by replacing any existing fragment
