@@ -60,3 +60,7 @@ deploy:
 #	make zip
 #	zr.bat
 #	del zr.bat
+
+deploydbg:
+	copy app\release\app-release.apk S:\web\sakura-pdic\android\pdicroid-0.8.27.apk
+#	echo upftp > S:\www\cgi-bin\cmdsvr\cmd.txt
