@@ -810,6 +810,8 @@ bool Squre::_IsPopupOpened() const
 {
 #ifdef USE_PS
 	return ps && ps->IsOpened();
+#else
+	return false;
 #endif
 }
 

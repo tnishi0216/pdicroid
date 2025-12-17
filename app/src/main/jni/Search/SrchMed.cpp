@@ -2,7 +2,7 @@
 #pragma hdrstop
 #include "SrchMed.h"
 #include "SrchPatParser.h"
-#include "WordCount.h"
+#include "wordcount.h"
 #include "pdstrlib.h"
 #include "LangProc.h"
 #include "BookmarkMan.h"
@@ -12,7 +12,7 @@
 #if 0
 #define	D	DBW
 #else
-#define	D	(void)
+inline void D(...) {}
 #endif
 
 static bool SetupRegs(Regs &regs, tnstr_vec &patterns);
@@ -185,8 +185,7 @@ TSearchMediator::TSearchMediator(Squre *_squ, MPdic &dic, SrchStat &_ss, SrchSta
 void TSearchMediator::ClearSubWords()
 {
 	sub_words_map.clear();
-	if (&sub_words)
-		sub_words.clear();
+	sub_words.clear();
 	SubWordsIndex = -1;
 }
 

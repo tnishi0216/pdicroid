@@ -25,7 +25,7 @@
 #if 0
 #define	DBX	DBW
 #else
-#define	DBX	(void)
+inline void DBX(...)	{}
 #endif
 
 // Scroll control //

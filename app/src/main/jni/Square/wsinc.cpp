@@ -33,7 +33,7 @@
 #if 0
 #define	D	DBW
 #else
-#define	D	(void)
+inline void D(...)	{}
 #endif
 
 #define	USE_STOP	0	// SrchParamが検索threadとぶつかる場合は1

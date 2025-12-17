@@ -64,7 +64,7 @@ bool TLangProcStd::OpenIrreg()
 #if USEDBW
 #define	D	DBW		// for debug
 #else
-#define	D	(void)
+inline void D(...) {}
 #endif
 
 // Prerequisite : Call cs.dic->OpenIrregDic().
@@ -742,8 +742,7 @@ jrep:
 			*dp = '\0';
 			convf |= SLW_DEUTCH3;
 		} else
-		if ( (*(dp-1) == 't')	// -t --> -n
-			){
+		if ( *(dp-1) == 't' ){	// -t --> -n
 			*(dp-1) = 'n';
 			*dp = '\0';
 			convf |= SLW_DEUTCH3;

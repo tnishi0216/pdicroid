@@ -86,6 +86,7 @@ public:
 };
 class ISearchingDlg : public IDialog {
 public:
+	virtual ~ISearchingDlg(){}
 	virtual bool IsStopped() = 0;
 	virtual bool IsSpeedUp() = 0;
 };
