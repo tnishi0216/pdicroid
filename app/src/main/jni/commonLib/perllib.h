@@ -60,6 +60,13 @@ void split(const TCHAR *str, tstring_vec &array, const TCHAR *delim);
 void push(string_vec &strs, string_vec *s);
 void keys(string_map &smap, string_vec &svec);
 
+// Avoid conflict with sys/stat.h macro 'st_mtime' which some platforms define
+#if defined(st_mtime)
+#pragma push_macro("st_mtime")
+#undef st_mtime
+#define _PERLLIB_HAS_PUSHED_ST_MTIME
+#endif
+
 // file operations //
 bool IsFile(const char *file);
 bool IsDirectory(const char *dir);
@@ -67,8 +74,14 @@ inline bool IsDirectory(const string &dir) { return IsDirectory(dir.c_str()); }
 int FileSize(const char *file);
 inline int FileSize(string &file) { return FileSize(file.c_str()); }
 
-time_t st_mtime(const char *file);
-inline time_t st_mtime(string &s){ return st_mtime(s.c_str()); }
+// time_t st_mtime(const char *file);
+// inline time_t st_mtime(string &s){ return st_mtime(s.c_str()); }
+
+#ifdef _PERLLIB_HAS_PUSHED_ST_MTIME
+#pragma pop_macro("st_mtime")
+#undef _PERLLIB_HAS_PUSHED_ST_MTIME
+#endif
+
 bool utime(time_t atime, time_t mtime, const string &file);
 int touch(const char *file, time_t date);
 #ifdef _Windows
