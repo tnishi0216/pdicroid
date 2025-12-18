@@ -307,11 +307,7 @@ bocu_t *DEF_NAME(bocu1Decode)( const unsigned char **_src, const unsigned char *
 			if(b>=BOCU1_START_NEG_2 && b<BOCU1_START_POS_2){
 				/* single-byte difference */
 				c=prev+((int32_t)b-BOCU1_MIDDLE);
-				Rx.prev=bocu1Prev(c);
-				*dst++ = (bocu_t)pretrans(c);
-				if (dst>=dstend)
-					break;
-				continue;
+				goto jvalidcode;
 			} else
 			if(b==BOCU1_RESET){
 				/* only reset the state, no code point */
@@ -388,6 +384,7 @@ bocu_t *DEF_NAME(bocu1Decode)( const unsigned char **_src, const unsigned char *
 				c = Rx.prev+c+t;
 				if ( 0<=c && c<=0x10ffff ){
 					/* valid code point result */
+jvalidcode:
 					Rx.prev=bocu1Prev(c);
 					Rx.count=0;
 					c = pretrans(c);
