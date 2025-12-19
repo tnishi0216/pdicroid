@@ -27,6 +27,9 @@
     - ndk-build.cmdへのpathを環境変数PATHに設定
     - NDK_PATH=ndk-build.cmdへのpathを記述
 
+- ビルドの実行
+  - make
+
 ## 確認済みversion
 
 - Android Studio Narwhal 4 Feature Drop|2025.1.4

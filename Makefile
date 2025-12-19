@@ -1,6 +1,8 @@
 
 include env.mk
 
+.PHONY: build clean javah deploy
+
 APP_BUILD_SCRIPT_PATH=.\Android.mk
 
 build:
