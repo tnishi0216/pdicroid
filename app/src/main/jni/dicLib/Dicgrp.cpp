@@ -9,7 +9,7 @@
 #include	"wpdcom.h"
 #include	"filestr.h"
 #include	"faststr.h"
-#include	"dicproc.h"
+#include	"Dicproc.h"
 #include "pdstrlib.h"
 
 // «‘ƒOƒ‹[ƒvˆ—

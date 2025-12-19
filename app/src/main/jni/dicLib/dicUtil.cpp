@@ -110,7 +110,7 @@ int comp_word(const _kchar *word, const _kchar *composit_word)
 		_kchar cc = *composit_word++;
 		if (!cc)
 			return 1;
-		int ret = (int)*(byte*)word++ - (int)(byte)cc;
+		int ret = (int)*(uint8_t*)word++ - (int)(uint8_t)cc;
 		if (ret!=0)
 			return ret;
 		if (cc=='\t')

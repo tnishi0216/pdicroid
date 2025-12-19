@@ -28,8 +28,12 @@ enum eTEXTFILEMODE {
 #if defined(UNIX)
 #include <unistd.h>
 #define	__off_t		off_t
+#ifndef S_IREAD
 #define	S_IREAD		0
+#endif
+#ifndef S_IWRITE
 #define	S_IWRITE	0
+#endif
 #ifdef __UTF8
 #define	_topen		open
 #define	_tchmod		chmod
@@ -299,8 +303,7 @@ TOFileT<T>::TOFileT()
 template <class T>
 TOFileT<T>::~TOFileT()
 {
-	if (writebuff)
-		delete[] writebuff;
+	delete[] writebuff;
 }
 
 class TOFileW : public TOFileT<utf16_t> {

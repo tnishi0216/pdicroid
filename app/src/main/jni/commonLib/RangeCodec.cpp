@@ -14,7 +14,6 @@
 /*------------------------------------------*/
 /*		Type Definitions					*/
 /*------------------------------------------*/
-typedef unsigned char byte;
 
 #include "RangeCodec.h"
 
@@ -25,7 +24,7 @@ struct TRangeCoder {
 	unsigned low;	// low value of range
 	unsigned range;	// range
 	unsigned totfreq;	// total frequency(number of data)
-	byte *dp;		// destination pointer to be stored
+	uint8_t *dp;		// destination pointer to be stored
 };
 #define RC_CODE_BITS	32
 #define RC_TOPVAL		((code_t)1<<24)
@@ -34,18 +33,17 @@ struct TRangeCoder {
 struct TGammaParamC {
 	unsigned putcount;
 	unsigned bitbuf;
-	byte *dp;		// destination pointer to be stored
+	uint8_t *dp;		// destination pointer to be stored
 };
 
 struct TGammaParamD {
 	int getcount;
 	unsigned bitbuf;
-	const byte *sp;		// data source
+	const uint8_t *sp;		// data source
 };
 
-int rcEncode( const byte *sp, int sp_len, byte *dp );
-int rcDecode( const byte *sp, byte *dp );
-
+int rcEncode( const uint8_t *sp, int sp_len, uint8_t *dp );
+int rcDecode( const uint8_t *sp, uint8_t *dp );
 static void PutGamma( TGammaParamC &gp, unsigned short code );
 static void PutGammaEnd( TGammaParamC &gp );
 
@@ -60,7 +58,7 @@ static HWND hwndRC;
 // return value:
 //	1 : OK
 //	0 : NG(逆に大きくなる)
-int RCEncode( const byte *sp, int sp_len, byte *dp, int &destlen )
+int RCEncode( const uint8_t *sp, int sp_len, uint8_t *dp, int &destlen )
 {
 	RC_HEADER *header = (RC_HEADER*)dp;
 	header->size = sizeof(RC_HEADER);
@@ -94,7 +92,7 @@ int RCEncode( const byte *sp, int sp_len, byte *dp, int &destlen )
 //	DBW("org=%d cmp=%d",header->orgsize,header->compsize);
 	return 1;
 }
-int RCDecode( const byte *src, int srclen, byte *dest, int &destlen )
+int RCDecode( const uint8_t *src, int srclen, uint8_t *dest, int &destlen )
 {
 	RC_HEADER *header = (RC_HEADER*)src;
 	if (header->size<sizeof(RC_HEADER)
@@ -103,7 +101,7 @@ int RCDecode( const byte *src, int srclen, byte *dest, int &destlen )
 	}
 	destlen = 0;
 	src += header->size;
-	const byte *end = src + header->compsize-256/8;
+	const uint8_t *end = src + header->compsize-256/8;
 	for(;src<end;){
 		unsigned short size = *(unsigned short*)src;
 		src += sizeof(short);
@@ -119,12 +117,12 @@ inline void rc_encode( TRangeCoder &rc, unsigned cumfreq, unsigned freq )
 	rc.low += cumfreq * rc.range;
 	rc.range *= freq;
 	while ((rc.low ^ (rc.low+rc.range)) < RC_TOPVAL){
-		*rc.dp++ = (byte)(rc.low>>24);
+		*rc.dp++ = (uint8_t)(rc.low>>24);
 		rc.range <<= 8;
 		rc.low <<= 8;
 	}
 	while (rc.range<RC_BOTTOMVAL){
-		*rc.dp++ = (byte)(rc.low>>24);
+		*rc.dp++ = (uint8_t)(rc.low>>24);
 		rc.range = ((-rc.low)&(RC_BOTTOMVAL-1))<<8;
 		rc.low <<= 8;
 	}
@@ -133,7 +131,7 @@ inline void rc_encode( TRangeCoder &rc, unsigned cumfreq, unsigned freq )
 // sp_len must be less than max value of freq_t
 // dp はあらかじめ用意したバッファ（2048バイト以上あれば大丈夫かな・・・かなり怪しい）
 //int rcCompress( const unsigned char *sp, int sp_len, char *dp )
-int rcEncode( const byte *sp, int sp_len, byte *dp )
+int rcEncode( const uint8_t *sp, int sp_len, uint8_t *dp )
 {
 	unsigned freq[257];	// 出現度数table
 	freq_t cumfreq[258];// 累積度数table
@@ -143,7 +141,7 @@ int rcEncode( const byte *sp, int sp_len, byte *dp )
 	TRangeCoder rc;
 	unsigned i;
 	unsigned l;
-	const byte *p;
+	const uint8_t *p;
 
 	int index;
 
@@ -171,7 +169,7 @@ int rcEncode( const byte *sp, int sp_len, byte *dp )
 	// Encode frequency table //
 	TGammaParamC gp;
 	gp.putcount = 8;	// 初期化 for γ符号
-	gp.dp = (byte*)dp;	// 初期化 for γ符号
+	gp.dp = (uint8_t*)dp;	// 初期化 for γ符号
 	gp.bitbuf = 0;
 
 	for (i=0;i<256;i++)
@@ -191,7 +189,7 @@ int rcEncode( const byte *sp, int sp_len, byte *dp )
 
 	// Encode rc_data //
 	rc.totfreq = cumfreq[257];
-	rc.dp = (byte*)gp.dp;
+	rc.dp = (uint8_t*)gp.dp;
 	for (i=0;i<blocksize;i++){
 		index = sp[i];
 		rc_encode( rc, cumfreq[index], freq[index] );
@@ -206,7 +204,7 @@ int rcEncode( const byte *sp, int sp_len, byte *dp )
 		rc_encode( rc, cumfreq[256], 1 );
 	}
 
-	return (int)((byte*)rc.dp - dp);
+	return (int)((uint8_t*)rc.dp - dp);
 }
 #define rightbits(n,x) ((x)&((1U<<(n))-1U))
 static
@@ -277,7 +275,7 @@ void PutGammaEnd( TGammaParamC &gp )
 	*gp.dp++ = gp.bitbuf;
 }
 
-int rcDecode( const byte *sp, byte *dp )
+int rcDecode( const uint8_t *sp, uint8_t *dp )
 {
 	// start decoding //
 	// start decoding //
@@ -298,14 +296,14 @@ int rcDecode( const byte *sp, byte *dp )
 	for (i=1;i<258;i++)
 		cumfreq[i] = cumfreq[i-1] + freq[i-1];
 
-	const byte *rsp = gp.sp;
+	const uint8_t *rsp = gp.sp;
 	unsigned low = 0;
 	unsigned range = 0xffffffffu;
 	unsigned code = 0;
 	for (i=0;i<4;i++)
 		code = (code<<8) | *rsp++;
 
-	byte *rdp = dp;
+	uint8_t *rdp = dp;
 	unsigned totfreq = cumfreq[257];
 
 	for (;;){
@@ -339,7 +337,7 @@ int rcDecode( const byte *sp, byte *dp )
 				break;
 			}
 		}
-		*rdp++ = (byte)lo;
+		*rdp++ = (uint8_t)lo;
 		// decode //
 		low += cumfreq[lo] * range;
 		range *= freq[lo];

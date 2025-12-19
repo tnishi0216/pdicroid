@@ -24,7 +24,7 @@ int MATCHINFO::CalcPoint() const
 	const tchar *cword = find_cword_pos(word);
 	int _numword = WordCount(cword);
 	bool numsub = false;
-	int _point = addpoint + _numword << 6;	// 64倍
+	int _point = addpoint + (_numword << 6);	// 64倍
 	if (_numword < numword){
 		// this->numwordは検索に使用した単語数であるため
 		// この値とWordCount()との乖離で減点

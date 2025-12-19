@@ -133,6 +133,7 @@ public:
 // —v‘f‚ªupdate‚³‚ê‚é‚Æ‚«‚Éview‚ğŒÄ‚Ño‚·
 class IPoolViewer {
 public:
+	virtual ~IPoolViewer() {}
 	virtual void Clear() = 0;
 	virtual void Add(tnstr *word, Japa *japa, int dicno, int level) = 0;
 	virtual void Insert(int index, tnstr *word, Japa *japa, int dicno, int level) = 0;

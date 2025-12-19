@@ -41,9 +41,7 @@ tchar *GetString( UINT msgno )
 		return _t("");
 
 	StrN &= 3;
-	if ( StrArray[ StrN ] ){
-		delete[] StrArray[ StrN ];
-	}
+	delete[] StrArray[ StrN ];
 	if ( !LoadString( hTNInstance, msgno, StrBuffer, 256 ) ){
 		return StrArray[ StrN ] = NULL;
 	}

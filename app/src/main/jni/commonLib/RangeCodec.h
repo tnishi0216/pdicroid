@@ -13,16 +13,16 @@ struct RC_HEADER {
 	unsigned int blocksize;	// 0のときは、blocksize=orgsize
 };
 
-int RCDecode( const byte *src, int srclen, byte *dest, int &destlen );
-int RCEncode( const byte *src, int srclen, byte *dest, int &destlen );
-unsigned int RCGetOrgSize( const byte *header );
+int RCDecode( const uint8_t *src, int srclen, uint8_t *dest, int &destlen );
+int RCEncode( const uint8_t *src, int srclen, uint8_t *dest, int &destlen );
+unsigned int RCGetOrgSize( const uint8_t *header );
 int RCGetErrorCode( );
 #ifdef _WINDOWS
 void RCSetWindow( HWND hwnd );
 #endif
 
 // オリジナルサイズの取得（拡張ヘッダーサイズは含まない）
-inline unsigned int RCGetOrgSize( const byte *header )
+inline unsigned int RCGetOrgSize( const uint8_t *header )
 {
 	return ((const RC_HEADER *)header)->orgsize;
 }

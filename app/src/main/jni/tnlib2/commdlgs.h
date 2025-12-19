@@ -10,4 +10,5 @@
 // CommFileDialogで取得したマルチファイル名 str をfilesにセットする
 void GetCommFiles( const tchar *str, tnstr_vec  &files, int delim='|', int nFileOffset=-1 );
 
-#endif	__COMMDLGS_H
+#endif	// __COMMDLGS_H
+

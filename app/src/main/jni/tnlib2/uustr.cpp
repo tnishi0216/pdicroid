@@ -25,7 +25,7 @@ void uustr::constructor(const wchar_t *str, int len)
 }
 uustr::~uustr()
 {
-	if ( newbuffer ) delete[] newbuffer;
+	delete[] newbuffer;
 }
 uustr::operator char *()
 {

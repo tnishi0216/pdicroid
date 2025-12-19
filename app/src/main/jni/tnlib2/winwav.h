@@ -52,7 +52,7 @@ class WaveIO {
 		BOOL Create( const tchar *filename, long datalength, FOURCC fccHeader=NULL );
 		// buffer,lengthは最小のサイズでも構わない
 		// bufferはGlobalAllocしたものであること
-		BOOL MemoryCreate( byte *buffer, DWORD length, FOURCC fccHeader=NULL );
+		BOOL MemoryCreate( uint8_t *buffer, DWORD length, FOURCC fccHeader=NULL );
 		BOOL CreateCom( DWORD length, FOURCC fccHeader );
 		LRESULT Write( HPSTR buf, LONG len )
 			{ return mmioWrite( hmmio, (HPSTR)buf, len ); }

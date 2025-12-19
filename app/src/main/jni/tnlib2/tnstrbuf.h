@@ -47,7 +47,7 @@ public:
 	}
 	virtual ~__tnstrbufT()
 	{
-		if (buf) delete[] buf;
+		delete[] buf;
 	}
 
 	// Simple Operations //
@@ -78,9 +78,7 @@ public:
 		}
 		p[0] = '\0';
 		strsize = (int)(p-buf);
-		if (buf_del){
-			delete[] buf_del;
-		}
+		delete[] buf_del;
 		return str ? (T*)str : 0;
 	}
 	void cat(const T *str)
@@ -115,8 +113,7 @@ public:
 		}
 		p[0] = '\0';
 		strsize = (int)(p-buf);
-		if (buf_del)
-			delete[] buf_del;
+		delete[] buf_del;
 	}
 	inline void cat(const T c)
 	{
@@ -148,7 +145,7 @@ public:
 	bool exist() const { return strsize>0; }
 	void setBuf(T *newbuf, int _bufsize)
 	{
-		if (buf) delete[] buf;
+		delete[] buf;
 		buf = newbuf;
 		bufsize = _bufsize;
 		strsize = __length(buf);
@@ -462,9 +459,7 @@ public:
 		}
 		p[0] = '\0';
 		strsize = (int)(p-buf);
-		if (buf_del){
-			delete[] buf_del;
-		}
+		delete[] buf_del;
 		return str ? (T*)str : 0;
 	}
 	void cat(const T *str)
@@ -497,8 +492,7 @@ public:
 		}
 		p[0] = '\0';
 		strsize = (int)(p-buf);
-		if (buf_del)
-			delete[] buf_del;
+		delete[] buf_del;
 	}
 	inline void cat(const T c)
 	{

@@ -67,14 +67,14 @@ public:
 	// 準削除予定 //
 //	void Read( int id, TNChar &val )
 //		{ Read(GetString(id), val); }
-	int Read(const tchar *name, int defval)
+	int Read(const tchar *name, int defval) const
 		{ return ReadInteger(name, defval); }
 	void Write(const tchar *key, int val)
 		{ WriteInteger(key, val); }
 	void Write(const tchar *key, const tchar *str)
 		{ WriteString(key, str); }
 
-	int Read(int id, int defval)
+	int Read(int id, int defval) const
 		{ return ReadInteger(id, defval); }
 	void Write(int id, int val)
 		{ WriteInteger(id, val); }
@@ -144,17 +144,17 @@ public:
 	virtual void Flush( )
 		{ ::RegFlushKey( hKey ); }
 	virtual bool KeyExists(const tchar *name);
-	virtual bool ValueExists(const tchar *name);
+	virtual bool ValueExists(const tchar *name) const;
 	virtual bool EnumKeys(tnstr_vec &array);
-	virtual bool EnumValues(tnstr_vec &array);
+	virtual bool EnumValues(tnstr_vec &array) const;
 	virtual bool DeleteValue( const tchar *name );	// nameにNULLも可能(=全て)
 protected:
 	virtual void DeleteKeyImpl( const tchar *subkey );	// subkeyはWIN32APIと違いNULLに可能(=全て)
 public:
-	virtual int ReadInteger( const tchar *name, int defval );
+	virtual int ReadInteger( const tchar *name, int defval ) const;
 	//virtual void WriteMultiString(const tchar *key, const tchar *str);
 	//virtual tchar *ReadMultiString(const tchar *key);
-	virtual tnstr ReadString(const tchar *key, const tchar *defval=_t(""));
+	virtual tnstr ReadString(const tchar *key, const tchar *defval=_t("")) const;
 	virtual void WriteInteger( const tchar *key, int val );
 	virtual bool WriteString( const tchar *key, const tchar *str );
 
@@ -163,7 +163,7 @@ public:
 
 	// Registry depends //
 public:
-	bool QueryValue( const tchar *name, void *buffer, DWORD &maxlen, DWORD *type=NULL );
+	bool QueryValue( const tchar *name, void *buffer, DWORD &maxlen, DWORD *type=NULL ) const;
 		// bufferをNULLにするとmaxlenにデータの長さを返す
 	bool SetValue( const tchar *name, const void *buffer, DWORD len, DWORD type );
 
@@ -173,7 +173,7 @@ protected:
 //	bool Open( HKEY hkey, const tchar *keyname );
 
 	bool EnumKey( DWORD index, tnstr &name );
-	bool EnumValue( DWORD index, tnstr &name, void *buffer=NULL, DWORD *maxlen=NULL, DWORD *type=NULL );
+	bool EnumValue( DWORD index, tnstr &name, void *buffer=NULL, DWORD *maxlen=NULL, DWORD *type=NULL ) const;
 			// maxlen は渡すときにバッファのサイズ、正常終了すると受け取ったデータのサイズを表す
 			// bufferはNULLにすることができるその場合は、値の名前だけ得る
 
@@ -208,11 +208,11 @@ protected:
 public:
 //	virtual bool Read( const tchar *key, tnstr &val );
 	virtual bool KeyExists(const tchar *name);
-	virtual bool ValueExists(const tchar *name);
+	virtual bool ValueExists(const tchar *name) const;
 	virtual bool EnumKeys( tnstr_vec &array );
-	virtual bool EnumValues(tnstr_vec &array);
-	virtual int ReadInteger( const tchar *name, int defval );
-	virtual tnstr ReadString(const tchar *key, const tchar *defval=_t(""));
+	virtual bool EnumValues(tnstr_vec &array) const;
+	virtual int ReadInteger( const tchar *name, int defval ) const;
+	virtual tnstr ReadString(const tchar *key, const tchar *defval=_t("")) const;
 	virtual void WriteInteger( const tchar *key, int val );
 	virtual bool WriteString( const tchar *key, const tchar *str );
 protected:

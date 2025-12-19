@@ -4,7 +4,6 @@
 // UTF16 <-> UTF8 conversion string class
 
 #include <string>
-using namespace std;
 
 class uustr {
 protected:
@@ -16,9 +15,9 @@ public:
 	uustr( const char *str );
 	uustr( const char *str, int len )
 		{ constructor(str, len); }
-	uustr(string &str)
+	uustr(std::string &str)
 		{ constructor(str.c_str(), str.length()); }
-	uustr(wstring &str)
+	uustr(std::wstring &str)
 		{ constructor(str.c_str(), str.length()); }
 	uustr( const wchar_t *str );
 protected:

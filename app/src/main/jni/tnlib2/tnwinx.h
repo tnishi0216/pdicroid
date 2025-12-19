@@ -179,4 +179,5 @@ extern FNMultiByteToWideChar _MultiByteToWideChar;
 #define	_MultiByteToWideChar	MultiByteToWideChar
 #endif
 
-#endif	__TNWINX_H
+#endif	// __TNWINX_H
+

@@ -3,7 +3,6 @@
 #pragma hdrstop
 
 #include "utf.h"
-typedef unsigned char byte;
 
 // c : UTF-32
 int UTF8Len(int c)
@@ -61,23 +60,23 @@ int UTF16toUTF8( const utf16_t *src, int srclen, char *dst, int dstlen )
 		if ( c < 0x80 ){
 			// 1 octet
 			w = 1;
-			*dst++ = (byte)c;
+			*dst++ = (uint8_t)c;
 		} else {
 			if ( c < 0x800 ){
 				w = 2;
-				*dst++ = (byte)((c>>6)+0xC0);
+				*dst++ = (uint8_t)((c>>6)+0xC0);
 			} else {
 				if ( c < 0x10000 ){
 					w = 3;
-					*dst++ = (byte)((c>>12)+0xE0);
+					*dst++ = (uint8_t)((c>>12)+0xE0);
 				} else {
 					w = 4;
-					*dst++ = (byte)((c>>18)+0xF0);
-					*dst++ = (byte)(((c>>12)&0x3F)+0x80);
+					*dst++ = (uint8_t)((c>>18)+0xF0);
+					*dst++ = (uint8_t)(((c>>12)&0x3F)+0x80);
 				}
-				*dst++ = (byte)(((c>>6)&0x3F)+0x80);
+				*dst++ = (uint8_t)(((c>>6)&0x3F)+0x80);
 			}
-			*dst++ = (byte)((c&0x3F)+0x80);
+			*dst++ = (uint8_t)((c&0x3F)+0x80);
 		}
 		size += w;
 	}
@@ -95,19 +94,19 @@ int UTF8toUTF16( const char *src, int srclen, utf16_t *dst, int dstlen )
 	utf16_t *dst_end = (dstlen>=0?dst+dstlen-2:(utf16_t*)(-1));
 	int size = 0;
 	while (src<end){
-		long c = *(byte*)src++;
+		long c = *(uint8_t*)src++;
 		if (c == 0)
 			break;	// end of string
 		if (c & 0x80){
 			unsigned long diff;
 			diff = (0xC0<<6);
-			c = (c<<6) | (*(byte*)src++ & 0x3F);
+			c = (c<<6) | (*(uint8_t*)src++ & 0x3F);
 			if ( c >= (0xE0<<6) ){
 				diff = (0xE0<<12);
-				c = (c<<6) | (*(byte*)src++ & 0x3F);
+				c = (c<<6) | (*(uint8_t*)src++ & 0x3F);
 				if ( c >= (0xF0<<12) ){
 					diff = (0xF0<<18);
-					c = (c<<6) | (*(byte*)src++ & 0x3F);
+					c = (c<<6) | (*(uint8_t*)src++ & 0x3F);
 				}
 			}
 			c -= diff;
@@ -134,7 +133,7 @@ int UTF8toUTF16( const char *src, int srclen, utf16_t *dst, int dstlen )
 }
 unsigned long UTF8toUTF16( const char *src, const char **next )
 {
-	unsigned long c = *(byte*)src;
+	unsigned long c = *(uint8_t*)src;
 	if (c == 0){
 		*next = src;
 		return 0;	// end of string
@@ -143,7 +142,7 @@ unsigned long UTF8toUTF16( const char *src, const char **next )
 	if (c & 0x80){
 		unsigned long diff;
 		diff = (0xC0<<6);
-		byte cc = *(byte*)src;
+		uint8_t cc = *(uint8_t*)src;
 		if (!cc){
 			*next = src;
 			return 0;	// illegal sequence
@@ -152,7 +151,7 @@ unsigned long UTF8toUTF16( const char *src, const char **next )
 		c = (c<<6) | (cc & 0x3F);
 		if ( c >= (0xE0<<6) ){
 			diff = (0xE0<<12);
-			cc = *(byte*)src;
+			cc = *(uint8_t*)src;
 			if (!cc){
 				*next = src;
 				return 0;	// illegal sequence
@@ -161,7 +160,7 @@ unsigned long UTF8toUTF16( const char *src, const char **next )
 			c = (c<<6) | (cc & 0x3F);
 			if ( c >= (0xF0<<12) ){
 				diff = (0xF0<<18);
-				cc = *(byte*)src;
+				cc = *(uint8_t*)src;
 				if (!cc){
 					*next = src;
 					return 0;	// illegal sequence
@@ -209,23 +208,23 @@ int UTF32toUTF8( const utf32_t *src, int srclen, char *dst, int dstlen )
 		if ( c < 0x80 ){
 			// 1 octet
 			w = 1;
-			*dst++ = (byte)c;
+			*dst++ = (uint8_t)c;
 		} else {
 			if ( c < 0x800 ){
 				w = 2;
-				*dst++ = (byte)((c>>6)+0xC0);
+				*dst++ = (uint8_t)((c>>6)+0xC0);
 			} else {
 				if ( c < 0x10000 ){
 					w = 3;
-					*dst++ = (byte)((c>>12)+0xE0);
+					*dst++ = (uint8_t)((c>>12)+0xE0);
 				} else {
 					w = 4;
-					*dst++ = (byte)((c>>18)+0xF0);
-					*dst++ = (byte)(((c>>12)&0x3F)+0x80);
+					*dst++ = (uint8_t)((c>>18)+0xF0);
+					*dst++ = (uint8_t)(((c>>12)&0x3F)+0x80);
 				}
-				*dst++ = (byte)(((c>>6)&0x3F)+0x80);
+				*dst++ = (uint8_t)(((c>>6)&0x3F)+0x80);
 			}
-			*dst++ = (byte)((c&0x3F)+0x80);
+			*dst++ = (uint8_t)((c&0x3F)+0x80);
 		}
 		size += w;
 	}
@@ -244,19 +243,19 @@ int UTF8toUTF32( const char *src, int srclen, utf32_t *dst, int dstlen )
 	utf32_t *dst_end = (dstlen>=0?dst+dstlen-2:(utf32_t*)(-1));
 	int size = 0;
 	while (src<end){
-		utf32_t c = *(byte*)src++;
+		utf32_t c = *(uint8_t*)src++;
 		if (c == 0)
 			break;	// end of string
 		if (c & 0x80){
 			unsigned long diff;
 			diff = (0xC0<<6);
-			c = (c<<6) | (*(byte*)src++ & 0x3F);
+			c = (c<<6) | (*(uint8_t*)src++ & 0x3F);
 			if ( c >= (0xE0<<6) ){
 				diff = (0xE0<<12);
-				c = (c<<6) | (*(byte*)src++ & 0x3F);
+				c = (c<<6) | (*(uint8_t*)src++ & 0x3F);
 				if ( c >= (0xF0<<12) ){
 					diff = (0xF0<<18);
-					c = (c<<6) | (*(byte*)src++ & 0x3F);
+					c = (c<<6) | (*(uint8_t*)src++ & 0x3F);
 				}
 			}
 			c -= diff;
@@ -273,7 +272,7 @@ int UTF8toUTF32( const char *src, int srclen, utf32_t *dst, int dstlen )
 
 utf32_t UTF8toUTF32( const char *src, const char **next )
 {
-	utf32_t c = *(byte*)src;
+	utf32_t c = *(uint8_t*)src;
 	if (c == 0){
 		*next = src;
 		return 0;	// end of string
@@ -282,7 +281,7 @@ utf32_t UTF8toUTF32( const char *src, const char **next )
 	if (c & 0x80){
 		utf32_t diff;
 		diff = (0xC0<<6);
-		byte cc = *(byte*)src;
+		uint8_t cc = *(uint8_t*)src;
 		if (!cc){
 			*next = src;
 			return 0;	// illegal sequence
@@ -291,7 +290,7 @@ utf32_t UTF8toUTF32( const char *src, const char **next )
 		c = (c<<6) | (cc & 0x3F);
 		if ( c >= (0xE0<<6) ){
 			diff = (0xE0<<12);
-			cc = *(byte*)src;
+			cc = *(uint8_t*)src;
 			if (!cc){
 				*next = src;
 				return 0;	// illegal sequence
@@ -300,7 +299,7 @@ utf32_t UTF8toUTF32( const char *src, const char **next )
 			c = (c<<6) | (cc & 0x3F);
 			if ( c >= (0xF0<<12) ){
 				diff = (0xF0<<18);
-				cc = *(byte*)src;
+				cc = *(uint8_t*)src;
 				if (!cc){
 					*next = src;
 					return 0;	// illegal sequence
@@ -317,27 +316,27 @@ utf32_t UTF8toUTF32( const char *src, const char **next )
 
 const char *utf8CharNext(const char *s)
 {
-	unsigned long c = *(byte*)s;
+	unsigned long c = *(uint8_t*)s;
 	if (*s == 0){
 		return s;	// end of string
 	}
 	s++;
 	if (c & 0x80){
-		byte cc = *(byte*)s;
+		uint8_t cc = *(uint8_t*)s;
 		if (!cc){
 			return s;	// illegal sequence
 		}
 		s++;
 		c = (c<<6) | (cc & 0x3F);
 		if ( c >= (0xE0<<6) ){
-			cc = *(byte*)s;
+			cc = *(uint8_t*)s;
 			if (!cc){
 				return s;	// illegal sequence
 			}
 			s++;
 			c = (c<<6) | (cc & 0x3F);
 			if ( c >= (0xF0<<12) ){
-				cc = *(byte*)s;
+				cc = *(uint8_t*)s;
 				if (!cc){
 					return s;	// illegal sequence
 				}

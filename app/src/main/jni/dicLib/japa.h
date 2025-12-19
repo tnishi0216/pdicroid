@@ -111,7 +111,7 @@ protected:
 #endif
 	static void FreeBocuOutBuffer();
 #endif	// USE_BOCU1
-	static byte *GetBuffer;
+	static uint8_t *GetBuffer;
 	static int GetBufferSize;
 	static void FreeGetBuffer();
 public:
@@ -179,7 +179,7 @@ public:
 #endif
 		}
 
-	void SetAll( const byte *src, int l, IndexData *dic, bool field2, wa_t attr);	// 返り値はエラーかどうか
+	void SetAll( const uint8_t *src, int l, IndexData *dic, bool field2, wa_t attr);	// 返り値はエラーかどうか
 	void SetAll2( const tchar *src, bool dist=true);		// フォーマットテキスト形式から
 													// dist : 訳 / 用例の区別
 
@@ -203,8 +203,8 @@ public:
 	int jcut( int len )
 		{ return ::jcut( japa, len ); }
 
-	uint _Get2( byte *buf, int compflag, uint limitlen, uint totallen, IndexData *dic ) const;
-	byte *Get2( uint &length, int compflag, uint limitlen, IndexData *dic ) const;
+	uint _Get2( uint8_t *buf, int compflag, uint limitlen, uint totallen, IndexData *dic ) const;
+	uint8_t *Get2( uint &length, int compflag, uint limitlen, IndexData *dic ) const;
 
 	int GetAllLen( ) const;
 	void operator = ( const Japa &j );
@@ -290,7 +290,7 @@ public:
 	int CutOld( );	// NEWDIC形式の長さに合わせ、登録できない発音記号などをカットする。英単語、日本語訳、用例がカットされた場合のみ１を返す
 	bool IsOld( ) const;	// 古い辞書形式(NEWDIC)に登録可能？
 public:
-	static byte *Decode( const byte *src, uint jtblen, uint &decodelen );
+	static uint8_t *Decode( const uint8_t *src, uint jtblen, uint &decodelen );
 
 	bool IsQWord() const;		// ? だけの日本語訳か？
 public:

@@ -47,8 +47,8 @@ extern const tchar *StrLinkError;
 //#pragma	option	-a1
 #endif
 struct JLinkFormat {
-	byte type;		// リンクの種類
-	byte data[1];	// データ本体
+	uint8_t type;		// リンクの種類
+	uint8_t data[1];	// データ本体
 };
 
 typedef unsigned int t_id;
@@ -59,11 +59,11 @@ struct FileLinkField {
 	short	size;		// FileLinkFieldのサイズ
 	short	nMag;
 	short	nAspect;
-//	byte data[ 1 ];		// データ(可変長) データ部の位置は
+//	uint8_t data[ 1 ];		// データ(可変長) データ部の位置は
 						// FileLinkField of;
-						// byte *data = of.GetDataPtr( ); で求めること！
-	byte *GetDataPtr( )
-		{ return (byte*)(((byte*)this) + size); }
+						// uint8_t *data = of.GetDataPtr( ); で求めること！
+	uint8_t *GetDataPtr( )
+		{ return (uint8_t*)(((uint8_t*)this) + size); }
 		// この構造体の先頭を指しているポインタ(top)からdataの先頭アドレスを求める
 };
 
@@ -72,11 +72,11 @@ struct FileImageField {
 	short	size;		// FileLinkFieldのサイズ
 	short	nMag;
 	short	nAspect;
-//	byte data[ 1 ];		// データ(可変長) データ部の位置は
+//	uint8_t data[ 1 ];		// データ(可変長) データ部の位置は
 						// FileLinkField of;
-						// byte *data = of.GetDataPtr( ); で求めること！
-	byte *GetDataPtr( )
-		{ return (byte*)(((byte*)this) + size); }
+						// uint8_t *data = of.GetDataPtr( ); で求めること！
+	uint8_t *GetDataPtr( )
+		{ return (uint8_t*)(((uint8_t*)this) + size); }
 		// この構造体の先頭を指しているポインタ(top)からdataの先頭アドレスを求める
 };
 
@@ -86,15 +86,15 @@ struct ImageField {
 	int		headersize;	// header for image data
 	short	nMag;
 	short	nAspect;
-//	byte header[ 1 ];	// ヘッダー(可変長)
-//	byte data[ 1 ];		// データ(可変長) データ部の位置は
+//	uint8_t header[ 1 ];	// ヘッダー(可変長)
+//	uint8_t data[ 1 ];		// データ(可変長) データ部の位置は
 						// ImageField df;
-						// byte *data = df.GetDataPtr( ); で求めること！
-	 byte *GetDataPtr( )
-		{ return (byte*)(((byte*)this) + size + headersize); }
+						// uint8_t *data = df.GetDataPtr( ); で求めること！
+	uint8_t *GetDataPtr( )
+		{ return (uint8_t*)(((uint8_t*)this) + size + headersize); }
 		// この構造体の先頭を指しているポインタ(top)からdataの先頭アドレスを求める
-	byte *GetHeaderPtr( )
-		{ return (byte*)(((byte*)this) + size); }
+	uint8_t *GetHeaderPtr( )
+		{ return (uint8_t*)(((uint8_t*)this) + size); }
 };
 
 #if 0	// to be deleted.
@@ -103,11 +103,11 @@ struct RTFField {
 	short	size;		// RTFFieldのサイズ
 	short	nMag;
 	short	nAspect;
-//	byte data[ 1 ];		// データ(可変長) データ部の位置は
+//	uint8_t data[ 1 ];		// データ(可変長) データ部の位置は
 						// RTFField of;
-						// byte *data = of.GetDataPtr( ); で求めること！
-	byte *GetDataPtr( )
-		{ return (byte*)(((byte*)this) + size); }
+						// uint8_t *data = of.GetDataPtr( ); で求めること！
+	uint8_t *GetDataPtr( )
+		{ return (uint8_t*)(((uint8_t*)this) + size); }
 		// この構造体の先頭を指しているポインタ(top)からdataの先頭アドレスを求める
 };
 #endif
@@ -151,8 +151,8 @@ void DrawSelection( HDC hdc, RECT &rc, COLORREF color );	// 選択矩形を描く
 class JLinkObject : TMemoryObject {
 typedef TMemoryObject super;
 public:
-	JLinkObject( const byte *_data, int _len );
-	JLinkObject( const byte *_data, int _len, bool reference );	// 参照型の場合reference=true
+	JLinkObject( const uint8_t *_data, int _len );
+	JLinkObject( const uint8_t *_data, int _len, bool reference );	// 参照型の場合reference=true
 	bool _Validate( );
 	inline void Release( )
 		{ deref(); }
@@ -160,22 +160,22 @@ public:
 		{ ref(); return this; }
 	inline int GetLength() const
 		{ return super::size(); }
-	bool Set( const byte *data, int len );
-	bool Get( byte *data );
-	byte *GetData( )
-		{ return (byte*)data; }
+	bool Set( const uint8_t *data, int len );
+	bool Get( uint8_t *data );
+	uint8_t *GetData( )
+		{ return (uint8_t*)data; }
 };
 #else	// old
 class JLinkObject {
 private:
-	byte *data;
+	uint8_t *data;
 	DWORD len;
 	int ref;		// 参照回数
 protected:
 	BOOL fActive;
 public:
-	JLinkObject( const byte *_data, DWORD _len );
-	JLinkObject( const byte *_data, DWORD _len, bool reference );	// 参照型の場合reference=true
+	JLinkObject( const uint8_t *_data, DWORD _len );
+	JLinkObject( const uint8_t *_data, DWORD _len, bool reference );	// 参照型の場合reference=true
 	virtual ~JLinkObject( );
 	bool Validate( );
 	bool IsDataValid() const
@@ -187,9 +187,9 @@ public:
 		{ return len; }
 	BOOL IsActive( )
 		{ return fActive; }
-	virtual BOOL Set( const byte *data, DWORD len );
-	virtual BOOL Get( byte *data );
-	virtual byte *GetData( ) const
+	virtual BOOL Set( const uint8_t *data, DWORD len );
+	virtual BOOL Get( uint8_t *data );
+	virtual uint8_t *GetData( ) const
 		{ return data; }
 	virtual BOOL CopyToClipboard( )
 		{ return FALSE; }
@@ -217,11 +217,11 @@ protected:
 protected:
 	static JLinkArray jlarray;
 	JLink *Search( Pdic *_dic, t_id _id );
-	byte *GetTitle( byte *buf );
+	uint8_t *GetTitle( uint8_t *buf );
 #ifdef USE_BOCU1
-	void SetTitle( const byte *buf );
+	void SetTitle( const uint8_t *buf );
 #elif defined(_UNICODE)
-	void SetTitle( const byte *buf )
+	void SetTitle( const uint8_t *buf )
 		{ SetTitle( (const tchar*)buf ); }
 #endif
 	int GetTitleLen()
@@ -272,9 +272,9 @@ public:
 	virtual int GetLength( ) = 0;
 	virtual int GetHeaderLength( )			// 非圧縮長(タイトルの次から)
 		{ return 0; }
-	virtual BOOL Get( byte *buf ) = 0;
-	virtual BOOL Set( const byte *buf, int len ) = 0;
-	virtual BOOL PreSet( const byte * )
+	virtual BOOL Get( uint8_t *buf ) = 0;
+	virtual BOOL Set( const uint8_t *buf, int len ) = 0;
+	virtual BOOL PreSet( const uint8_t * )
 		{ return FALSE; }
 	virtual JLink *Clone( Pdic * ) = 0;
 	void CopyMapMode( JLink *o );
@@ -342,12 +342,12 @@ private:
 public:
 	virtual int GetLength( );
 	virtual JLink *Clone( Pdic * );
-	virtual BOOL Get( byte *buf );
-	byte *GetData()
-		{ return jlobj ? (byte*)jlobj->GetData() : NULL; }
-	virtual BOOL Set( const byte *buf, int len );
+	virtual BOOL Get( uint8_t *buf );
+	uint8_t *GetData()
+		{ return jlobj ? (uint8_t*)jlobj->GetData() : NULL; }
+	virtual BOOL Set( const uint8_t *buf, int len );
 	void Set(JLinkObject *jlobj);
-	bool SetRef( const byte *buf, int len );
+	bool SetRef( const uint8_t *buf, int len );
 	virtual const tchar *GetClassName( tnstr &str );
 	virtual BOOL IsLinked( )
 		{ return FALSE; }
@@ -388,7 +388,7 @@ public:
 	JLinkObject *wavedata;	// PCMWAVE 専用
 	tnstr filename;		// PCMLINK専用
 public:
-	JLVoice( Pdic *dic, t_id _id, PCMWAVEFORMAT *_pcm, byte *_wavedata, DWORD _length );	// メモリから
+	JLVoice( Pdic *dic, t_id _id, PCMWAVEFORMAT *_pcm, uint8_t *_wavedata, DWORD _length );	// メモリから
 	JLVoice( Pdic *dic, t_id _id, PCMLINK *_link, tchar *filename );
 
 	JLVoice( Pdic *dic, t_id _id, class WaveIO *wio, int length = -1 );	// WAVﾌｧｲﾙから(wioはオープン済みであること)
@@ -406,9 +406,9 @@ public:
 	virtual BOOL CanCopy( ) { return wavedata ? TRUE : FALSE; }
 #endif
 	virtual JLink *Clone( Pdic * );
-	virtual BOOL Get( byte *buf );
-	BOOL PreSet( const byte *buf );
-	virtual BOOL Set( const byte *buf, int len );
+	virtual BOOL Get( uint8_t *buf );
+	BOOL PreSet( const uint8_t *buf );
+	virtual BOOL Set( const uint8_t *buf, int len );
 	virtual const tchar *GetClassName( tnstr &str );
 	virtual BOOL IsLinked( );
 
@@ -436,9 +436,9 @@ public:
 	~JLRTF( );
 	virtual void SetID( t_id _id );
 	virtual int GetLength( );
-	virtual BOOL Get( byte *buf );
-	virtual BOOL Set( const byte *buf, int len );
-	virtual BOOL PreSet( const byte *buf );
+	virtual BOOL Get( uint8_t *buf );
+	virtual BOOL Set( const uint8_t *buf, int len );
+	virtual BOOL PreSet( const uint8_t *buf );
 	virtual int Draw( TNFONT &tnfont, RECT &rc, BOOL dispf, EnphTextVec *=NULL );
 	virtual JLink *Clone( Pdic * );
 	virtual const tchar *GetClassName( tnstr &str );
@@ -504,9 +504,9 @@ public:
 	virtual BOOL CanCopy( );
 #endif
 	virtual JLink *Clone( Pdic * );
-	virtual BOOL Get( byte *buf );
-	BOOL PreSet( const byte *buf );
-	virtual BOOL Set( const byte *buf, int len );
+	virtual BOOL Get( uint8_t *buf );
+	BOOL PreSet( const uint8_t *buf );
+	virtual BOOL Set( const uint8_t *buf, int len );
 	virtual const tchar *GetClassName( tnstr &str );
 	virtual BOOL IsLinked( ){return true;}
 	int GetPos()
@@ -531,8 +531,8 @@ public:
 	virtual BOOL CopyToClipboard( HWND );
 	virtual BOOL CanCopy( );
 	virtual JLink *Clone( Pdic * );
-	virtual BOOL Get( byte *buf );
-	virtual BOOL Set( const byte *buf, int len );
+	virtual BOOL Get( uint8_t *buf );
+	virtual BOOL Set( const uint8_t *buf, int len );
 	virtual const tchar *GetClassName( tnstr &str );
 	virtual BOOL IsLinked( );
 };

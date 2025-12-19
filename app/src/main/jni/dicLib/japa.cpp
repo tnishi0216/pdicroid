@@ -245,10 +245,10 @@ int Japa::GetAllLen( ) const
 //		デコードデータとdecodelenは一致する
 // 必ず、デコードバッファは呼出側でdeleteすること！！
 // エラー発生は、メモリ不足か、解凍失敗
-byte *Japa::Decode( const byte *src, uint jtblen, uint &decodelen )
+uint8_t *Japa::Decode( const uint8_t *src, uint jtblen, uint &decodelen )
 {
 	uint nocomplen = *((t_noc*)src);	// 非圧縮部の長さ
-	const byte *header = src + sizeof(t_noc) + nocomplen;	// 圧縮部の先頭（ヘッダー部を含む）
+	const uint8_t *header = src + sizeof(t_noc) + nocomplen;	// 圧縮部の先頭（ヘッダー部を含む）
 	uint complen = jtblen - sizeof(t_noc) - nocomplen;	// 圧縮部の長さ（ヘッダーを含む）
 
 	uint orglen = cmpGetOrgSize( header );
@@ -256,7 +256,7 @@ byte *Japa::Decode( const byte *src, uint jtblen, uint &decodelen )
 		DBW("orglen=%d complen=%d", orglen, complen);
 		return NULL;	// corrupted?
 	}
-	byte *decode = new byte[ orglen + nocomplen ];	// 先頭のt_jtbはダミー
+	uint8_t *decode = new uint8_t[ orglen + nocomplen ];	// 先頭のt_jtbはダミー
 	if ( !decode )
 		return NULL;
 
@@ -289,7 +289,7 @@ byte *Japa::Decode( const byte *src, uint jtblen, uint &decodelen )
 		__lock__; \
 		tchar *out = GetBocuOutBuffer(LJALL); \
 		if (out){ \
-			bocu1DecodeT( &src, (const byte*)(src)+srclen, LJALL, out); \
+			bocu1DecodeT( &src, (const uint8_t*)(src)+srclen, LJALL, out); \
 			strcls.set( out ); \
 		} \
 		ReleaseBocuOutBuffer(); \
@@ -305,7 +305,7 @@ byte *Japa::Decode( const byte *src, uint jtblen, uint &decodelen )
 // 文字列セット //
 #if defined(NEED_SINGLEBYTE)
 #define	__SET_STR(_src, src, strcls, single) \
-	src = (byte*)(strcls.set( (const _mchar*)_src ) + 1);
+	src = (uint8_t*)(strcls.set( (const _mchar*)_src ) + 1);
 #else
 #define	__SET_STR(_src, src, strcls, single) \
 	strcls.set( (_mchar*)_src ); \
@@ -330,11 +330,11 @@ byte *Japa::Decode( const byte *src, uint jtblen, uint &decodelen )
 #define	__SetText1( dic, _src, src, strcls, single, maxlength ) \
 	{ \
 		__lock__; \
-		const byte *__src = _src; \
+		const uint8_t *__src = _src; \
 		tchar *out = GetBocuOutBuffer(maxlength); \
 		if (out){ \
-			bocu1DecodeT( &__src, (const byte*)UINT_PTR_MAX, maxlength, out ); \
-			src = (const byte*)__ALIGN_MCHAR(__src); \
+			bocu1DecodeT( &__src, (const uint8_t*)UINT_PTR_MAX, maxlength, out ); \
+			src = (const uint8_t*)__ALIGN_MCHAR(__src); \
 			strcls.set( out ); \
 		} \
 		ReleaseBocuOutBuffer(); \
@@ -349,10 +349,10 @@ byte *Japa::Decode( const byte *src, uint jtblen, uint &decodelen )
 #define	__SetText2( dic, _src, strcls, single, maxlength ) \
 	{ \
 		__lock__; \
-		const byte *__src = _src; \
+		const uint8_t *__src = _src; \
 		tchar *out = GetBocuOutBuffer(maxlength); \
 		if (out){ \
-			bocu1DecodeT( &__src, (const byte*)UINT_PTR_MAX, maxlength, out ); \
+			bocu1DecodeT( &__src, (const uint8_t*)UINT_PTR_MAX, maxlength, out ); \
 			strcls.set( out ); \
 		} \
 		ReleaseBocuOutBuffer(); \
@@ -361,7 +361,7 @@ byte *Japa::Decode( const byte *src, uint jtblen, uint &decodelen )
 
 // note:
 // NEWDIC4の場合、attrは、SetAll()の前か後ろに直接 japa.attr = attr;というようにsetする。
-void Japa::SetAll( const byte *src, int l, IndexData *dic, bool field2, wa_t _attr)
+void Japa::SetAll( const uint8_t *src, int l, IndexData *dic, bool field2, wa_t _attr)
 {
 #if defined(USE_JLINK)
 	int linkattr = ((Pdic*)dic)->GetLinkAttr( );
@@ -385,12 +385,12 @@ void Japa::SetAll( const byte *src, int l, IndexData *dic, bool field2, wa_t _at
 #endif
 		__SetText1( dic, src, src, japa, _jSingleByte, LJALL );
 		while ( 1 ){
-			byte jt = *src++;
+			uint8_t jt = *src++;
 #ifdef NEWDIC4UNI
 			src++;	// reserved
 #endif
 #if defined(USE_COMP)
-			byte *decode = NULL;
+			uint8_t *decode = NULL;
 #endif
 			uint jtb;
 			uint _srclen;
@@ -407,7 +407,7 @@ void Japa::SetAll( const byte *src, int l, IndexData *dic, bool field2, wa_t _at
 				src += sizeof(t_jtb);
 			}
 			// src : Compの場合:t_noc, Non-Compの場合:t_jlink
-			const byte *_src = src;	// _srcからt_jtbの取得はしないこと！！（圧縮していた場合、t_jtbがオーバフローすることがあるため！）
+			const uint8_t *_src = src;	// _srcからt_jtbの取得はしないこと！！（圧縮していた場合、t_jtbがオーバフローすることがあるため！）
 			_srclen = jtb;	// _srclenは解凍すると解凍後の長さになるので注意！
 #if RO_COMP
 			if ( jt & JT_COMP ){
@@ -518,7 +518,7 @@ void Japa::SetAll( const byte *src, int l, IndexData *dic, bool field2, wa_t _at
 					case JT_REF:
 						{
 #ifdef USE_REF
-							refnum = ( (byte)*_src++ ) / sizeof( short );
+							refnum = ( (uint8_t)*_src++ ) / sizeof( short );
 							for ( i=0;i<refnum;i++ ){
 								refdata[i] = ((short*)_src)++;
 							}
@@ -671,7 +671,7 @@ jmp1:
 #ifdef GUI
 		cmpSetWindow( NULL );
 #endif
-		if ( cmpEncode( (const byte*)src, len, (byte*)codbuf, destlen ) && destlen+sizeof(JLinkStructC)-sizeof(JLinkStruct)+10 < len ){
+		if ( cmpEncode( (const uint8_t*)src, len, (uint8_t*)codbuf, destlen ) && destlen+sizeof(JLinkStructC)-sizeof(JLinkStruct)+10 < len ){
 			// 圧縮後のほうが長い場合も考慮(1996.9.7) - +10はおまけ
 			// 圧縮できた
 			if ( fOver ){
@@ -722,8 +722,8 @@ notcomp:
 #ifdef DIC_UTF16
 #define	__SHORT_PADDING(dst) \
 	if ( (int)dst & 1 ){ /*1byte padding */ \
-		*(byte*)dst = '\0'; \
-		(byte*)dst += 1; \
+		*(uint8_t*)dst = '\0'; \
+		(uint8_t*)dst += 1; \
 	}
 #else	// !DIC_UTF16
 #define	__SHORT_PADDING(dst)	/* nothing */
@@ -733,15 +733,15 @@ notcomp:
 #ifdef DIC_UTF16
 #define	__MCHAR_PADDING(dst) \
 	if ( (int)dst & 1 ){ /*1byte padding */ \
-		*(byte*)dst = '\0'; \
-		(byte*)dst += 1; \
+		*(uint8_t*)dst = '\0'; \
+		(uint8_t*)dst += 1; \
 	} \
 	*(wchar_t*)dst = '\0'; \
 	*(wchar_t**)&(dst) += 1;
 #else	// !DIC_UTF16
 #define	__MCHAR_PADDING(dst) \
 	{ \
-	byte *__dst = (byte*)dst; \
+	uint8_t *__dst = (uint8_t*)dst; \
 	*__dst = '\0'; \
 	__dst++; \
 	dst = __dst; \
@@ -755,14 +755,14 @@ notcomp:
 	dst += srclen;
 #else	// USE_BOCU1
 #define	__GetText( dic, src, srclen, dst ) \
-	dst = bocu1EncodeT( src, (tchar*)((byte*)((wchar_t*)src)+srclen), dst ); \
+	dst = bocu1EncodeT( src, (tchar*)((uint8_t*)((wchar_t*)src)+srclen), dst ); \
 	__SHORT_PADDING(dst);
 #endif	// USE_BOCU1
 
 // lengthがわからない場合で終端'\0'を付加する場合の処理 //
 #if !defined(USE_BOCU1)
 #define	__GetText1( dic, src, dst ) \
-	dst = (byte*)_tcscpy2( (_mchar*)(dst), src );
+	dst = (uint8_t*)_tcscpy2( (_mchar*)(dst), src );
 #else	// USE_BOCU1
 #define	__GetText1( dic, src, dst ) \
 	dst = bocu1EncodeT( src, (tchar*)-1, dst ); \
@@ -790,14 +790,14 @@ notcomp:
 // Note:
 // buf[return]にattrがセットされる(NEWDIC4)
 // NEWDIC4の場合、Get()の後ろに、attr = buf[return];を追加すること
-uint Japa::_Get2( byte *buf, int
+uint Japa::_Get2( uint8_t *buf, int
 #if defined(USE_COMP) || !defined(NOFIELD2)
 	compflag
 #endif
 	, uint limitlen, uint totallen, IndexData *dic ) const
 {
-	byte *p = (byte*)buf;
-	byte *orgp;
+	uint8_t *p = (uint8_t*)buf;
+	uint8_t *orgp;
 //#if MIXDIC && !(defined(DIC_UTF8) && defined(USE_BOCU1))
 #if defined(MIXMJ) || defined(MIXJAPA)	// 2015.2.22 あまり自信が無いが、japaがtchar, _jcharがtcharなら不要のはずなので↑行の条件を変更した
 	_mstrdef( recjapa, (const tchar*)japa, _jSingleByte );
@@ -863,7 +863,7 @@ uint Japa::_Get2( byte *buf, int
 			*p++ = 0;	// reserved
 #endif
 #if defined(USE_COMP) && !defined(USE_BOCU1)
-			if ( (p=(byte*)TextComp( (char*)p, (char*)buf, exp, compflag, limitlen )) == NULL ){
+			if ( (p=(uint8_t*)TextComp( (char*)p, (char*)buf, exp, compflag, limitlen )) == NULL ){
 				return (uint)-1;
 			}
 #else
@@ -884,7 +884,7 @@ uint Japa::_Get2( byte *buf, int
 #ifdef NEWDIC4UNI
 			*p++ = 0;	// reserved
 #endif
-			*p++ = (byte)(refnum * sizeof( short ));
+			*p++ = (uint8_t)(refnum * sizeof( short ));
 			for ( int i =0;i<refnum;i++ ){
 				*((short*)p)++ = refdata[i];
 			}
@@ -896,7 +896,7 @@ uint Japa::_Get2( byte *buf, int
 			*p++ = 0;	// reserved
 #endif
 #if defined(USE_COMP) && !defined(USE_BOCU1)
-			if ( (p=(byte*)TextComp( (char*)p, (char*)buf, pron, compflag, limitlen )) == NULL ){
+			if ( (p=(uint8_t*)TextComp( (char*)p, (char*)buf, pron, compflag, limitlen )) == NULL ){
 				return (uint)-1;
 			}
 #else
@@ -947,14 +947,14 @@ uint Japa::_Get2( byte *buf, int
 			if ( ( compflag & CP_COMP2 ) == CP_COMP2 && l >= CP_MINLEN ){
 				// なるべく圧縮する
 comp:
-				byte *srcbuf = new byte[ l ];	// l には nocomplenが含まれている
+				uint8_t *srcbuf = new uint8_t[ l ];	// l には nocomplenが含まれている
 				if ( !srcbuf ){
 					if ( fOver ){
 						return (uint)-1;	// メモリ不足
 					}
 					goto notcomp;
 				}
-				byte *codbuf = new byte[ l ];
+				uint8_t *codbuf = new uint8_t[ l ];
 				if ( !codbuf ){
 					delete[] srcbuf;
 					if ( fOver ){
@@ -977,7 +977,7 @@ comp:
 				int nocomplen;
 #ifdef USE_BOCU1
 				{
-					byte *p = srcbuf + 1 + sizeof(t_id);
+					uint8_t *p = srcbuf + 1 + sizeof(t_id);
 					// skip compressed title
 					for(;*p;) p++;
 					p++;
@@ -1030,7 +1030,7 @@ comp:
 						jlsc.jlink = (char)jl.GetType( );				// リンクタイプ
 //						jlsc.id = jl.GetID( );
 //						memcpy( jlsc.title, jl.GetTitle( ), titlelen );
-						p = (byte*)&jlsc.id;
+						p = (uint8_t*)&jlsc.id;
 					}
 					memcpy( p, srcbuf, nocomplen - sizeof(t_jlink) );
 					delete[] srcbuf;
@@ -1067,7 +1067,7 @@ notcomp:
 				_alSetUShort( (t_jtb*)p, l+1 );
 				p += sizeof(t_jtb);
 			}
-			*p++ = (byte)jlinks[i].GetType( );
+			*p++ = (uint8_t)jlinks[i].GetType( );
 			if ( !jlinks[i].Get( p ) ){
 				return (uint)-1;		// OLEエラー
 				// エラー処理
@@ -1143,7 +1143,7 @@ void Japa::FreeBocuOutBuffer()
 
 #endif	// USE_BOCU1
 
-byte *Japa::GetBuffer = NULL;
+uint8_t *Japa::GetBuffer = NULL;
 int Japa::GetBufferSize = 0;
 void Japa::FreeGetBuffer()
 {
@@ -1641,7 +1641,7 @@ exit:
 // length[31] == 1 : Field2を使用した場合(NEWDIC3)
 // 戻り値はdeleteしてはいけない
 // return[length]にattr(NEWDIC4)
-byte *Japa::Get2( uint &length, int compflag, uint limitlen, IndexData *dic ) const
+uint8_t *Japa::Get2( uint &length, int compflag, uint limitlen, IndexData *dic ) const
 {
 	__lock__;
 	uint len = GetAllLen( );
@@ -1663,7 +1663,7 @@ byte *Japa::Get2( uint &length, int compflag, uint limitlen, IndexData *dic ) co
 	if (bufsize>GetBufferSize){
 		if (GetBuffer)
 			delete[] GetBuffer;
-		GetBuffer = new byte[bufsize];
+		GetBuffer = new uint8_t[bufsize];
 		if ( !GetBuffer ){
 			GetBufferSize = 0;
 			return NULL;	// メモリ不足
@@ -1736,10 +1736,10 @@ void CatStr( _jMixChar &dest, const tchar *delim, const tchar *src )
 // _mcscpyのreturn valueが次のdestination pointer version
 // return valueは終端'\0'の次へのpointer
 // japaでしか使用しないのでここで宣言
-_mchar *_tcscpy2( register _mchar *dst, register const _mchar *src )
+_mchar *_tcscpy2( _mchar *dst, const _mchar *src )
 {
 	for(;;){
-		register _mchar c = *src++;
+		_mchar c = *src++;
 		*dst++ = c;
 		if ( c == '\0' ){
 			break;

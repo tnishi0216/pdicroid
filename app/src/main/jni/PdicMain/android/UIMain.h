@@ -7,6 +7,7 @@
 class IPdicMain {
 public:
 	virtual class MPdic *GetActiveDic() = 0;
+	virtual ~IPdicMain(){}
 };
 
 class IWordEdit {

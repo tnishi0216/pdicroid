@@ -20,7 +20,7 @@ int BIFile::open( const tchar* _filename )
 //バイナリファイル専用読み込みルーチン
 int BIFile::read( void *buf, int len )
 {
-	register int d;
+	int d;
 	if ( ( d = ::read( fd, buf, len )) <= 0 ){
 		return -1;
 	}

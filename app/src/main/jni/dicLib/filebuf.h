@@ -55,7 +55,7 @@ private:
 #endif
 	int &error;
 #ifdef SWAP_ENDIAN
-	byte seqbuf[SEQBUFFSIZE];	//シーケンシャルアクセスバッファ
+	uint8_t seqbuf[SEQBUFFSIZE];	//シーケンシャルアクセスバッファ
 	int seqloc;
 #endif
 private:

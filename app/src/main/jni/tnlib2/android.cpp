@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <wchar.h>
+#include <unistd.h>
 
 static tnstr TemporaryDirectory;
 

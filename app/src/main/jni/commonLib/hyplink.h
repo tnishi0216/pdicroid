@@ -38,11 +38,11 @@ struct THyperLink {
 	union {
 		unsigned int unnamed;
 		struct {
-			byte type;		// マウスクリック時の動作
-			byte item;		// 発音記号、日本語訳、用例・・・
-			byte bookno;	// EPWING用
-			byte bxtag : 1;	// HTML Tag(bx)
-			byte state : 7;	// 1:BoxOpen/0:Close for HLT_HTML_BXTAG
+			uint8_t type;		// マウスクリック時の動作
+			uint8_t item;		// 発音記号、日本語訳、用例・・・
+			uint8_t bookno;	// EPWING用
+			uint8_t bxtag : 1;	// HTML Tag(bx)
+			uint8_t state : 7;	// 1:BoxOpen/0:Close for HLT_HTML_BXTAG
 		};
 	};
 	tnstr key;		// 検索用の単語, URL for HLT_HTML_HREF, title for HLT_HTML_BXTAG
@@ -88,10 +88,10 @@ protected:
 
 public:
 	THyperLinks( );
-	int ExtractStaticWords( byte item, const tchar *text );
+	int ExtractStaticWords( uint8_t item, const tchar *text );
 
 	void StartEnum();
-	THyperLink *Next(byte type);
+	THyperLink *Next(uint8_t type);
 };
 
 extern "C" {
@@ -99,6 +99,6 @@ THyperLink * WINAPI HyperLinkAdd( THyperLinks *hls );
 }
 
 extern class Pdic *HypLinkCurrentDic;
-extern byte HypLinkCurrentItem;
+extern uint8_t HypLinkCurrentItem;
 
 #endif

@@ -49,9 +49,7 @@ void __tnstrA::setUTF8(const wchar_t *utf16, int utf16_len)
 	if (!buf_new)
 		return;	// error
 	UTF16toUTF8(utf16, utf16_len, buf_new);
-	if (buf){
-		delete[] buf;
-	}
+	delete[] buf;
 	buf = buf_new;
 }
 #endif
@@ -70,9 +68,7 @@ void __tnstrA::setUTF8(const wchar_t *utf32, int utf32_len)
 	if (!buf_new)
 		return;	// error
 	UTF32toUTF8((const utf32_t*)utf32, utf32_len, buf_new);
-	if (buf){
-		delete[] buf;
-	}
+	delete[] buf;
 	buf = buf_new;
 }
 #endif
@@ -98,9 +94,7 @@ void __tnstrA::setAnsi(const wchar_t *utf16, int utf16_len)
 		return;	// error
 	}
 	buf_new[ret] = '\0';
-	if (buf){
-		delete[] buf;
-	}
+	delete[] buf;
 	buf = buf_new;
 }
 #endif
@@ -181,9 +175,7 @@ void __tnstrW::setUTF8(const char *utf8, int utf8_len)
 		return;	// error
 	UTF8toUTF32(utf8, utf8_len, (utf32_t*)buf_new);
 #endif
-	if (buf){
-		delete[] buf;
-	}
+	delete[] buf;
 	buf = buf_new;
 }
 
@@ -204,9 +196,7 @@ void __tnstrW::setAnsi(const char *ansi, int ansi_len)
 		return;	// error
 	int wlen = MultiByteToWideChar(CP_ACP, 0, ansi, ansi_len, buf_new, buf_len);
 	buf_new[wlen] = '\0';
-	if (buf){
-		delete[] buf;
-	}
+	delete[] buf;
 	buf = buf_new;
 }
 #else
@@ -228,9 +218,7 @@ void __tnstrW::setAsc(const char *asc, int asc_len)
 		*dp++ = *asc++;
 	}
 	buf_new[asc_len] = '\0';
-	if (buf){
-		delete[] buf;
-	}
+	delete[] buf;
 	buf = buf_new;
 }
 #endif

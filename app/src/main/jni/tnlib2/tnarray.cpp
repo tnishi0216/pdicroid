@@ -17,8 +17,7 @@ ObjectArrayBase::ObjectArrayBase( int _maxnum )
 ObjectArrayBase::~ObjectArrayBase()
 {
 	clear();
-	if (array)
-		delete[] array;
+	delete[] array;
 }
 
 void ObjectArrayBase::clear( void )

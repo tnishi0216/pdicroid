@@ -33,7 +33,7 @@ __ustr::__ustr( const wchar_t *str )
 }
 __ustr::~__ustr()
 {
-	if ( newbuffer ) delete[] newbuffer;
+	delete[] newbuffer;
 }
 __ustr::operator char *()
 {

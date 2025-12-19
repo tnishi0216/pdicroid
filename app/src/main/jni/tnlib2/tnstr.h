@@ -10,7 +10,6 @@
 #include <vector>
 #include <map>
 #endif
-using namespace std;
 
 #ifdef __BORLANDC__	
 #pragma option push
@@ -109,7 +108,7 @@ public:
 #endif
 	virtual ~__tnstrT()
 	{
-		if (buf) delete[] buf;
+		delete[] buf;
 	}
 
 	// Simple Operations //
@@ -131,9 +130,7 @@ public:
 			}
 		}
 		p[0] = '\0';
-		if (buf_del){
-			delete[] buf_del;
-		}
+		delete[] buf_del;
 		return str ? (T*)str : 0;
 	}
 	void cat(const T *str)
@@ -155,8 +152,7 @@ public:
 			*p++ = *str++;
 		}
 		p[0] = '\0';
-		if (buf)
-			delete[] buf;
+		delete[] buf;
 		buf = newbuf;
 	}
 	void cat( const T *str1, const T *str2 )
@@ -172,8 +168,7 @@ public:
 		memcpy( p+l, str1, len1*sizeof(T) );
 		memcpy( p+l+len1, str2, len2*sizeof(T) );
 		p[l+len1+len2] = '\0';
-		if (buf)
-			delete[] buf;
+		delete[] buf;
 		buf = p;
 	}
 	void cat(const T c)
@@ -185,8 +180,7 @@ public:
 		memcpy( p, buf, l*sizeof(T) );
 		p[l] = c;
 		p[l+1] = '\0';
-		if (buf)
-			delete[] buf;
+		delete[] buf;
 		buf = p;
 	}
 	T *get(T *str, int len)
@@ -227,7 +221,7 @@ public:
 	}
 	void setBuf(T *newbuf)
 	{
-		if (buf) delete[] buf;
+		delete[] buf;
 		buf = newbuf;
 	}
 	T *discard()
@@ -610,8 +604,8 @@ __tnstrA tnsprintfA(const char *fmt, ...);
 __tnstrA _tnsprintfA(const char *fmt, va_list arg);
 
 #ifndef __NO_WINDOWS_H
-typedef map<__tnstrW,__tnstrW> tnstrW_map;
-typedef map<__tnstrA,__tnstrA> tnstrA_map;
+typedef std::map<__tnstrW,__tnstrW> tnstrW_map;
+typedef std::map<__tnstrA,__tnstrA> tnstrA_map;
 #endif
 
 #if defined(_UNICODE) && !defined(__UTF8)

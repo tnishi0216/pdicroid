@@ -503,7 +503,7 @@ bool TQueHistory::SaveQueFile()
 		tnstr filename = File.GetFileName();
 		if ( tof->open(filename) == -1 ){
 			// ‚±‚±‚É—ˆ‚é‚±‚Æ‚È‚ñ‚Ä‚ ‚è“¾‚È‚¢‚ª
-			return NULL;
+			return false;
 		}
 		tof->end();
 	}

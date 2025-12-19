@@ -103,8 +103,8 @@ __kstr::operator char *()
 
 	// WideChar to BOCU
 
-	*(byte**)&newbuffer = slab_alloc( length*3 + 1, byte );
-	*bocu1EncodeT( (tchar*)buffer, (tchar*)buffer+length, (byte*)newbuffer, Translator->encodeKT) = '\0';
+	*(uint8_t**)&newbuffer = slab_alloc( length*3 + 1, uint8_t );
+	*bocu1EncodeT( (tchar*)buffer, (tchar*)buffer+length, (uint8_t*)newbuffer, Translator->encodeKT) = '\0';
 	return (char*)newbuffer;
 }
 __kstr::operator wchar_t *()
@@ -114,9 +114,9 @@ __kstr::operator wchar_t *()
 
 	// BOCU to WideChar
 
-	const byte *b = (byte*)buffer;
+	const uint8_t *b = (uint8_t*)buffer;
 	*(wchar_t**)&newbuffer = slab_alloc( length*4, wchar_t );
-	bocu1DecodeT( &b, (byte*)buffer+length, length*4, (tchar*)newbuffer, NULL, Translator->decodeKT );
+	bocu1DecodeT( &b, (uint8_t*)buffer+length, length*4, (tchar*)newbuffer, NULL, Translator->decodeKT );
 	return (wchar_t*)newbuffer;
 }
 // BOCU1 -> UTF8ïœä∑êÍópclass
@@ -135,10 +135,10 @@ __kstr_utf8::operator const char *()
 {
 	if ( newbuffer ) return (char*)newbuffer;
 
-	const byte *b = (byte*)buffer;
+	const uint8_t *b = (uint8_t*)buffer;
 	int length = strlen((char*)buffer);
 	*(char**)&newbuffer = slab_alloc( length*4, char );
-	bocu1DecodeUTF8( &b, (byte*)buffer+length, length*4, newbuffer );
+	bocu1DecodeUTF8( &b, (uint8_t*)buffer+length, length*4, newbuffer );
 	return newbuffer;
 }
 #endif	// INETDIC

@@ -73,7 +73,7 @@ int JLinkArray::Search( int i, Pdic *dic, t_id id )
 // super::datarefは使用しない
 //
 // _dataはNULLでも可能:その場合はﾊﾞｯﾌｧを新規確保するだけ
-JLinkObject::JLinkObject( const byte *_data, int _len )
+JLinkObject::JLinkObject( const uint8_t *_data, int _len )
 {
 	Set( _data, _len );
 }
@@ -81,8 +81,8 @@ JLinkObject::JLinkObject( const byte *_data, int _len )
 // _dataは、JLinkObjectの参照となる
 // したがって、JLinkObject objectがdeleteされるまでは有効でなければならない
 // ただし、１回以上誤って余計にやると data は削除されるので要注意！！
-JLinkObject::JLinkObject( const byte *_data, int _len, bool /* reference */ )
-	:super((byte*)_data, _len, true)
+JLinkObject::JLinkObject( const uint8_t *_data, int _len, bool /* reference */ )
+	:super((uint8_t*)_data, _len, true)
 {
 	//TODO: refcntは1で大丈夫？(originalは2だった)
 }
@@ -94,10 +94,10 @@ bool JLinkObject::_Validate( )
 	return data ? true : false;
 }
 
-bool JLinkObject::Set( const byte *_data, int _len )
+bool JLinkObject::Set( const uint8_t *_data, int _len )
 {
-	if ( super::data && (byte*)super::data == _data ) return true;
-	byte *p = new byte[ _len ];
+	if ( super::data && (uint8_t*)super::data == _data ) return true;
+	uint8_t *p = new uint8_t[ _len ];
 	if ( !p )
 		return false;
 	if (_data)
@@ -106,9 +106,9 @@ bool JLinkObject::Set( const byte *_data, int _len )
 	return true;
 }
 
-bool JLinkObject::Get( byte *buf )
+bool JLinkObject::Get( uint8_t *buf )
 {
-	if ( (byte*)super::data == buf ) return true;
+	if ( (uint8_t*)super::data == buf ) return true;
 	if ( super::data ){
 		memcpy( buf, super::data, datalen );
 		return true;
@@ -118,7 +118,7 @@ bool JLinkObject::Get( byte *buf )
 
 #else	// old : to be deleted.
 // _dataはNULLでも可能:その場合はﾊﾞｯﾌｧを新規確保するだけ
-JLinkObject::JLinkObject( const byte *_data, DWORD _len )
+JLinkObject::JLinkObject( const uint8_t *_data, DWORD _len )
 {
 	data = NULL;
 	if ( Set( _data, _len ) ){
@@ -132,9 +132,9 @@ JLinkObject::JLinkObject( const byte *_data, DWORD _len )
 // _dataは、JLinkObjectの参照となる
 // したがって、JLinkObject objectがdeleteされるまでは有効でなければならない
 // ただし、１回以上誤って余計にやると data は削除されるので要注意！！
-JLinkObject::JLinkObject( const byte *_data, DWORD _len, bool /* reference */ )
+JLinkObject::JLinkObject( const uint8_t *_data, DWORD _len, bool /* reference */ )
 {
-	data = (byte*)_data;
+	data = (uint8_t*)_data;
 	len = _len;
 	ref = 2;	// １つ余計に
 }
@@ -178,10 +178,10 @@ BOOL JLinkObject::Activate( )
 	return fActive;
 }
 
-BOOL JLinkObject::Set( const byte *_data, DWORD _len )
+BOOL JLinkObject::Set( const uint8_t *_data, DWORD _len )
 {
 	if ( data && data == _data ) return TRUE;
-	byte *p = new byte[ _len ];
+	uint8_t *p = new uint8_t[ _len ];
 	if ( !p )
 		return FALSE;
 	DeleteObject();
@@ -192,7 +192,7 @@ BOOL JLinkObject::Set( const byte *_data, DWORD _len )
 	return TRUE;
 }
 
-BOOL JLinkObject::Get( byte *buf )
+BOOL JLinkObject::Get( uint8_t *buf )
 {
 	if ( data == buf ) return TRUE;
 	if ( data ){
@@ -370,7 +370,7 @@ int JLink::GetCFType( )
 	}
 }
 // 辞書のdata bufferへtitleをcopyする
-byte *JLink::GetTitle( byte *buf )
+uint8_t *JLink::GetTitle( uint8_t *buf )
 {
 #ifdef USE_BOCU1
 	buf = bocu1EncodeT( title, (tchar*)-1, buf );
@@ -380,11 +380,11 @@ byte *JLink::GetTitle( byte *buf )
 #if defined(DIC_UTF8)
 #error	not yet supported
 #endif
-	return (byte*)nstrcpy( (tchar*)buf, title );
+	return (uint8_t*)nstrcpy( (tchar*)buf, title );
 #endif
 }
 #ifdef USE_BOCU1
-void JLink::SetTitle( const byte *buf )
+void JLink::SetTitle( const uint8_t *buf )
 {
 	tchar *s = bocu1DecodeStr( buf );
 	title.set( s );
@@ -734,7 +734,7 @@ int JLUFO::GetLength( )
 	return 0;
 }
 
-BOOL JLUFO::Get( byte *buf )
+BOOL JLUFO::Get( uint8_t *buf )
 {
 	*(t_id*)buf = GetID();
 	*(t_extra *)(buf+sizeof(t_id)) = ExtraData;
@@ -744,7 +744,7 @@ BOOL JLUFO::Get( byte *buf )
 	return TRUE;
 }
 
-BOOL JLUFO::Set( const byte *buf, int len )
+BOOL JLUFO::Set( const uint8_t *buf, int len )
 {
 	if ( jlobj ){
 		jlobj->Release( );
@@ -778,7 +778,7 @@ void JLUFO::Set(JLinkObject *_jlobj)
 // bufは所有しない
 // bufは他の関数と異なり、正味のデータの先頭であることに注意！！(IDは含まない)
 // IDはSetID()で、別途Setする必要がある。
-bool JLUFO::SetRef( const byte *buf, int len )
+bool JLUFO::SetRef( const uint8_t *buf, int len )
 {
 	if ( jlobj ){
 		jlobj->Release( );

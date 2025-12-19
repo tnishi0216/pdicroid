@@ -535,7 +535,6 @@ tnstr TRegKeyR::ReadString(const tchar *name, const tchar *defval)
 		buf[0] = '\0';	// regedit.exeで空の文字列を作成すると１バイトの'\0'ができあがるためこの処理が必要(Win2Kで確認)
 #endif
 		if (!QueryValue( name, buf, len )){
-			delete[] buf;
 			return defval;
 		}
 		return tnstr(buf);
@@ -698,7 +697,7 @@ bool TRegKeyR::EnumKey( DWORD index, tnstr &name )
 
 }
 
-bool TRegKeyR::EnumValues(tnstr_vec &array)
+bool TRegKeyR::EnumValues(tnstr_vec &array) const
 {
 	for (int i=0;;i++){
 		tnstr *name = new tnstr;
@@ -806,7 +805,7 @@ bool TRegKeyIni::KeyExists(const tchar *name)
 	DWORD dwRet = GetPrivateProfileString(_uustrT(keyname), NULL, _T(""), buffer, buffer_size, _uustrT(FileName));
 	return dwRet>0;	// one or more names exist in the sub section.
 }
-bool TRegKeyIni::ValueExists(const tchar *valuename)
+bool TRegKeyIni::ValueExists(const tchar *valuename) const
 {
 	tnstr_vec values;
 	EnumValues(values);
@@ -864,7 +863,7 @@ bool TRegKeyIni::EnumKeys( tnstr_vec &array )
 	}
 	return true;
 }
-bool TRegKeyIni::EnumValues(tnstr_vec &array)
+bool TRegKeyIni::EnumValues(tnstr_vec &array) const
 {
 	const int MAXIMUM_CONTENT_SIZE = 16384;	// これ以上大きいデータは読み込みできない
 	int buffer_size = MAXIMUM_CONTENT_SIZE;
@@ -885,11 +884,11 @@ bool TRegKeyIni::EnumValues(tnstr_vec &array)
 	delete[] buffer;
 	return true;
 }
-int TRegKeyIni::ReadInteger( const tchar *name, int defval )
+int TRegKeyIni::ReadInteger( const tchar *name, int defval ) const
 {
 	return GetPrivateProfileInt(SectionName, name, defval, FileName);
 }
-tnstr TRegKeyIni::ReadString(const tchar *key, const tchar *defval)
+tnstr TRegKeyIni::ReadString(const tchar *key, const tchar *defval) const
 {
 	DWORD buffer_size = 1024;
 	tchar auto_buf[1024+1];

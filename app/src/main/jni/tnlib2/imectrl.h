@@ -4,4 +4,4 @@
 void IMEOpen( HWND hwnd, BOOL f );
 BOOL IsIMEOpened( HWND hwnd );
 
-#endif	__IMECTRL_H
+#endif	// __IMECTRL_H

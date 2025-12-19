@@ -108,5 +108,5 @@ class BitmapGDI {
 };
 
 
-#endif	__GDI_H
+#endif	// __GDI_H
 

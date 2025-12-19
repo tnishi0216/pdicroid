@@ -10,7 +10,7 @@
 static HWND hwndZLIB;
 #endif
 
-int zlibEncode( const byte *sp, long sp_len, byte *dp, long &destlen )
+int zlibEncode( const uint8_t *sp, long sp_len, uint8_t *dp, long &destlen )
 {
 	ZLIB_HEADER *header = (ZLIB_HEADER*)dp;
 	header->size = sizeof(ZLIB_HEADER);
@@ -33,7 +33,7 @@ int zlibEncode( const byte *sp, long sp_len, byte *dp, long &destlen )
 	return 1;
 }
 
-int zlibDecode( const byte *src, long srclen, byte *dest, long &destlen )
+int zlibDecode( const uint8_t *src, long srclen, uint8_t *dest, long &destlen )
 {
 	ZLIB_HEADER *header = (ZLIB_HEADER*)src;
 	if (header->size<sizeof(ZLIB_HEADER)

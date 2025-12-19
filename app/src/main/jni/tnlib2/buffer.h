@@ -3,7 +3,7 @@
 
 class Buffer {
 protected:
-	byte *buf;
+	uint8_t *buf;
 	int size;
 public:
 	Buffer( int _size );
@@ -13,11 +13,11 @@ public:
 	~Buffer();
 	operator char *()
 		{ return (char*)buf; }
-	operator byte *()
+	operator uint8_t *()
 		{ return buf; }
 //		char &operator[]( int i )
 //			{ return buf[i]; }
-	byte &operator[]( int i )
+	uint8_t &operator[]( int i )
 		{ return buf[i]; }
 	int GetSize( )
 		{ return size; }

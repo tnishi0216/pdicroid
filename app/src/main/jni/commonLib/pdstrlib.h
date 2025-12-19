@@ -42,9 +42,9 @@ inline bool ishex(unsigned char c)
 }
 
 // •¶Žš—ñ //
-tchar *BinToHex( const byte *bin, int bytes );	// obsolete, use bintohex
-tchar *bintohex( tchar *buffer, const byte *bin, int bytes );
-tnstr bintohex( const byte *bin, int bytes );
+tchar *BinToHex( const uint8_t *bin, int bytes );	// obsolete, use bintohex
+tchar *bintohex( tchar *buffer, const uint8_t *bin, int bytes );
+tnstr bintohex( const uint8_t *bin, int bytes );
 bool ReplaceString( tchar *str, const tchar *target, const tchar *newstring );
 tnstr replace(const tchar *str, const tchar *pat, const tchar *sub);
 void ReplaceCRLF(tnstr &str);
@@ -54,7 +54,7 @@ void EscapeURIString( const char *str1, __tnstrA &str2 );
 bool IsRegularChar(tchar c);
 bool EscapeRegular(const tchar *str, tnstr &escstr, bool multibyte);
 void NormalizeCRLF( const tchar *str, tchar *buf, const tchar *crlf );
-tchar *bocu1DecodeStr( const byte *data, const byte **_end=NULL );
+tchar *bocu1DecodeStr( const uint8_t *data, const uint8_t **_end=NULL );
 
 // Time //
 tnstr time2str(timex_t t);

@@ -10,16 +10,16 @@ struct ZLIB_HEADER {
 	unsigned long blocksize;	// 0のときは、blocksize=orgsize
 };
 
-int zlibEncode( const byte *src, long srclen, byte *dest, long &destlen );
-int zlibDecode( const byte *src, long srclen, byte *dest, long &destlen );
-unsigned long zlibGetOrgSize( const byte *header );
+int zlibEncode( const uint8_t *src, long srclen, uint8_t *dest, long &destlen );
+int zlibDecode( const uint8_t *src, long srclen, uint8_t *dest, long &destlen );
+unsigned long zlibGetOrgSize( const uint8_t *header );
 int zlibGetErrorCode( );
 #ifdef _WINDOWS
 void zlibSetWindow( HWND hwnd );
 #endif
 
 // オリジナルサイズの取得（拡張ヘッダーサイズは含まない）
-inline unsigned long zlibGetOrgSize( const byte *header )
+inline unsigned long zlibGetOrgSize( const uint8_t *header )
 {
 	return ((const ZLIB_HEADER *)header)->orgsize;
 }

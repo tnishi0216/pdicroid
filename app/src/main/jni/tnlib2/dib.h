@@ -113,4 +113,4 @@ BOOL      FAR  SaveDIB( HDIB );
 void BitBltDIB( HDC hdc, RECT *dcRect, RECT *dibRect, HDIB hDib );
 void StretchBltDIB( HDC hdc, RECT *dcRect, RECT *dibRect, HDIB hDib );
 
-#endif	__DIB_H
+#endif	// __DIB_H

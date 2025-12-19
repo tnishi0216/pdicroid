@@ -219,4 +219,5 @@ public:
 //	void AppendExtension();
 };
 
-#endif	__COMFILE_H
+#endif	// __COMFILE_H
+

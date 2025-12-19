@@ -16,14 +16,12 @@ Str::Str(int _maxlen)
 
 Str::~Str()
 {
-	if (buf)
-		delete buf;
+	delete[] buf;
 }
 
 void Str::set(const char *str)
 {
-	if (buf)
-		delete buf;
+	delete[] buf;
 	buf = new char[strlen(str)+1];
 	strcpy(buf, str);
 }

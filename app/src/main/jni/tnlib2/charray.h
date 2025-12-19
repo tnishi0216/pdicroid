@@ -1,32 +1,7 @@
 #ifndef	__CHARRAY_H
 #define	__CHARRAY_H
 
-//#include	"char.h"
 #include "tnstr.h"
-
-#if 0	// いらない？
-class CharArray {
-protected:
-	__Char **array;
-	int num;
-	int maxnum;
-public:
-	CharArray( int _maxnum );
-	virtual ~CharArray();
-//		void set( const tchar *str );
-	int add( const tchar *str );
-	int add( __Char *obj );
-	void del( const tchar *str );
-	void _del( int i );
-	void clear( void );				//全てのクリア
-	void clear( int i )			{ array[i]->clear(); }
-	int is_clear( void );
-	int is_clear( int i )
-		{ return array[i]->is_clear(); }
-	int get_num( void )	{return num;}
-	const tchar *operator [](int i)	{return *array[i];}
-};
-#endif
 
 #include "tnarray.h"
 

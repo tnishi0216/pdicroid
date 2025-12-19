@@ -204,28 +204,20 @@ Squre::Squre(class TSquareFrame*frame, class TSquareView *view, TSquItemView &it
 
 Squre::~Squre()
 {
-	if (SrchParams)
-		delete SrchParams;
-	if (sub_srchparams)
-		delete sub_srchparams;
-	if (sub_words)
-		delete sub_words;
+	delete SrchParams;
+	delete sub_srchparams;
+	delete sub_words;
 	while (DelFiles.size()){
 		DeleteFile(DelFiles[0]);
 		DelFiles.del(0);
 	}
-	if (dicGroup)
-		delete dicGroup;
-	if (&Dic)
-		delete &Dic;
+	delete dicGroup;
+	delete &Dic;
 #if INETDIC
-	if (InetDicMan)
-		delete InetDicMan;
+	delete InetDicMan;
 #endif
-	if (MouseCap)
-		delete MouseCap;
-	if (SrchMed)
-		delete SrchMed;
+	delete MouseCap;
+	delete SrchMed;
 }
 
 void Squre::SetUIMain(TSquUIMain *uimain)
@@ -465,7 +457,7 @@ bool Squre::CanCloseMessage( )
 
 }
 
-#include "dicproc.h"
+#include "Dicproc.h"
 #include "filestr.h"
 #include "msgdlg.h"
 #include "id.h"
@@ -632,8 +624,7 @@ jretry:;
 #endif
 #endif
 #if INETDIC
-		if (InetDicMan)
-			delete InetDicMan;
+		delete InetDicMan;
 		InetDicMan = TInetDicUIMan::CreateInstance(*TUIMain::GetInstance(), Dic);
 #endif
 		Open( );
@@ -810,6 +801,8 @@ bool Squre::_IsPopupOpened() const
 {
 #ifdef USE_PS
 	return ps && ps->IsOpened();
+#else
+	return false;
 #endif
 }
 

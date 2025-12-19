@@ -2,6 +2,7 @@
 #pragma hdrstop
 #include <time.h>
 #include <unistd.h>
+#include <string.h>
 
 #define	min(x,y)	((x)<(y)?(x):(y))
 

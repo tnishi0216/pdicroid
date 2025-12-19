@@ -56,8 +56,8 @@ typedef unsigned char _muchar;
 #ifdef DIC_UTF8
 #define	_mmbsnicmp	strnicmp
 #define	_mtoi		atoi
-#define	_misleadbyte(c)	(((byte)(c)>=0xC0)||((byte)(c)<0x80)?true:false)
-#define	_mcharlength(c)	((uchar)(c)<0x80?1:((uchar)(c)<0xE0?2:((uchar)(c)<0xF0?3:4)))
+#define	_misleadbyte(c)	(((uint8_t)(c)>=0xC0)||((uint8_t)(c)<0x80)?true:false)
+#define	_mcharlength(c)	((uint8_t)(c)<0x80?1:((uint8_t)(c)<0xE0?2:((uint8_t)(c)<0xF0?3:4)))
 #else	// for shift-jis
 #define	_mmbsnicmp	_mbsnicmp
 #define	_misleadbyte(c)	_ismbblead(c)

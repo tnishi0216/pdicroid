@@ -418,8 +418,7 @@ TOFile::TOFile()
 TOFile::~TOFile()
 {
 	close( );
-	if (writebuff)
-		delete[] writebuff;
+	delete[] writebuff;
 }
 
 int TOFile::open( const tchar *_filename )

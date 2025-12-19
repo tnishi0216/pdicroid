@@ -7,7 +7,7 @@ class TDataBufBase {
 protected:
 	class PdicData *Data;
 	unsigned BlockSize;
-	byte *DataBuf;
+	uint8_t *DataBuf;
 public:
 	TDataBufBase(class PdicData *data);
 	virtual ~TDataBufBase();
@@ -20,9 +20,9 @@ public:
 class TDataBufMemMap : public TDataBufBase {
 typedef TDataBufBase super;
 protected:
-	byte *LastPtr;	// for seek/read operation
+	uint8_t *LastPtr;	// for seek/read operation
 	class TMmfMap *MM;
-	byte *BaseAddr;
+	uint8_t *BaseAddr;
 public:
 	TDataBufMemMap(PdicData *data);
 	virtual ~TDataBufMemMap();
@@ -32,11 +32,11 @@ public:
 	bool isOpened() const
 		{ return MM!=NULL; }
 	// databuf //
-	byte *alloc(t_pbn2 pbn, t_blknum _blknum);
+	uint8_t *alloc(t_pbn2 pbn, t_blknum _blknum);
 	void setDataPbn(t_pbn2 pbn);
-	byte *getDataBuf() const
+	uint8_t *getDataBuf() const
 		{ return DataBuf; }
-	byte *getDataPtr(t_pbn2 pbn)
+	uint8_t *getDataPtr(t_pbn2 pbn)
 		{ return BaseAddr + pbn*BlockSize; }
 
 	// mode //
@@ -55,7 +55,7 @@ public:
 	int write(t_pbn2 pbn);
 	int write(t_pbn2 pbn, const void *data, int len, int off);
 	int write(const void *data, int len);
-	int fill(byte data, int len);
+	int fill(uint8_t data, int len);
 	bool flush( ){ return true; }
 	bool invalidate( ){ return true; }
 
@@ -88,9 +88,9 @@ public:
 	bool writeBlockNum(t_pbn2 pbn, t_blknum blknum);
 	t_blknum readBlockNum(t_pbn2 pbn)
 		{ return *(t_blknum*)getDataPtr(pbn); }
-	void set(t_pbn2 pbn, byte *data, t_blknum blknum);
+	void set(t_pbn2 pbn, uint8_t *data, t_blknum blknum);
 	void resetWrite(){}
-	void setDataBuf(byte *new_databuf, t_blknum blknum, t_pbn2 pbn);
+	void setDataBuf(uint8_t *new_databuf, t_blknum blknum, t_pbn2 pbn);
 	void grow(t_pbn2 oldpbn, t_pbn2 newpbn, int old_blknum, int new_blknum);
 	void shrink(int new_blknum);
 };
@@ -111,11 +111,11 @@ public:
 	bool Open(unsigned blocksize);
 	void Close();
 
-	byte *alloc(t_pbn2 pbn, t_blknum _blknum);
-	byte *alloc_opt(t_pbn2 pbn, t_blknum _blknum);
-	inline byte *getDataBuf()
+	uint8_t *alloc(t_pbn2 pbn, t_blknum _blknum);
+	uint8_t *alloc_opt(t_pbn2 pbn, t_blknum _blknum);
+	inline uint8_t *getDataBuf()
 		{ return DataBuf; }
-	void setDataBuf(byte *ptr, t_blknum blknum, t_pbn2 pbn);
+	void setDataBuf(uint8_t *ptr, t_blknum blknum, t_pbn2 pbn);
 protected:
 	void _setDataBuf(t_blknum _blknum, t_pbn2 bpn);
 public:
@@ -140,7 +140,7 @@ public:
 		writef = 0;
 #endif
 	}
-	void set(t_pbn2 pbn, byte *data, t_blknum blknum);
+	void set(t_pbn2 pbn, uint8_t *data, t_blknum blknum);
 
 	t_blknum readBlockNum(t_pbn2 pbn);
 	bool writeBlockNum(t_pbn2 pbn, t_blknum blknum);
@@ -171,7 +171,7 @@ public:
 		{ return BlockSize*getBlockNum(); }
 	// defined in HDicData.cpp
 	int prevWord(uint &loc ,_kchar *wbuf);
-	const byte *srchTail( _kchar *wbuf );
+	const uint8_t *srchTail( _kchar *wbuf );
 	int GetFieldHeaderSize()
 		{ return isField2() ? L_FieldHeader2 : L_FieldHeader; }
 	int isEmpty();
@@ -257,7 +257,7 @@ protected:
 	FileBuf &file;
 
 	bool canGrow;				// ブロックサイズを大きくすることができる？
-	byte dictype;
+	uint8_t dictype;
 	short version;
 
 	TZeroBuffer zeroBuffer;
@@ -344,14 +344,14 @@ public:
 	void ChangeOffset( int offs );
 
 	//情報取得
-	const byte *getDataBuf(void)
+	const uint8_t *getDataBuf(void)
 		{ return databuf.getDataBuf(); }		//(_kchar*)でキャスティングしているところがあるので後で直す！
-	byte *_getDataBuf( )								//databuf can be change
+	uint8_t *_getDataBuf( )								//databuf can be change
 		{ databuf.flush(); return databuf.getDataBuf(); }
 	void InvalidDataBuf();
 
 	// databufを指定のバッファに置き換える
-	bool SetDataBuf( t_pbn2 pbn, const byte *p, int _blknum);
+	bool SetDataBuf( t_pbn2 pbn, const uint8_t *p, int _blknum);
 
 
 	//後方検索（dicsub1.cpp)

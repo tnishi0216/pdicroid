@@ -116,7 +116,7 @@ int DllDictionaryT<T>::ReadObject(JapaT<T> &japa)
 				delete obj;
 				continue;
 			}
-			byte *data = new byte[len];
+			uint8_t *data = new uint8_t[len];
 			if (!data)
 				goto jerror;
 			memcpy(data, fnPDGetDataBinary(hobj), len);

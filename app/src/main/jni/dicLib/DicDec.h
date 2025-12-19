@@ -15,8 +15,8 @@ public:
 	static bool IsDicDecData(const struct HEADER *header);
 	unsigned GetDecodeSize(const char *data);
 	unsigned GetDecodeSizeForDB(const char *data);
-	unsigned Decode(const char *data, byte *out);
-	void DecodeForDB(const char *data, byte *out);
+	unsigned Decode(const char *data, uint8_t *out);
+	void DecodeForDB(const char *data, uint8_t *out);
 };
 
 #endif

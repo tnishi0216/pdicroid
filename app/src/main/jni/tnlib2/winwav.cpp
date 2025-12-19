@@ -167,7 +167,7 @@ void WaveIO::Close( )
 
 // buffer, lengthは初期値を与える(実際のデータに必要なものより小さくても構わない)
 // bufferは必ずGlobalAlloc()で割り当てたものであること
-BOOL WaveIO::MemoryCreate( byte *buffer, DWORD length, FOURCC fccHeader )
+BOOL WaveIO::MemoryCreate( uint8_t *buffer, DWORD length, FOURCC fccHeader )
 {
 	MMIOINFO mminfo;
 	memset( &mminfo, 0, sizeof(MMIOINFO) );

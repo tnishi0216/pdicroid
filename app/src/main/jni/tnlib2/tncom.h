@@ -6,7 +6,6 @@
 /*--------------------------------------*/
 /*		TNCLASS‹¤’ÊINCLUDEƒtƒ@ƒCƒ‹		*/
 /*--------------------------------------*/
-//#include	"char.h"
 #include	"tnarray.h"
 #include	"charray.h"
 #include "harray.h"

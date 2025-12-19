@@ -44,9 +44,9 @@ _mchar *_mstrcut( _mchar *str, size_t len )
 #endif	// DIC_UTF8
 
 #ifdef UNICODE
-tchar *bocu1DecodeStr( const byte *data, const byte **_end )
+tchar *bocu1DecodeStr( const uint8_t *data, const uint8_t **_end )
 {
-	const byte *end = data;
+	const uint8_t *end = data;
 	for(;*end;) end++;
 	if (_end) *_end = end;
 	return bocu1DecodeT( &data, end, ((int)(end-data))*4+sizeof(tchar) );

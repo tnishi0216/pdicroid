@@ -24,11 +24,9 @@ GenericRexp::GenericRexp( )
 GenericRexp::~GenericRexp( )
 {
 #ifdef _UNICODE
-	if (Buffer)
-		delete[] Buffer;
+	delete[] Buffer;
 #endif
-	if (next)
-		delete next;
+	delete next;
 }
 BOOL GenericRexp::Compile(const tchar *str)
 {
@@ -127,7 +125,7 @@ bool GenericRexp::CompareBocu1( const char *s, FNPreCodeTranslate precode )
 	int maxlength = (slen<<2)+1;
 	if (BufferLen < maxlength ){
 		BufferLen = maxlength;
-		if (Buffer) delete[] Buffer;
+		delete[] Buffer;
 		Buffer = new wchar_t[BufferLen];
 	}
 	bocu1Decode( (const unsigned char**)&s, (const unsigned char*)(s)+slen, maxlength, Buffer, NULL, precode );
@@ -139,7 +137,7 @@ bool GenericRexp::CompareUTF8( const char *s )	// for UTF-8
 	int maxlength = (slen<<1)+1;
 	if (BufferLen < maxlength ){
 		BufferLen = maxlength;
-		if (Buffer) delete[] Buffer;
+		delete[] Buffer;
 		Buffer = new wchar_t[BufferLen];
 	}
 #if wchar_size==2

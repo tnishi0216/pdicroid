@@ -22,8 +22,7 @@ void DDOpen();
 void DDClose();
 #else
 #define	DDOpen()
-#define	DD	(void)
-//inline void DD( int , ulong =0 , ulong =0, const tchar * =NULL ){}
+inline void DD(...) {}
 #define	DDClose()
 #endif
 

@@ -134,4 +134,4 @@ class ChooseFontDialog {
 
 
 
-#endif	__COMFONT_H
+#endif	// __COMFONT_H

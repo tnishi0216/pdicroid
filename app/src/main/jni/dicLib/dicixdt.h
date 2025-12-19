@@ -88,7 +88,7 @@ public:
 		{ return databuf; }
 	bool SetupSearch(const tchar *word, SrchMode mode, GENERICREXP *regp, TLangProc *lp);
 	int prevWord( );
-	const byte *srchTail( );	// databuf()の一番最後の英単語を返す(返り値はバッファの位置)
+	const uint8_t *srchTail( );	// databuf()の一番最後の英単語を返す(返り値はバッファの位置)
 	const _kchar *GetFoundWord() const
 		{ return fw.fword; }
 	//void GetFoundJapa(Japa &j);
@@ -148,7 +148,7 @@ inline int CompareWord( const char *sp )
 #endif	// !USE_BOCU1
 
 	// bool CompareWordReg(const _kchar *word);
-	bool CompareCompress(const byte *src, uint jtblen );
+	bool CompareCompress(const uint8_t *src, uint jtblen );
 
 #if USE_NKF
 protected:
@@ -314,8 +314,8 @@ protected:
 	// もし、コンパイルに失敗した場合などの場合、呼出側でエラー処理行い、
 	// 検索が正常に行えるようにしておく事！
 	// 正規表現検索を行わない場合は NULL をセットする
-	int AllSearchCommon( const byte *ptr, const byte *nextp, wa_t attr, AllSearchParam *all=NULL );
-	bool SearchFileLink(AllSearchParam &all, const byte *src, uchar jt, uint jtblen);
+	int AllSearchCommon( const uint8_t *ptr, const uint8_t *nextp, wa_t attr, AllSearchParam *all=NULL );
+	bool SearchFileLink(AllSearchParam &all, const uint8_t *src, uchar jt, uint jtblen);
 
 	// record/update/erase //
 protected:
@@ -356,7 +356,7 @@ protected:
 	void ShrinkIndex();
 	int AddIndex( int lbn, t_pbn2 pbn, const _kchar *word );
 public:
-	int UpdateObjectHeader( const _kchar *word, t_id id, int offset, int size, const byte *data );
+	int UpdateObjectHeader( const _kchar *word, t_id id, int offset, int size, const uint8_t *data );
 
 	// Utilities //
 protected:

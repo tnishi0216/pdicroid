@@ -13,8 +13,7 @@ VarBuffer::VarBuffer( int _slotsize )
 
 VarBuffer::~VarBuffer()
 {
-	if ( buff )
-		delete buff;
+	delete[] buff;
 }
 
 tchar *VarBuffer::increase( )

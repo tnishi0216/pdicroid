@@ -155,7 +155,7 @@ public:
 	bool allocate(int size);
 
 	// for debug
-	void **__get_array( ) { return array; }
+	void **__get_array( ) const { return array; }
 	void __set_array( void **_array ) { array = _array; }
 };
 
@@ -203,8 +203,7 @@ public:
 template <class T>
 void FlexObjectArray<T>::delete_object( void *obj )
 {
-	if (obj)
-		delete ( T* )obj;
+	delete ( T* )obj;
 }
 
 template <class T>
@@ -357,7 +356,6 @@ public:
 	virtual ~FlexArrayBase();
 	void reserve(int size);
 	void clear( );
-	//void *_migrate( );
 	int get_num( )	const {return num;}
 	int size() const { return num; }
 	int GetCount( ) { return num; }
@@ -380,10 +378,6 @@ public:
 	void sort( int (*comp)( T *, T * ) );
 	int search( T obj );
 	void assign(const FlexArray<T> &o);
-#if 0
-	T *_migrate( )
-		{ return (T*)FlexArrayBase::migrate( ); }
-#endif
 	T *get_array( void ) const
 		{ return (T*)array; }
 	T &operator [](int i)	const {return ((T*)array)[i];}

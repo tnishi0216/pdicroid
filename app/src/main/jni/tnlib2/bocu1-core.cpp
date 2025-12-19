@@ -23,9 +23,9 @@
 #include <string.h>
 
 #ifndef __ANDROID__
+typedef unsigned char uint8_t;
 typedef long int32_t;
 #endif
-typedef unsigned char byte;
 #define	U_INLINE	inline
 #define	U_CFUNC
 
@@ -51,7 +51,7 @@ static unsigned long NoCodeTranslate(unsigned long code)
  * to trail byte values 0..19 (0..0x13) as used in the difference calculation.
  * External byte values that are illegal as trail bytes are mapped to -1.
  */
-static char
+static signed char
 bocu1ByteToTrail[BOCU1_MIN]={
 /*  0     1     2     3     4     5     6     7    */
 	-1,   0x00, 0x01, 0x02, 0x03, 0x04, 0x05, -1,
@@ -74,7 +74,7 @@ bocu1ByteToTrail[BOCU1_MIN]={
  * from trail byte values 0..19 (0..0x13) as used in the difference calculation
  * to external byte values 0x00..0x20.
  */
-static char
+static signed char
 bocu1TrailToByte[BOCU1_TRAIL_CONTROLS_COUNT]={
 /*  0     1     2     3     4     5     6     7    */
 	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x10, 0x11,
@@ -251,8 +251,7 @@ int DEF_NAME(bocu1EncodeLength)(const bocu_t *src, const bocu_t *end, unsigned c
 	}
 	unsigned char *cend = DEF_NAME(bocu1Encode)(src, end, dst);
 	int clen = (int)(cend-dst);
-	if (temp)
-		delete[] temp;
+	delete[] temp;
 	return clen;	// compressed length
 }
 // outmaxlength : in charactor in UTF-16
@@ -402,20 +401,20 @@ jvalidcode:
 					// change UTF-32 to UTF-8
 					if ( c < 0x80 ){
 						// 1 octet
-						*dst++ = (byte)c;
+						*dst++ = (uint8_t)c;
 					} else {
 						if ( c < 0x800 ){
-							*dst++ = (byte)((c>>6)+0xC0);
+							*dst++ = (uint8_t)((c>>6)+0xC0);
 						} else {
 							if ( c < 0x10000 ){
-								*dst++ = (byte)((c>>12)+0xE0);
+								*dst++ = (uint8_t)((c>>12)+0xE0);
 							} else {
-								*dst++ = (byte)((c>>18)+0xF0);
-								*dst++ = (byte)(((c>>12)&0x3F)+0x80);
+								*dst++ = (uint8_t)((c>>18)+0xF0);
+								*dst++ = (uint8_t)(((c>>12)&0x3F)+0x80);
 							}
-							*dst++ = (byte)(((c>>6)&0x3F)+0x80);
+							*dst++ = (uint8_t)(((c>>6)&0x3F)+0x80);
 						}
-						*dst++ = (byte)((c&0x3F)+0x80);
+						*dst++ = (uint8_t)((c&0x3F)+0x80);
 					}
 #endif	// BOCU_UTF8
 					if (dst>=dstend)

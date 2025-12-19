@@ -13,7 +13,7 @@
 #include "msgdlg.h"
 #include "browse.h"
 #include "filestr.h"
-#include "dicproc.h"
+#include "Dicproc.h"
 #ifdef _Windows
 #include	"retproc.h"
 #include "copydata.h"

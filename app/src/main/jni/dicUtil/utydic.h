@@ -334,7 +334,7 @@ public:
 	virtual long length( )
 		{return filelength(iof->get_fd());}
 	virtual int percent( )
-		{return (int)((unsigned __int64)tell(iof->get_fd()) * 100 / length());}
+			{return (int)((unsigned long long)tell(iof->get_fd()) * 100 / length());}
 #ifdef GUI
 	virtual int CanOpen( TWinControl *, const tchar *fname, int mode );
 #endif

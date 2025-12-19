@@ -51,8 +51,7 @@ public:
 	}
 	virtual ~TTextFileBufferT()
 	{
-		if (Buffer)
-			delete[] Buffer;
+		delete[] Buffer;
 	}
 	T &operator[](int index)
 	{
@@ -202,8 +201,7 @@ public:
 	}
 	~TTextFileBufferCC()
 	{
-		if (readbuf)
-			delete[] readbuf;
+		delete[] readbuf;
 	}
 	virtual int read();
 };

@@ -18,9 +18,7 @@ void FixChar::Constructor( const tchar *str, int _maxlen )
 
 FixChar::~FixChar()
 {
-	if ( buf ){
-		delete[] buf;
-	}
+	delete[] buf;
 	buf = 0;
 }
 

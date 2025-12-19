@@ -64,7 +64,7 @@ bool TLangProcStd::OpenIrreg()
 #if USEDBW
 #define	D	DBW		// for debug
 #else
-#define	D	(void)
+inline void D(...) {}
 #endif
 
 // Prerequisite : Call cs.dic->OpenIrregDic().
@@ -252,13 +252,13 @@ jrep:
 		if ( _flags & SLW_UMLAUT1 ){
 			// Umlaut -> ae, ....
 			switch ( c ){
-				case (byte)'\xC4': *dp++ = 'A'; *dp++ = 'E'; break;
-				case (byte)'\xD6': *dp++ = 'O'; *dp++ = 'E'; break;
-				case (byte)'\xDC': *dp++ = 'U'; *dp++ = 'E'; break;
-				case (byte)'\xDF': *dp++ = 's'; *dp++ = 's'; break;
-				case (byte)'\xE4': *dp++ = 'a'; *dp++ = 'e'; break;
-				case (byte)'\xF6': *dp++ = 'o'; *dp++ = 'e'; break;
-				case (byte)'\xFC': *dp++ = 'u'; *dp++ = 'e'; break;
+				case (uint8_t)'\xC4': *dp++ = 'A'; *dp++ = 'E'; break;
+				case (uint8_t)'\xD6': *dp++ = 'O'; *dp++ = 'E'; break;
+				case (uint8_t)'\xDC': *dp++ = 'U'; *dp++ = 'E'; break;
+				case (uint8_t)'\xDF': *dp++ = 's'; *dp++ = 's'; break;
+				case (uint8_t)'\xE4': *dp++ = 'a'; *dp++ = 'e'; break;
+				case (uint8_t)'\xF6': *dp++ = 'o'; *dp++ = 'e'; break;
+				case (uint8_t)'\xFC': *dp++ = 'u'; *dp++ = 'e'; break;
 				default:
 					goto j1;
 			}
@@ -303,15 +303,15 @@ jrep:
 		if ( _flags & SLW_UMLAUT3 ){
 			// Umlaut -> a,u,e,o,i
 			switch ( c ){
-				case (byte)'\xC4': *dp++ = 'A'; break;
-				case (byte)'\xD6': *dp++ = 'O'; break;
-				case (byte)'\xDC': *dp++ = 'U'; break;
-				case (byte)'\xDF': *dp++ = 's'; *dp++ = 's'; break;
-				case (byte)'\xE4': *dp++ = 'a'; break;
+				case (uint8_t)'\xC4': *dp++ = 'A'; break;
+				case (uint8_t)'\xD6': *dp++ = 'O'; break;
+				case (uint8_t)'\xDC': *dp++ = 'U'; break;
+				case (uint8_t)'\xDF': *dp++ = 's'; *dp++ = 's'; break;
+				case (uint8_t)'\xE4': *dp++ = 'a'; break;
 				//case '\xEB': *dp++ = 'E'; break;
 				//case '\xEF': *dp++ = 'I'; break;
-				case (byte)'\xF6': *dp++ = 'o'; break;
-				case (byte)'\xFC': *dp++ = 'u'; break;
+				case (uint8_t)'\xF6': *dp++ = 'o'; break;
+				case (uint8_t)'\xFC': *dp++ = 'u'; break;
 				default:
 					goto j3;
 			}
@@ -742,8 +742,7 @@ jrep:
 			*dp = '\0';
 			convf |= SLW_DEUTCH3;
 		} else
-		if ( (*(dp-1) == 't')	// -t --> -n
-			){
+		if ( *(dp-1) == 't' ){	// -t --> -n
 			*(dp-1) = 'n';
 			*dp = '\0';
 			convf |= SLW_DEUTCH3;

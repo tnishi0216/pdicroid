@@ -256,7 +256,7 @@ int AllSearchParam::prevWord( )
 	return databuf->prevWord((uint&)loc, wbuf);
 }
 
-const byte *AllSearchParam::srchTail( )	// databuf()の一番最後の英単語を返す(返り値はバッファの位置)
+const uint8_t *AllSearchParam::srchTail( )	// databuf()の一番最後の英単語を返す(返り値はバッファの位置)
 {
 	return databuf->srchTail(wbuf);
 }
@@ -442,7 +442,7 @@ int AllSearchParam::CompareBocu( const char *sp, int maxlength, const char **nex
 		CompareBuffer = new _jchar[maxlength];
 	}
 	int dstlen;
-	bocu1DecodeT( (const byte**)&sp, (const byte*)UINT_PTR_MAX, maxlength, CompareBuffer, &dstlen, fn );
+	bocu1DecodeT( (const uint8_t**)&sp, (const uint8_t*)UINT_PTR_MAX, maxlength, CompareBuffer, &dstlen, fn );
 	if (fuzzy){
 		tchar *dst = LangProc->NormalizeSearchPattern(CompareBuffer);
 		dstlen = (int)(dst-CompareBuffer);
@@ -482,10 +482,10 @@ bool AllSearchParam::CompareWordReg(const _kchar *word)
 
 // 圧縮textのcompare
 #ifdef USE_COMP
-bool AllSearchParam::CompareCompress(const byte *src, uint jtblen )
+bool AllSearchParam::CompareCompress(const uint8_t *src, uint jtblen )
 {
 	uint decodelen;
-	byte *decode = Japa::Decode( src, jtblen, decodelen );
+	uint8_t *decode = Japa::Decode( src, jtblen, decodelen );
 	if ( decode ){
 		if ( Compare( (_mtchar*)decode ) ){
 			delete[] decode;
@@ -944,7 +944,7 @@ void IndexData::getfjapa( Japa &j, AllSearchParam *_all )
 	}
 	while ( *cp++ ) flen-=sizeof(_kchar);
 	flen-=sizeof(_kchar);
-	j._SetAll( (byte*)cp, (int)flen, this, databuf.isField2(), attr );
+	j._SetAll( (uint8_t*)cp, (int)flen, this, databuf.isField2(), attr );
 }
 
 /*======================================================================*/
@@ -1082,13 +1082,13 @@ jmp0:
 			}
 			if (all.mode & SRCH_REGEXP){
 				// 正規表現が有効な場合はその条件が一致した場合のみ
-				if ( AllSearchCommon( (byte*)p, (byte*)nextp, attr, &all) )
+				if ( AllSearchCommon( (uint8_t*)p, (uint8_t*)nextp, attr, &all) )
 					break;
 			} else {
 				break;
 			}
 		} else {
-			if ( AllSearchCommon( (byte*)p, (byte*)nextp, attr, &all) ){
+			if ( AllSearchCommon( (uint8_t*)p, (uint8_t*)nextp, attr, &all) ){
 				break;
 			}
 		}
@@ -1097,7 +1097,7 @@ jmp0:
 	word.set( all.wbuf );
 
 	if ( japa ){
-		japa->_SetAll( (byte*)p, FP_DIFF( nextp, p ), this, fField2, SEL_FIELD2( fField2, ((FieldFormat2*)all_cp)->attr, all_cp->attr ) );
+		japa->_SetAll( (uint8_t*)p, FP_DIFF( nextp, p ), this, fField2, SEL_FIELD2( fField2, ((FieldFormat2*)all_cp)->attr, all_cp->attr ) );
 	}
 	all.loc = FP_DIFF( (char*)all_cp, databuf.getDataBuf() );
 	return AS_FOUND;
@@ -1226,7 +1226,7 @@ int IndexData::NextAllScan( _KChar &word, Japa *japa, AllSearchParam &all )
 
 // p : 訳語部の先頭アドレス（属性のあるアドレス）
 // nextp : 次の見出語の先頭アドレス
-int IndexData::AllSearchCommon( const byte *p, const byte *nextp, wa_t attr, AllSearchParam *_all)
+int IndexData::AllSearchCommon( const uint8_t *p, const uint8_t *nextp, wa_t attr, AllSearchParam *_all)
 {
 	AllSearchParam &all = _all ? *_all : this->all;
 
@@ -1320,7 +1320,7 @@ jmp2:
 #ifdef NEWDIC4UNI
 				p++;	// reserved
 #endif
-				const byte *_p;
+				const uint8_t *_p;
 				uint jtblen;
 				if ( all.GetDataBuf()->isField2() ){
 					jtblen = *((t_jtb2*)p);
@@ -1357,7 +1357,7 @@ jmp2:
 							if ( all.CompareBocu( (_mchar*)p, max(LPRON+1,LEXP+1), (const _mchar**)&p ) )
 								return 1;
 #ifdef NEWDIC4UNI
-							p = (byte*)((((int)p)+2)&~1);
+							p = (uint8_t*)((((int)p)+2)&~1);
 #endif
 							goto jmp1;
 #else	// !USE_BOCU
@@ -1407,7 +1407,7 @@ jmp2:
 								|| *(t_jlink*)_p == JL_ICONFILE
 #endif
 							){
-								const byte *pTitle = _p + sizeof(t_jlink) + sizeof(t_id);
+								const uint8_t *pTitle = _p + sizeof(t_jlink) + sizeof(t_id);
 								while (*pTitle++);	// Skip title
 								FileLinkField &jlf = *(FileLinkField*)pTitle;
 								if ( all.CompareBocu( (_mchar*)jlf.GetDataPtr(), _BOCUtoWLEN(_mcslen((_mchar*)jlf.GetDataPtr())) ) ){
@@ -1442,7 +1442,7 @@ jmp2:
 
 #if defined(USE_FILELINK)
 #include "JLFileSearch.h"
-bool IndexData::SearchFileLink(AllSearchParam &all, const byte *src, uchar jt, uint jtblen)
+bool IndexData::SearchFileLink(AllSearchParam &all, const uint8_t *src, uchar jt, uint jtblen)
 {
 	return ::SearchFileLink((class Pdic*)this, all, src, jt, jtblen);
 }
@@ -1554,13 +1554,13 @@ int IndexData::PrevAllSearch_k( _MChar &word, Japa *japa, AllSearchParam *_all)
 			}
 			if (all.mode & SRCH_REGEXP){
 				// 正規表現が有効な場合はその条件が一致した場合のみ
-				if ( AllSearchCommon( (byte*)p, (byte*)nextp, attr, &all) )
+				if ( AllSearchCommon( (const uint8_t*)p, (const uint8_t*)nextp, attr, &all) )
 					break;
 			} else {
 				break;
 			}
 		} else {
-			if ( AllSearchCommon( (byte*)p, (byte*)nextp, attr, &all) )
+			if ( AllSearchCommon( (const uint8_t*)p, (const uint8_t*)nextp, attr, &all) )
 				break;
 		}
 	}
@@ -1568,7 +1568,7 @@ int IndexData::PrevAllSearch_k( _MChar &word, Japa *japa, AllSearchParam *_all)
 	//全検索 or 一致したもの
 	word.set( all.wbuf );
 	if ( japa ){
-		japa->_SetAll( (byte*)p, FP_DIFF( nextp, p ), this, fField2,
+		japa->_SetAll( (const uint8_t*)p, FP_DIFF( nextp, p ), this, fField2,
 			SEL_FIELD2( fField2, ((const FieldFormat2*)( databuf.getDataBuf() + all.loc ))->attr, ((const FieldFormat*)( databuf.getDataBuf() + all.loc ))->attr )
 		);
 	}
@@ -1603,9 +1603,9 @@ int IndexData::CurAllSearch( _MChar &word, Japa *japa, int, AllSearchParam *_all
 		while ( *p ) p++; p++;	// skip word
 		if ( japa ){
 #ifdef DOS
-			japa->_SetAll( (byte*)p, 0, this, true, ((FieldFormat2*)all_cp)->attr );
+			japa->_SetAll( (uint8_t*)p, 0, this, true, ((FieldFormat2*)all_cp)->attr );
 #else
-			japa->_SetAll( (byte*)p, FP_DIFF( NextField2( (FieldFormat2*)all_cp ), p ), this, true, ((FieldFormat2*)all_cp)->attr );
+			japa->_SetAll( (uint8_t*)p, FP_DIFF( NextField2( (FieldFormat2*)all_cp ), p ), this, true, ((FieldFormat2*)all_cp)->attr );
 #endif
 		}
 	} else
@@ -1613,7 +1613,7 @@ int IndexData::CurAllSearch( _MChar &word, Japa *japa, int, AllSearchParam *_all
 		p = all_cp->word;
 		while ( *p++ ) ;
 		if ( japa ){
-			japa->_SetAll( (byte*)p, FP_DIFF( NextField( all_cp ), p ), this, false, all_cp->attr );
+			japa->_SetAll( (uint8_t*)p, FP_DIFF( NextField( all_cp ), p ), this, false, all_cp->attr );
 		}
 	}
 	return 0;
@@ -1732,7 +1732,7 @@ int IndexData::_record( const _mchar * word, uint wordlen, const Japa &japa )
 	if ( wordlen == 0 )
 		wordlen = _mcslen( word );
 	uint japalen;
-	byte *buf = japa.Get2( japalen, compflag, GetLimitSize( ) - _MLENTOBYTE(wordlen), this );
+	uint8_t *buf = japa.Get2( japalen, compflag, GetLimitSize( ) - _MLENTOBYTE(wordlen), this );
 	if ( !buf ){
 		error = DICERR_TOOLONG;	// 登録データが長すぎる（またはメモリ不足）
 		return -1;
@@ -1871,7 +1871,7 @@ int IndexData::_update( const _mchar * word, uint wordlen, const Japa &japa )
 	if ( wordlen == 0 )
 		wordlen = _mcslen( word );
 	uint japalen;
-	byte *buf = japa.Get2( japalen, compflag, GetLimitSize( ) - wordlen, this );
+	uint8_t *buf = japa.Get2( japalen, compflag, GetLimitSize( ) - _MLENTOBYTE(wordlen), this );
 	if ( !buf ){
 		error = DICERR_TOOLONG;	// 登録データが長すぎる(またはメモリ不足)
 		return -1;
@@ -2234,7 +2234,7 @@ void DBOFF( )
 //		0 : offset, sizeが不正であるため更新できず,単語は登録されていない、オブジェクトが見つからない
 //		1 : 更新できた
 //		-1: エラー発生
-int IndexData::UpdateObjectHeader( const _mchar *word, t_id id, int offset, int size, const byte *udata )
+int IndexData::UpdateObjectHeader( const _mchar *word, t_id id, int offset, int size, const uint8_t *udata )
 {
 	if (_BSearch(word) == -1) return -1;
 
@@ -2245,7 +2245,7 @@ int IndexData::UpdateObjectHeader( const _mchar *word, t_id id, int offset, int 
 		return 0;
 
 	TDataBuf &databuf = *data->GetDataBuf();
-	byte *p = (byte*)databuf.GetDataPtr( fw.lp ) + databuf.GetFieldHeaderSize();
+	uint8_t *p = (uint8_t*)databuf.GetDataPtr( fw.lp ) + databuf.GetFieldHeaderSize();
 	while ( *(_mchar*)p ) p += sizeof(_mchar); p += sizeof(_mchar);	// skip word
 
 	if ( !(*p & WA_EX) ) return 0;
@@ -2261,7 +2261,7 @@ int IndexData::UpdateObjectHeader( const _mchar *word, t_id id, int offset, int 
 	while ( 1 ){
 		t_exattr jt = *p++;
 		if ( jt == JT_END ) return 0;
-		byte *next = p;
+		uint8_t *next = p;
 		uint jtb;
 		if ( jtbsize == sizeof(t_jtb2) ){
 			jtb = *(*(t_jtb2**)&p)++;
@@ -2543,7 +2543,7 @@ int IndexData::EasyOptimize( t_pbn2 *_ipbn, t_pbn2 *_pbn )
 				break;
 		}
 
-		byte *buf;
+		uint8_t *buf;
 		t_pbn2 loadlbn;
 		t_blknum loadnum;
 		if ( ( buf = tb.load( ipbn, loadlbn ) ) == NULL ){	//テンポラリバッファに無い場合は
@@ -2654,7 +2654,7 @@ int IndexData::SaveAllTempBuff( int &ntemp, TempBuff &tb, EmptyList &el, t_pbn2 
 	DBOPT("テンポラリバッファが一杯になったので、すべて空きブロックへ掃き出します\n");
 	ntemp = 0;
 	t_pbn2 blk;
-	byte *buf;
+	uint8_t *buf;
 	while ( ( buf = tb.allLoad( blk ) ) != NULL ){
 		t_blknum num;
 		num = (t_blknum)(*(t_blknum*)buf & ~FIELDTYPE);

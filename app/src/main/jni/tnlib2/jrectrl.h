@@ -71,4 +71,4 @@ protected:
 	void SetupIgnoreCase();
 };
 
-#endif	__JRECTRL_H
+#endif	// __JRECTRL_H

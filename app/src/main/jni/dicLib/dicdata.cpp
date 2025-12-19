@@ -50,7 +50,7 @@ bool TDataBufMemMap::Open(unsigned blocksize)
 		return false;	// already opened
 	BlockSize = blocksize;
 	MM = new TMmfMap(Data->file.GetFileHandle());
-	BaseAddr = (byte*)MM->map(Data->GetOffset(), Data->GetDataSize(), Data->file.isReadOnly());
+	BaseAddr = (uint8_t*)MM->map(Data->GetOffset(), Data->GetDataSize(), Data->file.isReadOnly());
 	if (!BaseAddr){
 		delete MM;
 		MM = NULL;
@@ -76,7 +76,7 @@ void TDataBufMemMap::Close()
 	DataBuf = NULL;
 	LastPtr = NULL;
 }
-byte *TDataBufMemMap::alloc(t_pbn2 pbn, t_blknum _blknum)
+uint8_t *TDataBufMemMap::alloc(t_pbn2 pbn, t_blknum _blknum)
 {
 	DataBuf = getDataPtr(pbn);
 	*(t_blknum*)DataBuf = _blknum;
@@ -97,7 +97,7 @@ int TDataBufMemMap::seek_alloc(t_pbn2 pbn, int offs)
 		unsigned offs = (unsigned)DataBuf - (unsigned)BaseAddr;
 		// Not enough space
 		MM->unmap();
-		BaseAddr = (byte*)MM->map(Data->GetOffset(), pbn*BlockSize, Data->file.isReadOnly());
+		BaseAddr = (uint8_t*)MM->map(Data->GetOffset(), pbn*BlockSize, Data->file.isReadOnly());
 		if (!BaseAddr){
 			LastPtr = NULL;
 			DataBuf = NULL;
@@ -113,7 +113,7 @@ int TDataBufMemMap::seek_alloc(t_pbn2 pbn, int offs)
 }
 int TDataBufMemMap::read(t_pbn2 pbn, void *data, int len, int off)
 {
-	byte *DataBuf = getDataPtr(pbn)+off;
+	uint8_t *DataBuf = getDataPtr(pbn)+off;
 	memcpy(data, DataBuf, len);
 	LastPtr = DataBuf+len;
 	return len;
@@ -150,7 +150,7 @@ int TDataBufMemMap::write(const void *data, int len)
 	LastPtr += len;
 	return len;
 }
-int TDataBufMemMap::fill(byte data, int len)
+int TDataBufMemMap::fill(uint8_t data, int len)
 {
 	memset(LastPtr, data, len);
 	LastPtr += len;
@@ -158,7 +158,7 @@ int TDataBufMemMap::fill(byte data, int len)
 }
 void TDataBufMemMap::changeOffset(unsigned prev_offset, unsigned new_offset)
 {
-	BaseAddr = (byte*)MM->changeOffset(new_offset);
+	BaseAddr = (uint8_t*)MM->changeOffset(new_offset);
 	DataBuf = NULL;
 	LastPtr = NULL;
 }
@@ -167,16 +167,16 @@ bool TDataBufMemMap::writeBlockNum(t_pbn2 pbn, t_blknum blknum)
 	*(t_blknum*)getDataPtr(pbn) = blknum;
 	return true;
 }
-void TDataBufMemMap::set(t_pbn2 pbn, byte *data, t_blknum blknum)
+void TDataBufMemMap::set(t_pbn2 pbn, uint8_t *data, t_blknum blknum)
 {
-	byte *databuf = getDataPtr(pbn);
+	uint8_t *databuf = getDataPtr(pbn);
 	*(t_blknum*)databuf = blknum;
 	memcpy(databuf, data, blknum*BlockSize);
 }
 void TDataBufMemMap::grow(t_pbn2 oldpbn, t_pbn2 newpbn, int old_blknum, int new_blknum)
 {
-	byte *oldptr = getDataPtr(newpbn);
-	byte *newptr = getDataPtr(oldpbn);
+	uint8_t *oldptr = getDataPtr(newpbn);
+	uint8_t *newptr = getDataPtr(oldpbn);
 	if (oldptr!=newptr){
 		memcpy(oldptr, newptr, old_blknum*BlockSize);
 	}
@@ -220,16 +220,16 @@ void TDataBufFile::Close()
 }
 // Note:
 // _blknum can include FIELDTYPE
-byte *TDataBufFile::alloc(t_pbn2 pbn, t_blknum _blknum)
+uint8_t *TDataBufFile::alloc(t_pbn2 pbn, t_blknum _blknum)
 {
 	blknum = _blknum;
 	allocnum = blknum&~FIELDTYPE;
 	if (allocnum==0)
 		allocnum++;	// for empty block
-	setDataBuf(new byte[ allocnum*Data->blocksize ], blknum, pbn);
+	setDataBuf(new uint8_t[ allocnum*Data->blocksize ], blknum, pbn);
 	return DataBuf;
 }
-byte *TDataBufFile::alloc_opt(t_pbn2 pbn, t_blknum _blknum)
+uint8_t *TDataBufFile::alloc_opt(t_pbn2 pbn, t_blknum _blknum)
 {
 	if (allocnum>=(_blknum & ~FIELDTYPE)){
 		// no need to realloc
@@ -238,7 +238,7 @@ byte *TDataBufFile::alloc_opt(t_pbn2 pbn, t_blknum _blknum)
 	}
 	return alloc(pbn, _blknum);
 }
-void TDataBufFile::setDataBuf(byte *ptr, t_blknum _blknum, t_pbn2 pbn)
+void TDataBufFile::setDataBuf(uint8_t *ptr, t_blknum _blknum, t_pbn2 pbn)
 {
 	if (DataBuf){
 		delete[] DataBuf;
@@ -313,7 +313,7 @@ void TDataBufFile::changeOffset(unsigned prev_offset, unsigned new_offset)
 		lastpbn-=(new_offset-prev_offset)/BlockSize;
 }
 // setDataBuf() + write()
-void TDataBufFile::set(t_pbn2 pbn, byte *data, t_blknum blknum)
+void TDataBufFile::set(t_pbn2 pbn, uint8_t *data, t_blknum blknum)
 {
 	setDataBuf( data, blknum, pbn );
 	Data->write( pbn );	// Undo write
@@ -846,7 +846,7 @@ TDataBuf *PdicData::CreateDataBuf()
 }
 
 #if MEMMAPDIC
-int PdicData::file_fill(byte data, int len)
+int PdicData::file_fill(uint8_t data, int len)
 {
 	return databuf.fill(data, len);
 }
@@ -886,9 +886,9 @@ int PdicData::file_fill(int len)
 #endif	// !MEMMAPDIC
 //TODO: 呼び出し側も含めて二重memory allocationになっているので
 // 呼び出し側がallocateを呼び出すように修正する
-bool PdicData::SetDataBuf( t_pbn2 pbn, const byte *p, int _blknum)
+bool PdicData::SetDataBuf( t_pbn2 pbn, const uint8_t *p, int _blknum)
 {
-	byte *newbuf = databuf.alloc(pbn, _blknum);
+	uint8_t *newbuf = databuf.alloc(pbn, _blknum);
 	if (!newbuf)
 		return false;
 	memcpy(newbuf, p, _blknum*blocksize);
@@ -945,7 +945,7 @@ int PdicData::UndoUpdate( DivList *dl, int divnum )
 	}
 	if ( divnum >= 1 ){
 		Flush( );
-		databuf.set(dl[0].oldpbn, (byte*)dl[0].word, *(t_blknum*)dl[0].word);	// Undo write
+		databuf.set(dl[0].oldpbn, (uint8_t*)dl[0].word, *(t_blknum*)dl[0].word);	// Undo write
 	}
 	return 0;
 }
@@ -990,7 +990,7 @@ int PdicData::CopyToTopField( FieldFormat *dp, FieldFormat *src, const _kchar *w
 //	分割の必要の無い場合に呼ぶと正常に動作するかどうかわからない
 //
 // override
-int PdicData::updateWord( const tchar *word, const byte *japa, uint japalen, FINDWORD &fw, DivList *divlist, int &divnum, int recmode )
+int PdicData::updateWord( const tchar *word, const uint8_t *japa, uint japalen, FINDWORD &fw, DivList *divlist, int &divnum, int recmode )
 {
 	divnum = 0;
 	if ( Flush( ) )

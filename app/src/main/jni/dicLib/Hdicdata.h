@@ -49,12 +49,12 @@ public:
 	t_pbn2 NewBlock( int num );
 
 	// Field1êÍópä÷êî
-	int addWord( const _kchar * word, uint wordlen, const byte *japa, uint japalen, FINDWORD &fw, DivInfo *divinfo );
-	int addWord2( const _kchar * word, uint wordlen, const byte *japa, uint japalen, t_pbn2 pbn );
-	int updateWord( const byte *japa, uint japalen, FINDWORD &fw, DivInfo *divinfo );
-	int updateWord( const _kchar *, const byte *, uint , FINDWORD &, DivList *, int &, int  ){ return -1; }
+	int addWord( const _kchar * word, uint wordlen, const uint8_t *japa, uint japalen, FINDWORD &fw, DivInfo *divinfo );
+	int addWord2( const _kchar * word, uint wordlen, const uint8_t *japa, uint japalen, t_pbn2 pbn );
+	int updateWord( const uint8_t *japa, uint japalen, FINDWORD &fw, DivInfo *divinfo );
+	int updateWord( const _kchar *, const uint8_t *, uint , FINDWORD &, DivList *, int &, int  ){ return -1; }
 	int eraseWord( t_pbn2 pbn, int loc );
-	int DivBlock( const _kchar *word, const byte *japa, uint japalen, FINDWORD &fw, int fNew, DivInfo *divinfo, PdicIndex *index );
+	int DivBlock( const _kchar *word, const uint8_t *japa, uint japalen, FINDWORD &fw, int fNew, DivInfo *divinfo, PdicIndex *index );
 };
 
 #endif	/* __Hdicdata_h */

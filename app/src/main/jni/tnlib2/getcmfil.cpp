@@ -76,7 +76,7 @@ void GetCommFiles( const tchar *_str, tnstr_vec &files, int delim, int nFileOffs
 				cp++;
 			cp++;
 		} else {
-			delete[] buf;
+			delete buf;
 			if ( str != _str ) delete[] str;
 			return;
 		}

@@ -18,7 +18,9 @@ typedef int64_t __int64;
 
 #ifdef UNIX	// __ANDROID__
 
+#if __cplusplus <= 201402L
 typedef unsigned char byte;
+#endif
 typedef	unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
@@ -378,6 +380,7 @@ BOOL DeleteFile(const tchar *filename);
 
 typedef unsigned char byte;
 typedef	unsigned char uchar;
+typedef unsigned char uint8_t;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long ulong;

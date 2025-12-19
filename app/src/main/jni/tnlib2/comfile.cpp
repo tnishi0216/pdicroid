@@ -36,8 +36,7 @@ CommFileDialog::~CommFileDialog()
 		FreeProcInstance( (FARPROC)lpfnHook );
 	}
 #endif
-	if (pathbuffer)
-		delete[] pathbuffer;
+	delete[] pathbuffer;
 }
 
 // このイニシャライズを実行すると、マルチセレクトで指定したバッファーサイズが
@@ -71,9 +70,7 @@ void CommFileDialog::AllowMultiSelect( int size )
 {
 	ofn.Flags |= OFN_ALLOWMULTISELECT;
 #if 1
-	if ( pathbuffer ){
-		delete[] pathbuffer;
-	}
+	delete[] pathbuffer;
 	pathbuffer = new tchar[ size+1 ];
 	lstrcpy( pathbuffer, pathname );
 	ofn.lpstrFile = pathbuffer;

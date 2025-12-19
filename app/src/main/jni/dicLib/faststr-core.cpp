@@ -648,7 +648,7 @@ char *jfstrstr( const char *s1, const char *s2, int n2 )
 				if ( s1 > e ){
 					return NULL;
 				}
-				if ( (byte)*s1 == c1 ){
+				if ( (uint8_t)*s1 == c1 ){
 					p = (const uchar *)s1+1;
 					q = (const uchar *)s2+1;
 					break;
@@ -752,7 +752,7 @@ char *jfstristr( const char *s1, const char *s2, int n2 )
 				if ( s1 > e ){
 					return NULL;
 				}
-				if ( (byte)A_lower(*s1) == c1 ){
+				if ( (uint8_t)A_lower(*s1) == c1 ){
 					p = (const uchar *)s1+1;
 					q = (const uchar *)s2+1;
 					break;
@@ -764,7 +764,7 @@ char *jfstristr( const char *s1, const char *s2, int n2 )
 				if ( s1 > e ){
 					return NULL;
 				}
-				if ( (byte)*s1 == c1 ){
+				if ( (uint8_t)*s1 == c1 ){
 					if ( (uchar)*(s1+1) == c2 ){
 						p = (const uchar *)s1+2;
 						q = (const uchar *)s2+2;

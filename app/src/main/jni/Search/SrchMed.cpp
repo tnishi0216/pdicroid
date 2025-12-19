@@ -2,7 +2,7 @@
 #pragma hdrstop
 #include "SrchMed.h"
 #include "SrchPatParser.h"
-#include "WordCount.h"
+#include "wordcount.h"
 #include "pdstrlib.h"
 #include "LangProc.h"
 #include "BookmarkMan.h"
@@ -12,7 +12,7 @@
 #if 0
 #define	D	DBW
 #else
-#define	D	(void)
+inline void D(...) {}
 #endif
 
 static bool SetupRegs(Regs &regs, tnstr_vec &patterns);
@@ -185,8 +185,7 @@ TSearchMediator::TSearchMediator(Squre *_squ, MPdic &dic, SrchStat &_ss, SrchSta
 void TSearchMediator::ClearSubWords()
 {
 	sub_words_map.clear();
-	if (&sub_words)
-		sub_words.clear();
+	sub_words.clear();
 	SubWordsIndex = -1;
 }
 
@@ -333,7 +332,7 @@ bool TSearchMediator::AddPool( tnstr *word, Japa *j, int dicno )
 	if (ss.GetSearchType()&SST_SUBSEARCH && ss.GetSearchPhase()!=0){
 		int index;
 		if (ss.GetSearchType()&SST_PHASE1){
-			if (sub_words_map.count(word->c_str())){
+			if (map_find(sub_words_map, word->c_str())){
 				// ignore it
 				return true;
 			}
@@ -342,7 +341,7 @@ bool TSearchMediator::AddPool( tnstr *word, Japa *j, int dicno )
 			//DBW("A1:%d %ws", index, word->c_str());
 		} else {
 			__assert(ss.GetSearchType()&SST_PHASE2);
-			if (sub_words_map.count(word->c_str())){
+			if (map_find(sub_words_map, word->c_str())){
 				// ignore it
 				return true;
 			}

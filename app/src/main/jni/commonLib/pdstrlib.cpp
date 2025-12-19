@@ -222,12 +222,12 @@ tchar getlastchar(const tchar *str)
 //	sizeがわかっているのならnewはいらんでしょ！！
 // binからbytes分だけhex文字列に変換
 // 戻り値はdelete[]すること
-tchar *BinToHex( const byte *bin, int bytes )
+tchar *BinToHex( const uint8_t *bin, int bytes )
 {
 	tchar *buffer = new tchar[(bytes<<1)+1];
 	tchar *dp = buffer;
 	for (int i=0;i<bytes<<1;i++){
-		byte c = bin[i>>1];
+		uint8_t c = bin[i>>1];
 		if (!(i&1)) c>>=4;
 		c &= 0xF;
 		if (c>=0xA){
@@ -240,11 +240,11 @@ tchar *BinToHex( const byte *bin, int bytes )
 	return buffer;
 }
 // buffer : サイズは (bytes*2+1)
-tchar *bintohex( tchar *buffer, const byte *bin, int bytes )
+tchar *bintohex( tchar *buffer, const uint8_t *bin, int bytes )
 {
 	tchar *dp = buffer;
 	for (int i=0;i<bytes<<1;i++){
-		byte c = bin[i>>1];
+		uint8_t c = bin[i>>1];
 		if (!(i&1)) c>>=4;
 		c &= 0xF;
 		if (c>=0xA){
@@ -257,7 +257,7 @@ tchar *bintohex( tchar *buffer, const byte *bin, int bytes )
 	return buffer;
 }
 // binからbytes分だけhex文字列に変換
-tnstr bintohex( const byte *bin, int bytes )
+tnstr bintohex( const uint8_t *bin, int bytes )
 {
 	tnstr s;
 	s.reserve(bytes*2);

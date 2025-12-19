@@ -76,7 +76,7 @@ BOOL WINAPI _TNHtmlHelp(HWND hwnd, LPCTSTR path, UINT cmd, DWORD data)
 			link.pszMsgTitle =  NULL ;
 			link.pszWindow =    NULL ;
 			link.fIndexOnFail = TRUE ;
-			TNHtmlHelp(hwnd, path,
+			ret = TNHtmlHelp(hwnd, path,
 						 HH_KEYWORD_LOOKUP, (DWORD)&link);
 			}
 			break;

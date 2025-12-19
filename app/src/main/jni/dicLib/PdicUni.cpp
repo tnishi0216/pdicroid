@@ -361,7 +361,7 @@ JLOle *PdicUni::GetObjectOle(TUniObjData &obj, int id)
 
 		// Copy the ole data to the raw image.
 		long len = org->GetLength();
-		byte *data = new byte[len];
+		uint8_t *data = new uint8_t[len];
 		if (!data){
 			break;	// no memory
 		}
