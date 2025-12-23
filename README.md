@@ -1,4 +1,4 @@
-# 環境構築
+# PDIC for Android 環境構築
 
 ## 動作環境
 
@@ -35,9 +35,9 @@
 - ndk-build.cmd 29.0.1420685, 21.0.6113669
 - GNU Make 3.82.90, 4.4.1
 
-## 参考情報
+# 参考情報
 
-### git comment rules
+## git comment rules
 
 - [A][B][C] 正式版での問題の修正
 - [XA][XB][XC] 開発版での問題の修正（リリースされたものに限る）
@@ -52,4 +52,10 @@
 - [?*] エンバグ・副作用の修正
 
 
+# リンク
+
+## PDIC for Android Home Page
+
+- <a href="https://pdic.sakura.ne.jp/android/">PDIC for Android公式ホームページ</a> ダウンロードはこちらから（野良アプリ）
+- <a href="https://play.google.com/apps/testing/com.reliefoffice.pdic">Google Play</a> Googleの制限により非公開状態
 
