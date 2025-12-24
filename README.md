@@ -8,12 +8,10 @@
 ## NDKのビルド
 
 - AndroidStudioでNDKをinstallする
-  - Tools - SDK Managerにて、
-    - SDK ToolsタブでNDKを選択
-      - 右下の"Show Package Details"をチェックして使用するNDK versionを選択
-      - 検証済みversion
-        - 29.0.1420685
-        - 21.0.6113669
+  - Tools - SDK Managerにて、SDK ToolsタブでNDKを選択、右下の"Show Package Details"をチェックして使用するNDK versionを選択
+    - 検証済みversion
+      - 29.0.1420685
+      - 21.0.6113669
 
 - MSYS2, MinGWなど、make, cp, rmコマンドが実行できる環境を用意する
   - MSYS2を使用する場合
