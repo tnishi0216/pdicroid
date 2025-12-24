@@ -540,6 +540,9 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             // Bluetooth Manager //
             bluetoothManager = new BluetoothManager();
         }
+
+        // FollowPlayingLineEnabledの状態を取得
+        FollowPlayingLineEnabled = pref.getBoolean(pfs.FOLLOW_PLAYING_LINE, false);
     }
 
     public void onToolbarClicked()
@@ -1239,7 +1242,6 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             moveCursorPlayingLine(true);
         } else if (id == R.id.action_toggle_follow_play_line){
             toggleFollowPlayingLine();
-            item.setChecked(FollowPlayingLineEnabled);
         } else if (id == R.id.action_viewpsb) {
             viewPSBookmarkList();
         } else if (id == R.id.action_wpm) {
@@ -1710,6 +1712,10 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     void toggleFollowPlayingLine()
     {
         FollowPlayingLineEnabled = !FollowPlayingLineEnabled;
+        // 状態を保存する
+        SharedPreferences.Editor edit = pref.edit();
+        edit.putBoolean(pfs.FOLLOW_PLAYING_LINE, FollowPlayingLineEnabled);
+        edit.commit();
     }
 
     // --------------------------------------- //
