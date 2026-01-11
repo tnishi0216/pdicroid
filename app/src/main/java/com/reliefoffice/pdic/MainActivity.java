@@ -271,6 +271,10 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
 
         int num = dicMan.getDictionaryNum();
         if (num==0){
+            // If we are already in the Dictionary Setting screen, do not show the alert dialog
+            // to avoid an infinite loop where closing the alert re-triggers onResume/restart.
+            if (curFragment instanceof DicSettingFragment) return;
+            
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(getString(R.string.msg_nodictionary))
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {

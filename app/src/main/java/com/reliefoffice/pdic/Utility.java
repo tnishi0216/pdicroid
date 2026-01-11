@@ -393,7 +393,9 @@ public class Utility {
 
     public static final boolean requestStorageAllPermission(Activity activity){
         if (Build.VERSION.SDK_INT >= 30){
-            if(!Environment.isExternalStorageManager()){
+            if (Environment.isExternalStorageManager()) {
+                return true;
+            } else {
                 try {
                     Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
                     Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
@@ -403,6 +405,7 @@ public class Utility {
                     intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
                     activity.startActivity(intent);
                 }
+                return false;
             }
         } else {
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
