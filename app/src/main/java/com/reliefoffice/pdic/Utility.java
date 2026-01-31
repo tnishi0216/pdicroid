@@ -437,6 +437,16 @@ public class Utility {
         return true;
     }
 
+    public static final boolean requestBluetoothConnectPermission(Activity activity){
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                    REQUEST_CODE_PERMISSION);
+            return false;
+        }
+        return true;
+    }
+
     // Network
     public static final void initializeSSLContext(Context mContext){
         try {

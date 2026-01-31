@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.support.v4.media.session.MediaSessionCompat;
 
@@ -161,7 +162,12 @@ public class AudioPlayService extends Service {
     private void startForegroundNotification(){
         try{
             Notification notification = buildNotification();
-            startForeground(NOTIF_ID, notification);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                // Android 14 (API 34) 以降: serviceType パラメータが必須
+                startForeground(NOTIF_ID, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+            } else {
+                startForeground(NOTIF_ID, notification);
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -546,7 +552,7 @@ public class AudioPlayService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                if (action.equals(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED)){
+                if (action != null && action.equals(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED)){
                     int state = intent.getIntExtra(BluetoothA2dp.EXTRA_STATE, BluetoothA2dp.STATE_DISCONNECTED);
                     if (state == BluetoothA2dp.STATE_DISCONNECTED){
                         if (audioPlayPause(true)){
@@ -566,10 +572,15 @@ public class AudioPlayService extends Service {
             }
         };
         public BluetoothManager(){
-            IntentFilter intentFilter = new IntentFilter(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED);
-            intentFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
-            intentFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
-            getApplicationContext().registerReceiver(btReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED);
+            try {
+                IntentFilter intentFilter = new IntentFilter(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED);
+                intentFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
+                intentFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
+                getApplicationContext().registerReceiver(btReceiver, intentFilter, Context.RECEIVER_EXPORTED);
+                Log.d("BluetoothManager", "BroadcastReceiver registered successfully. SDK=" + Build.VERSION.SDK_INT);
+            } catch (Exception e) {
+                Log.e("BluetoothManager", "Failed to register BroadcastReceiver", e);
+            }
         }
         public void unregister(Context context){
             context.unregisterReceiver(btReceiver);
@@ -583,6 +594,12 @@ public class AudioPlayService extends Service {
         int status = lastPlaying ? 1 : 0;
         Intent intent = new Intent(PlayStatusNotificationName);
         intent.putExtra("status",status);
-        sendBroadcast(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            // Android 14 (API 34) 以降: BroadcastOptions を指定
+            android.app.BroadcastOptions options = android.app.BroadcastOptions.makeBasic();
+            sendBroadcast(intent, null, options.toBundle());
+        } else {
+            sendBroadcast(intent);
+        }
     }
 }

@@ -8,7 +8,9 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:requestLegacyExternalStorage="true"
@@ -73,7 +75,8 @@
             android:name=".FileSaveActivity"
             android:label="@string/title_activity_file_save" />
 
-        <service android:name=".AudioPlayService" />
+        <service android:name=".AudioPlayService"
+            android:foregroundServiceType="mediaPlayback" />
     </application>
 
 </manifest>

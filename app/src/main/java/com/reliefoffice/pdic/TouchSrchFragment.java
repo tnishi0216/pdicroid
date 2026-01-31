@@ -21,6 +21,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -777,6 +778,9 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
         // Bluetooth Manager //
         Utility.requestBluetoothPermission(getActivity());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Utility.requestBluetoothConnectPermission(getActivity());
+        }
 
         fromMain = false;
 
@@ -1925,7 +1929,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     // use_service == trueのときのみ生成
     void initServiceNotification() {
         if (!use_service) return;
-        getActivity().registerReceiver(playStatusNotification, new IntentFilter(AudioPlayService.PlayStatusNotificationName), Context.RECEIVER_NOT_EXPORTED);
+        getActivity().registerReceiver(playStatusNotification, new IntentFilter(AudioPlayService.PlayStatusNotificationName), Context.RECEIVER_EXPORTED);
     }
     void cleanupServiceNotification(){
         if (!use_service) return;
