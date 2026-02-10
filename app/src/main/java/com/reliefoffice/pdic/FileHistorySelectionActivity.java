@@ -28,6 +28,11 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
         fileHistory = new FileHistoryManager(this);
     }
 
+    // Override the method of superclass
+    protected boolean requestStoragePermission(){
+        return true;
+    }
+
     @Override
     protected List<FileInfo> getListFileInfo(String path) {
         if (fileHistory.size()==0){

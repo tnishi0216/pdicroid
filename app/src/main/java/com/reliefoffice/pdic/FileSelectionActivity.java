@@ -199,12 +199,17 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
 //        if (!Utility.requestStoragePermission(this)){
 //            return;
 //        }
-         if (!Utility.requestStorageAllPermission(this)){
-             return;
-         }
+        if (!requestStoragePermission()){
+            return;
+        }
         if (checkStartSelectFile()){
             startSelectFile();
         }
+    }
+
+    // might be overridden by subclass
+    protected boolean requestStoragePermission(){
+        return Utility.requestStoragePermission(this);
     }
 
     @Override
