@@ -12,9 +12,7 @@ import java.nio.charset.Charset;
 
 import com.reliefoffice.pdic.text.LineBreak;
 
-import org.mozilla.universalchardet.CharsetListener;
 import org.mozilla.universalchardet.UniversalDetector;
-//import org.mozilla.universalchardet.UniversalDetector.DetectorException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -22,8 +20,6 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.Toast;
-
-import com.reliefoffice.pdic.R;
 
 public class TextLoadTask extends AsyncTask<String, Integer, StringBuilder>{
 
