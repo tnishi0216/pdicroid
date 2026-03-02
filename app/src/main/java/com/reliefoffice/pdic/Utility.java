@@ -364,8 +364,8 @@ public class Utility {
         if (Build.VERSION.SDK_INT >= 33) {
             // API 33以上：READ_MEDIA_*権限が必要
             String[] permissions = {
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO,
+//                  Manifest.permission.READ_MEDIA_IMAGES,
+//                  Manifest.permission.READ_MEDIA_VIDEO,
                     Manifest.permission.READ_MEDIA_AUDIO
             };
             boolean needRequest = false;
