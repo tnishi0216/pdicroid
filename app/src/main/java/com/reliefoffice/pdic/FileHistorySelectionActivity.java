@@ -66,6 +66,7 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
         PSBookmarkFileManager psbmFM = PSBookmarkFileManager.createInstance(this, ndvFM);
         psbmFM.open();
         psbmFM.loadBookmarkFiles();
+        boolean mp3exists = false;
         for (int i=0;i<fileHistory.size();i++) {
             String filename = fileHistory.get(i);
             File file = new File(filename);
@@ -77,12 +78,21 @@ public class FileHistorySelectionActivity extends FileSelectionActivity {
                 fileInfo = new FileInfo(localFile.getName(), file);
                 fileInfo.setFileSize(localFile.length());
                 fileInfo.setModDate(localFile.lastModified());
+            } else
+            if (SAFUtility.isSAFFilename(filename)) {
+                // SAF file
+                SAFFile safFile = new SAFFile(filename);
+                String name = safFile.getFileName(this);
+                fileInfo = new FileInfo(name, filename);
+                fileInfo.setFileSize(safFile.getFileSize(this));
+                fileInfo.setModDate(safFile.getLastModified(this));
+                mp3exists = SAFUtility.mp3FileExistsFromUri(safFile.getUri(), this, altAudioFolder);
             } else {
                 // normal file
                 fileInfo = new FileInfo(file.getName(), file);
             }
             fileInfo.setReadDate(fileHistory.getDateLong(i));
-            fileInfo.m_mp3Exists = Utility.mp3Exists(fileInfo.getName(), altAudioFolder);
+            fileInfo.m_mp3Exists = mp3exists ? mp3exists : Utility.mp3Exists(fileInfo.getName(), altAudioFolder);
             fileInfo.setNrBM(psbmFM.getBoookmarkCount(filename));
             listFile.add(fileInfo);
         }

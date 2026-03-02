@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -27,6 +28,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.content.ContentUris;
+import android.database.Cursor;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -63,10 +68,10 @@ import com.reliefoffice.pdic.text.pfs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -1232,7 +1237,11 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_loadfile) {
-            selectFile();
+            if (config.isRestrictedMode){
+                selectSAFFile();
+            } else {
+                selectFile();
+            }
         } else if (id == R.id.action_loadfile_history) {
             selectFileFromHistory();
         } else if (id == R.id.action_loadfile_dropbox) {
@@ -1281,6 +1290,8 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     static final int REQUEST_CODE_SAVE = 1;
     static final int REQUEST_CODE_SELECT_FILE = 2;
     static final int REQUEST_CODE_SELECT_FILE_DBX = 3;
+    static final int REQUEST_CODE_SELECT_SAF_FILE = 4;
+    static final int REQUEST_CODE_OPEN_DOCUMENT_TREE = 6; // request code for ACTION_OPEN_DOCUMENT_TREE
 
     boolean fromDropbox = false;
     private String m_strInitialDir;
@@ -1297,6 +1308,11 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             i.putExtra("exts", config.TextExtensions);
             startActivityForResult(i, REQUEST_CODE_SELECT_FILE);
         }
+    }
+    void selectSAFFile() {
+        boolean debug = pref.getBoolean(pfs.DEBUG, false);
+        boolean isText = !debug; // debugモードではバイナリファイルも選択可能にする
+        SAFUtility.showSelectSAFFile(this, REQUEST_CODE_SELECT_SAF_FILE, isText);
     }
 
     String downloadedRemoteName;
@@ -1329,7 +1345,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     @Override
     public void onFileLoaded(StringBuilder result, String filename, String charset, int linebreak, int mOffset) {
         if (result != null) {
-            if (Utility.isLLMFile(filename)){
+            if (Utility.isLLMFile(filename, getContext())){
                 editText.setText( llmManager.setup(result.toString()) );
             } else {
                 editText.setText(result);
@@ -1359,7 +1375,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         @Override
         protected Object doInBackground(Object[] param) {
             try {
-                FileInputStream fis = new FileInputStream(filename);
+                InputStream fis = SAFFile.createInputStream(filename, context);
                 text = getText(fis);
                 ok = true;
             } catch (IOException e) {
@@ -1387,7 +1403,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
 
     private void onPostLoadFile(LoadFileTask loadTask) {
         if (loadTask.ok) {
-            if (Utility.isLLMFile(loadTask.filename)){
+            if (Utility.isLLMFile(loadTask.filename, getContext())){
                 editText.setText( llmManager.setup(loadTask.text) );
             } else {
                 editText.setText(loadTask.text);
@@ -1427,8 +1443,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         psbmFilename = PSBookmarkFileManager.buildFileName(openedFilename, remoteFilename, ndvUtils.prefix);
 
         // set title
-        File file = new File(filename);
-        lastFileName = file.getName();
+        lastFileName = SAFUtility.getBaseName(filename, getContext());
         getActivity().setTitle(lastFileName);
 
         // load PSBookmark
@@ -1490,14 +1505,67 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         }
 
         if (need_setup){
-            String audioFileName = Utility.changeExtension(openedFilename, "mp3");
-            audioOk = openAudioPlayer(audioFileName);
+            // remoteFilenameがある場合はそれをベースにmp3ファイル名を作成（再起動時にSAFファイル名を保持するため）
+            String baseFilename = Utility.isNotEmpty(remoteFilename) ? remoteFilename : openedFilename;
+
+            // SAFで選択されたファイルの場合、単純に拡張子を文字列置換するだけではアクセス権がない可能性がある。
+            // もしテキストファイルに対して既にツリーアクセスを永続化している場合は、ツリーURIを使って mp3 を検索する。
+            boolean triedTreeUri = false;
+            Uri docUriToSearch = null;
+            
+            // remoteFilename または openedFilename（SAF）からツリーを検索する対象 docUri を決定
+            if (Utility.isNotEmpty(remoteFilename) && SAFUtility.isSAFFilename(remoteFilename)){
+                docUriToSearch = Uri.parse(remoteFilename);
+            } else if (SAFUtility.isSAFFilename(baseFilename)){
+                // remoteFilename が null で openedFilename（=baseFilename）が SAF の場合
+                docUriToSearch = Uri.parse(baseFilename);
+            }
+            
+            if (docUriToSearch != null){
+                Uri treeUri = SAFUtility.findPersistedTreeUriForDocument(docUriToSearch, getContext());
+                if (treeUri != null) {
+                    try {
+                        audioOk = searchAndOpenMp3InDirectory(treeUri);
+                        triedTreeUri = true;
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            // Try to find mp3 using SAF/MediaStore instead of simple string replacement
+            Uri mp3Uri = null;
+            if (!triedTreeUri) {
+                mp3Uri = findSiblingMp3ByDisplayName(baseFilename);
+                if (mp3Uri != null) {
+                    audioOk = openAudioPlayer(mp3Uri.toString());
+                }
+            }
+            String audioFileName = "";
+            if (!audioOk) {
+                // Fallback to original method if new method failed
+                audioFileName = Utility.changeExtension(baseFilename, "mp3");
+                audioOk = openAudioPlayer(audioFileName);
+            }
             if (!audioOk){
                 String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, config.getDefaultAudioFolder());
                 if (Utility.isEmpty(altAudioFolder))
                     altAudioFolder = config.getDefaultAudioFolder();
                 audioFileName = Utility.changePath(audioFileName, altAudioFolder);
                 audioOk = openAudioPlayer(audioFileName);
+ 
+                // If still not found and the text file was opened via SAF, try directory enumeration
+                if (!audioOk && Utility.isNotEmpty(remoteFilename) && SAFUtility.isSAFFilename(remoteFilename)){
+                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+                    String treeUriStr = pref.getString("tree_mapping:" + remoteFilename, null);
+                    if (Utility.isNotEmpty(treeUriStr)){
+                        Uri treeUri = Uri.parse(treeUriStr);
+                        audioOk = searchAndOpenMp3InDirectory(treeUri);
+                    } else {
+                        // Prompt user to grant access to the directory containing the text file
+                        promptForDirectoryAccess();
+                    }
+                }
             }
         } else {
             reopenAudioPlayer();
@@ -1505,12 +1573,145 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         }
         showAudio(audioOk);
 
-        LLM = Utility.isLLMFile(openedFilename) && audioOk;
+        LLM = Utility.isLLMFile(openedFilename, getContext()) && audioOk;
         if (!LLM){
             llmManager.clear();
         }
 
         reloadMarkPosition();
+    }
+
+    // Prompt user to choose the directory (tree) that contains the text file so we can enumerate mp3 siblings
+    void promptForDirectoryAccess(){
+        if (getActivity() == null) return;
+        new android.support.v7.app.AlertDialog.Builder(getActivity())
+                .setTitle(R.string.dialog_request_directory_access_title)
+                .setMessage(R.string.dialog_request_directory_access_message)
+                .setPositiveButton(R.string.button_allow, (dialog, which) -> {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    // Request persistable read/write permission so we can call takePersistableUriPermission()
+                    intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    // Optionally, we could try to set an initial URI here on Android >= O, but keep simple
+                    startActivityForResult(intent, REQUEST_CODE_OPEN_DOCUMENT_TREE);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    // Safely find a sibling .mp3 file using display name from SAF URI
+    // Returns the URI of the mp3 file, or null if not found
+    @Nullable
+    private Uri findSiblingMp3ByDisplayName(String textFileUriOrPath) {
+        if (Utility.isEmpty(textFileUriOrPath)) return null;
+        Context ctx = getContext();
+        if (ctx == null) return null;
+
+        // Step 1: Get display name from the text file URI/path
+        String displayName = null;
+        if (SAFUtility.isSAFFilename(textFileUriOrPath)) {
+            Uri textUri = Uri.parse(textFileUriOrPath);
+            displayName = SAFUtility.getFileNameFromUri(textUri, ctx);
+        } else {
+            // Regular file path
+            displayName = new File(textFileUriOrPath).getName();
+        }
+
+        if (Utility.isEmpty(displayName)) return null;
+
+        // Step 2: Extract base name (without extension)
+        String base = displayName.contains(".")
+                ? displayName.substring(0, displayName.lastIndexOf('.'))
+                : displayName;
+        String mp3Name = base + ".mp3";
+
+        // Step 3: Try MediaStore first (covers audio files accessible via MediaStore)
+        Uri mediaUri = searchMediaStoreByDisplayName(ctx, mp3Name);
+        if (mediaUri != null) return mediaUri;
+
+        return null;
+    }
+
+    // Search MediaStore.Audio.Media for a file with the given display name
+    @Nullable
+    private Uri searchMediaStoreByDisplayName(Context context, String displayName) {
+        if (Utility.isEmpty(displayName)) return null;
+        try {
+            ContentResolver cr = context.getContentResolver();
+            String[] projection = { MediaStore.Audio.Media._ID, MediaStore.MediaColumns.DISPLAY_NAME };
+            String selection = MediaStore.MediaColumns.DISPLAY_NAME + " = ?";
+            String[] selArgs = { displayName };
+            Cursor c = cr.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, selArgs, null);
+            if (c != null) {
+                try {
+                    if (c.moveToFirst()) {
+                        long id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                        return ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+                    }
+                } finally {
+                    c.close();
+                }
+            }
+        } catch (Exception ignored) { }
+        return null;
+    }
+
+    // Enumerate children of the given tree URI and open the best matching mp3
+    boolean searchAndOpenMp3InDirectory(Uri treeUri){
+        if (treeUri == null) return false;
+        ContentResolver resolver = getContext().getContentResolver();
+        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri));
+        String[] projection = new String[]{DocumentsContract.Document.COLUMN_DOCUMENT_ID, DocumentsContract.Document.COLUMN_DISPLAY_NAME, DocumentsContract.Document.COLUMN_MIME_TYPE};
+        Cursor c = null;
+        try {
+            c = resolver.query(childrenUri, projection, null, null, null);
+            if (c == null) return false;
+            List<Uri> mp3s = new ArrayList<>();
+            while (c.moveToNext()){
+                String docId = c.getString(c.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID));
+                String name = c.getString(c.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
+                String mime = c.getString(c.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_MIME_TYPE));
+                if (name != null && name.toLowerCase().endsWith(".mp3")){
+                    Uri docUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, docId);
+                    mp3s.add(docUri);
+                } else if (mime != null && mime.startsWith("audio/")){
+                    Uri docUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, docId);
+                    mp3s.add(docUri);
+                }
+            }
+
+            if (mp3s.size() == 0) return false;
+
+            // Prefer exact name match (textfile base name -> .mp3)
+            String openedBasename = SAFUtility.getBaseName(openedFilename, getContext());
+            String desired = Utility.changeExtension(openedBasename, "mp3");
+            Uri chosen = null;
+            for (Uri u : mp3s){
+                String dname = SAFUtility.getFileNameFromUri(u, getContext());
+                if (desired.equals(dname)){
+                    chosen = u;
+                    break;
+                }
+            }
+            if (chosen == null) return false;
+
+            // Persist tree permission and save mapping from text file to tree for future automatic lookup
+            try {
+                int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+                getActivity().getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+                pref.edit().putString("tree_mapping:" + remoteFilename, treeUri.toString()).apply();
+            } catch (Exception e){
+                // ignore
+            }
+
+            boolean ok = openAudioPlayer(chosen.toString());
+            return ok;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (c != null) c.close();
+        }
     }
 
     // file load エラー後処理
@@ -1710,7 +1911,7 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         long endTime = System.currentTimeMillis();
         Log.d("PDD", "moveCursorPlayingLine: time=" + (endTime - startTime) + "ms pos="+getAudioCurrentPosition());
         if (debug){
-            Toast.makeText(getContext(), "linenum="+linenum+" pos="+getAudioCurrentPosition()+" "+llmManager.getLineText(linenum), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "linenum="+linenum+" moved line="+movedline+" pos="+getAudioCurrentPosition()+" "+llmManager.getLineText(linenum), Toast.LENGTH_LONG).show();
         }
     }
     boolean FollowPlayingLineEnabled = false;
@@ -1749,6 +1950,9 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 Log.i("PDD", "uri="+uri.toString());
                 Log.i("PDD", "filename="+uri.getPath());
 //                getActivity().getContentResolver().query()
+
+                // URIオブジェクトに永続的アクセス権を設定（URIを文字列で保存したあとでも使用するため）
+                SAFUtility.setPersistableUriPermission(uri, data.getFlags(), getContext());
             }
         } else
         if (requestCode == REQUEST_CODE_PSB) {
@@ -1812,6 +2016,42 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                         fileEncoding = bundle.getString("fileEncoding");
                         FileInfo fileInfo = new FileInfo(name, file);
                         onFileSelect(fileInfo);
+                    }
+                }
+            }
+        } else
+        if (requestCode == REQUEST_CODE_SELECT_SAF_FILE) {
+            // SAF (Storage Access Framework) file selection
+            if (resultCode == Activity.RESULT_OK) {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    fileEncoding = SAFUtility.getFileEncodingFromUri(uri, getContext());
+                    // URIオブジェクトに永続的アクセス権を設定（URIを文字列で保存したあとでも使用するため）
+                    SAFUtility.setPersistableUriPermission(uri, data.getFlags(), getContext());
+                    loadFile(uri.toString(), null);
+                }
+            }
+        } else if (requestCode == REQUEST_CODE_OPEN_DOCUMENT_TREE) {
+            // Directory (tree) access result
+            if (resultCode == Activity.RESULT_OK) {
+                Uri treeUri = data != null ? data.getData() : null;
+                if (treeUri != null) {
+                    int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    try {
+                        getActivity().getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                    // Persist mapping from this text file to the tree uri for future automatic detection
+                    if (Utility.isNotEmpty(remoteFilename)){
+                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        pref.edit().putString("tree_mapping:" + remoteFilename, treeUri.toString()).apply();
+                    }
+
+                    boolean ok = searchAndOpenMp3InDirectory(treeUri);
+                    showAudio(ok);
+                    if (!ok){
+                        Toast.makeText(getContext(), "対応する音声ファイルが見つかりませんでした。", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -2024,8 +2264,38 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
     }
     boolean openAudioPlayer(String filename) {
         closeAudioPlayer(false);
-        if (!Utility.fileExists(filename))
-            return false;
+        if (SAFUtility.isSAFFilename(filename)) {
+            SAFFile safFile = new SAFFile(filename);
+            // if (safFile.isAvailable(getContext()))
+            {
+	            // retrieve stored previous audio temp path
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+                String prevTemp = sp.getString(pfs.AUDIO_TEMP_FILENAME, "");
+
+                // try to copy/update
+                filename = safFile.copyToTemporaryFileIfNewer(getContext());   // real file name
+                if (Utility.isEmpty(filename)) return false;
+
+                // if previous path differs, delete old file
+                if (Utility.isNotEmpty(prevTemp) && !prevTemp.equals(filename)) {
+                    File old = new File(prevTemp);
+                    if (old.exists()) {
+                        try {
+                            old.delete();
+                        } catch (Exception e) {
+                            // ignore
+                        }
+                    }
+                }
+                if (Utility.isEmpty(prevTemp) || !prevTemp.equals(filename)) {
+                    // store new path persistently
+                    sp.edit().putString(pfs.AUDIO_TEMP_FILENAME, filename).apply();
+                }
+            }
+        } else {
+            if (!Utility.fileExists(filename))
+                return false;
+        }
 
         if (use_service){
             if (!startAudioPlayService(filename)){
@@ -2036,7 +2306,10 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 Log.e("PDD", "audioPlayService is still null!?!?");
                 return false;
             }
-            audioPlayService.openAudioPlayer(filename);
+            if (!audioPlayService.openAudioPlayer(filename)){
+                Log.e("PDD", "audioPlayService.openAudioPlayer failed");
+                return false;
+            }
         } else {
             mediaPlayer = new MediaPlayer();
             try {

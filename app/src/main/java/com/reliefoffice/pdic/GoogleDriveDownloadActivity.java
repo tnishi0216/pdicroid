@@ -2,22 +2,17 @@ package com.reliefoffice.pdic;
 
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.Metadata;
@@ -166,7 +161,7 @@ public class GoogleDriveDownloadActivity extends NetDriveDownloadActivity implem
                     String s = metadata.getTitle() + " " + metadata.getOriginalFilename() + " " + metadata.getFileExtension() + " " + metadata.getMimeType() + " " + metadata.getFileSize();
                     Log.d(TAG, "fileSelected: "+s);
 
-                    FileInfo fileInfo = new FileInfo(null, null);
+                    FileInfo fileInfo = new FileInfo();
                     onFileSelect(fileInfo);
                 }
             }

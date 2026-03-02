@@ -3,7 +3,6 @@ package com.reliefoffice.pdic;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,11 +12,10 @@ import java.nio.charset.Charset;
 import com.reliefoffice.pdic.text.LineBreak;
 
 import org.mozilla.universalchardet.UniversalDetector;
+//import org.mozilla.universalchardet.UniversalDetector.DetectorException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -33,7 +31,6 @@ public class TextLoadTask extends AsyncTask<String, Integer, StringBuilder>{
     private ProgressDialog mProgressDialog;
     private Activity mActivity;
     private int mLine;
-    private ContentResolver mCr;
     public interface OnFileLoadListener
     {
         void onPreFileLoad();
@@ -46,7 +43,6 @@ public class TextLoadTask extends AsyncTask<String, Integer, StringBuilder>{
         mDefaultCharset = defCharset;
         mActivity = activity;
         mLine = initline;
-        mCr = mActivity.getContentResolver();
     }
 
     @Override
@@ -69,24 +65,11 @@ public class TextLoadTask extends AsyncTask<String, Integer, StringBuilder>{
     {
         String uri = params[0];
         String charset = params[1];
-        if ( uri.startsWith("content://") ){
-            // content provider
-            try {
-                return openFile( mCr.openInputStream(Uri.parse(uri)), charset );
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }else{
-            // file
-            File f = new File(uri);
-            if ( f.exists() ){
-                mFilename = uri;
-                try{
-                    return openFile( new FileInputStream( f ), charset );
-                } catch( Exception e){
-                    e.printStackTrace();
-                }
-            }
+        try {
+            mFilename = uri;
+            return openFile( SAFFile.createInputStream( uri , mActivity ), charset );
+        } catch (Exception e){
+            e.printStackTrace();
         }
         return null;
     }

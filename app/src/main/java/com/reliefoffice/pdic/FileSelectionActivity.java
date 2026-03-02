@@ -206,7 +206,11 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
 
     // might be overridden by subclass
     protected boolean requestStoragePermission(){
+        if (config.isRestrictedMode){
+            return Utility.requestStoragePermission(this);
+        } else {
             return Utility.requestStorageAllPermission(this);
+        }
     }
 
     @Override

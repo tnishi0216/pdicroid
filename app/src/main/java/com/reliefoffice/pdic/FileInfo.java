@@ -9,6 +9,7 @@ public class FileInfo implements Comparable<FileInfo> {
 
     private String	m_strName;	// display name
     private File	m_file;	// file object (can be null)
+    private String m_remotePath;  // for SAF path
 
     private boolean m_isDir;
     private String m_parent;
@@ -21,6 +22,10 @@ public class FileInfo implements Comparable<FileInfo> {
 
     int m_nrBM;
 
+    public FileInfo()
+    {
+        initialize(null, null);
+    }
     // constructor
     public FileInfo( String strName, File file )
     {
@@ -38,6 +43,12 @@ public class FileInfo implements Comparable<FileInfo> {
         m_strName = strName;
         m_isDir = isDir;
         m_parent = parent;
+    }
+    public FileInfo( String strName, String remotePath )
+    {
+        m_strName = strName;
+        m_isDir = false;
+        m_remotePath = remotePath;
     }
     // constructor
     public FileInfo( String strName, boolean isDir, String parent, boolean mp3Exists )
@@ -65,9 +76,9 @@ public class FileInfo implements Comparable<FileInfo> {
     {
         return m_strName;
     }
-    public String getAbsolutePath() { return m_file!=null ? m_file.getAbsolutePath() : m_parent + m_strName; }
+    public String getAbsolutePath() { return m_file!=null ? m_file.getAbsolutePath() : (m_remotePath!=null ? m_remotePath : m_parent + m_strName); }
     public String getParent() { return m_file!=null ? m_file.getParent() : m_parent; }
-    public String getPath() { return m_file!=null ? m_file.getPath() : m_parent; }
+    public String getPath() { return m_file!=null ? m_file.getPath() : (m_remotePath!=null ? m_remotePath : m_parent); }
 
     public File getFile(){
         return m_file;  //Note: can be null

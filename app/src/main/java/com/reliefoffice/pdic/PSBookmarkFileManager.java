@@ -157,6 +157,10 @@ public class PSBookmarkFileManager implements INetDriveFileInfo.UpdateNotifier {
     // remotePrefix: i.e. "dbx:"
     public static String buildFileName(String localName, String remoteName, final String remotePrefix){
         if (Utility.isNotEmpty(remoteName)){
+            if (SAFUtility.isSAFFilename(remoteName)){
+                // すでにremote prefixが付与されている場合
+                return remoteName;
+            }
             return remotePrefix+remoteName;
         }
         return localName;

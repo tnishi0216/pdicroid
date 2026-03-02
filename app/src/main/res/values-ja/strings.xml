@@ -38,6 +38,7 @@
     <string name="title_activity_loadfile_history">履歴一覧</string>
     <string name="title_activity_setting">設定</string>
     <string name="msg_dictionary_added">辞書を追加しました</string>
+    <string name="msg_dictionary_already_registered">この辞書はすでに登録されています</string>
     <string name="msg_authenticated">認証しました</string>
     <string name="msg_open_dictionary_query">前回のPDICは正しく終了できませんでした。辞書を開きますか？</string>
     <string name="title_prog_dirlsit">ファイル一覧の取得</string>
@@ -130,4 +131,10 @@
     <string name="action_sleep_timer">おやすみ・目覚ましタイマー</string>
     <string name="audio_channel_name">音声再生</string>
     <string name="action_toggle_follow_play_line">再生行自動追従</string>
+    <string name="msg_failed_to_open_temporary_file">"一時ファイルのオープンに失敗しました: "</string>
+    <string name="msg_not_enough_space">ファイルコピーに必要な十分なストレージ容量がありません。</string>
+    <!-- dialog for directory access permission -->
+    <string name="dialog_request_directory_access_title">フォルダへのアクセスを許可してください</string>
+    <string name="dialog_request_directory_access_message">同じフォルダ内の音声ファイルを自動検出するため、フォルダへのアクセスを一度だけ許可してください。</string>
+    <string name="button_allow">許可する</string>
 </resources>

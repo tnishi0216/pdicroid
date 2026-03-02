@@ -32,5 +32,6 @@ public class pfs {
     public static final String WKU_TRANS_TIME = "WKUTransTime";
     public static final String WKU_TARGET_VOLUME = "WKUTargetVolume";
     public static final String FOLLOW_PLAYING_LINE = "FollowPlayingLine";
+    public static final String AUDIO_TEMP_FILENAME = "AudioTempFilename";
     public static final String DEBUG = "Debug";
 }

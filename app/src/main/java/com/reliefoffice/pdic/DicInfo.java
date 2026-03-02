@@ -18,6 +18,7 @@ public class DicInfo {
     public String ndvRevision;
     //public boolean ndvDownloadRequest;
     //public boolean ndvUploadRequest;
+    public boolean isTemp; // true when the file was copied from SAF to app-local temporary file
 
     final public boolean isDbx() { return Utility.isNotEmpty(ndvPath); }
 }

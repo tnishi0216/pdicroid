@@ -39,6 +39,7 @@
     <string name="title_activity_loadfile_history">File History</string>
     <string name="title_activity_setting">Settings</string>
     <string name="msg_dictionary_added">Dictionary added.</string>
+    <string name="msg_dictionary_already_registered">Dictionary already registered.</string>
     <string name="msg_authenticated">Authenticated</string>
     <string name="msg_open_dictionary_query">Previous PDIC is not terminated normally. Do you open the dictionary?</string>
     <string name="title_prog_dirlsit">Get the file list</string>
@@ -137,4 +138,10 @@
     <string name="action_sleep_timer">Sleep/Wakeup Timer</string>
     <string name="audio_channel_name">Audio Playback</string>
     <string name="action_toggle_follow_play_line">Follow playing line</string>
+    <string name="msg_failed_to_open_temporary_file">"Failed to open temporary file: "</string>
+    <string name="msg_not_enough_space">Not enough storage space for file copy.</string>
+    <!-- dialog for directory access permission -->
+    <string name="dialog_request_directory_access_title">Please allow access to the folder</string>
+    <string name="dialog_request_directory_access_message">To automatically detect audio files in the same folder, please grant access to the folder just once.</string>
+    <string name="button_allow">Allow</string>
 </resources>

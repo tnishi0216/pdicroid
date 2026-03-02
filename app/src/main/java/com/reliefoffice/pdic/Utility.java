@@ -138,9 +138,36 @@ public class Utility {
         return mp3Exists;
     }
 
-    //TODO: .txtのLLM:1形式は未対応
-    public static boolean isLLMFile(String filename)
+    /**
+     * SAFで選択されたファイルを含む、拡張子がllmであるかを判定
+     * SAFのURIの場合、Contextを使ってファイル名を取得してから判定
+     * @param filename 通常のパスまたはSAFのURI
+     * @param context Context（SAFのURI対応に必要）
+     * @return 拡張子がllmであればtrue
+     */
+    public static boolean isLLMFile(String filename, Context context)
     {
+        if (filename == null) {
+            return false;
+        }
+
+        // SAFのURIかどうかを判定
+        if (SAFUtility.isSAFFilename(filename)) {
+            try {
+                // SAFのURIの場合、ファイル名を取得
+                Uri uri = Uri.parse(filename);
+                String displayName = SAFUtility.getFileNameFromUri(uri, context);
+                if (displayName != null) {
+                    String extension = getFileExtension(displayName);
+                    return extension.toLowerCase().equals("llm");
+                }
+            } catch (Exception e) {
+                Log.w("Utility", "Failed to check LLM file: " + e.getMessage());
+                return false;
+            }
+        }
+
+        // 通常のパスの場合、従来の方法で判定
         String extension = getFileExtension(filename);
         return extension.toLowerCase().equals("llm");
     }

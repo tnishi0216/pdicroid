@@ -123,7 +123,8 @@ public class DicPref {
         if (length>7){ info.DLUrl = s[7];
         if (length>8){ info.ndvPath = s[8];
         if (length>9){ info.ndvRevision = s[9];
-        }}}}}}}}}}
+        if (length>10){ info.isTemp = "1".equals(s[10]);
+        }}}}}}}}}}}
         return info;
     }
     public void addDicInfo(DicInfo info){
@@ -134,7 +135,7 @@ public class DicPref {
         return s;
     }
     public void saveDicInfo(int index, DicInfo info){
-        saveDicPref(index, info.filename + "\t" + nonull(info.name) + "\t" + nonull(info.upgradeKey) + "\t" + nonull(info.version) + "\t" + nonull(info.date) + "\t" + nonull(info.descriptoin) + "\t" + nonull(info.HPUrl) + "\t" + nonull(info.DLUrl) + "\t" + nonull(info.ndvPath) + "\t" + nonull(info.ndvRevision));
+        saveDicPref(index, info.filename + "\t" + nonull(info.name) + "\t" + nonull(info.upgradeKey) + "\t" + nonull(info.version) + "\t" + nonull(info.date) + "\t" + nonull(info.descriptoin) + "\t" + nonull(info.HPUrl) + "\t" + nonull(info.DLUrl) + "\t" + nonull(info.ndvPath) + "\t" + nonull(info.ndvRevision) + "\t" + (info.isTemp ? "1" : "0"));
     }
 
     // dicpref format
