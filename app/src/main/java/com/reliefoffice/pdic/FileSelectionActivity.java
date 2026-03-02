@@ -196,9 +196,6 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
     @Override
     protected void onResume(){
         super.onResume();
-//        if (!Utility.requestStoragePermission(this)){
-//            return;
-//        }
         if (!requestStoragePermission()){
             return;
         }
@@ -209,7 +206,7 @@ public class FileSelectionActivity extends AppCompatActivity implements FileSele
 
     // might be overridden by subclass
     protected boolean requestStoragePermission(){
-        return Utility.requestStoragePermission(this);
+            return Utility.requestStorageAllPermission(this);
     }
 
     @Override
