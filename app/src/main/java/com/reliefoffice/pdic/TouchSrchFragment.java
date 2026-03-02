@@ -1555,9 +1555,10 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 audioOk = openAudioPlayer(audioFileName);
  
                 // If still not found and the text file was opened via SAF, try directory enumeration
-                if (!audioOk && Utility.isNotEmpty(remoteFilename) && SAFUtility.isSAFFilename(remoteFilename)){
+                String safCandidate = Utility.isNotEmpty(remoteFilename) ? remoteFilename : baseFilename;
+                if (!audioOk && Utility.isNotEmpty(safCandidate) && SAFUtility.isSAFFilename(safCandidate)){
                     SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-                    String treeUriStr = pref.getString("tree_mapping:" + remoteFilename, null);
+                    String treeUriStr = pref.getString("tree_mapping:" + safCandidate, null);
                     if (Utility.isNotEmpty(treeUriStr)){
                         Uri treeUri = Uri.parse(treeUriStr);
                         audioOk = searchAndOpenMp3InDirectory(treeUri);
@@ -1628,6 +1629,37 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
         Uri mediaUri = searchMediaStoreByDisplayName(ctx, mp3Name);
         if (mediaUri != null) return mediaUri;
 
+        // Step 4: if the original path/URI is a SAF document, MediaStore
+        // will never know about the file.  In that case try enumerating the
+        // containing tree and look for a matching display name.
+        if (SAFUtility.isSAFFilename(textFileUriOrPath)) {
+            Uri textUri = Uri.parse(textFileUriOrPath);
+            Uri treeUri = SAFUtility.findPersistedTreeUriForDocument(textUri, ctx);
+            if (treeUri != null) {
+                Uri found = findMp3InTree(treeUri, mp3Name);
+                if (found != null) return found;
+            } else {
+                // no persisted tree permission – try to derive parent folder
+                // from the document ID and treat it as a tree root.  this
+                // works when we only have a document-level permission.
+                try {
+                    if (DocumentsContract.isDocumentUri(ctx, textUri)) {
+                        String docId = DocumentsContract.getDocumentId(textUri);
+                        int slash = docId.lastIndexOf('/');
+                        if (slash >= 0) {
+                            String parentId = docId.substring(0, slash);
+                            treeUri = DocumentsContract.buildTreeDocumentUri(
+                                    textUri.getAuthority(), parentId);
+                            Uri found = findMp3InTree(treeUri, mp3Name);
+                            if (found != null) return found;
+                        }
+                    }
+                } catch (Exception ignored) {
+                    // if anything goes wrong just continue
+                }
+            }
+        }
+
         return null;
     }
 
@@ -1652,6 +1684,39 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
                 }
             }
         } catch (Exception ignored) { }
+        return null;
+    }
+
+    // Helper used by findSiblingMp3ByDisplayName: scan a tree for a file whose
+    // display name exactly matches |mp3Name|.  Returns the document URI or null.
+    @Nullable
+    private Uri findMp3InTree(Uri treeUri, String mp3Name) {
+        if (treeUri == null) return null;
+        ContentResolver resolver = getContext().getContentResolver();
+        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri,
+                DocumentsContract.getTreeDocumentId(treeUri));
+        String[] projection = new String[]{
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME
+        };
+        Cursor c = null;
+        try {
+            c = resolver.query(childrenUri, projection, null, null, null);
+            if (c == null) return null;
+            while (c.moveToNext()) {
+                String docId = c.getString(c.getColumnIndexOrThrow(
+                        DocumentsContract.Document.COLUMN_DOCUMENT_ID));
+                String name = c.getString(c.getColumnIndexOrThrow(
+                        DocumentsContract.Document.COLUMN_DISPLAY_NAME));
+                if (name != null && name.equals(mp3Name)) {
+                    return DocumentsContract.buildDocumentUriUsingTree(treeUri, docId);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (c != null) c.close();
+        }
         return null;
     }
 
