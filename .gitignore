@@ -5,4 +5,5 @@
 .history
 .idea
 build
+env.mk
 local.properties
