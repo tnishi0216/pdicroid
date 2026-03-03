@@ -72,6 +72,7 @@ deploy:
 	perl -S deploy.pl pdicroid.apk -vapp/build.gradle -hs:\web\sakura-pdic\android\index.html -hkey:Apk @sakura
 	-mkdir release
 	perl -S deploy.pl pdicroid.apk -vapp/build.gradle -rename -copy release
+	perl -S deploy.pl pdicroid -vapp/build.gradle -verinfo
 #	pause zip
 #	make zip
 #	zr.bat
