@@ -3,6 +3,7 @@ package com.reliefoffice.pdic;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.Intent;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -25,7 +26,9 @@ import android.support.design.widget.NavigationView;
 import com.reliefoffice.pdic.text.config;
 import com.reliefoffice.pdic.text.pfs;
 
-public class MainActivity extends AppCompatActivity implements IncrSrchFragment.OnFragmentInteractionListener, TouchSrchFragment.OnFragmentInteractionListener, DicSettingFragment.OnFragmentInteractionListener {
+import java.io.File;
+
+public class MainActivity extends AppCompatActivity implements IncrSrchFragment.OnFragmentInteractionListener, TouchSrchFragment.OnFragmentInteractionListener, DicSettingFragment.OnFragmentInteractionListener, IAsyncFileDownloadNotify {
     static final String PFS_RUNNING = "Running";
 
     PdicJni pdicJni;
@@ -34,6 +37,11 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
 
     boolean prevRunning = false;
     boolean openPending = false;
+    
+    // Version check variables
+    private String latestVersionName;
+    // reference to the dialog showing current version/checking status
+    private AlertDialog versionDialog;
 
     SharedPreferences pref;
 
@@ -157,6 +165,12 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
                 fragmentClass = DicSettingFragment.class;
                 lastNavSetting = true;
                 break;
+            case R.id.nav_check_version:
+                // show version dialog instead of switching fragment
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawers();
+                showVersionInfo(false);
+                return;
         }
 
         if (fragment == null) {
@@ -309,9 +323,9 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
 
         openPending = true;
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Open Dictionary");
-        alertDialogBuilder.setMessage( getString(R.string.msg_open_dictionary_query));
-        alertDialogBuilder.setPositiveButton("Yes",
+        alertDialogBuilder.setTitle(R.string.title_open_dictionary);
+        alertDialogBuilder.setMessage(getString(R.string.msg_open_dictionary_query));
+        alertDialogBuilder.setPositiveButton(R.string.button_yes,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -319,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
                         openDictionary();
                     }
                 });
-        alertDialogBuilder.setNegativeButton("No",
+        alertDialogBuilder.setNegativeButton(R.string.button_no,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -330,6 +344,120 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
+
+    void showVersionInfo(boolean latest){
+        if (versionDialog != null && versionDialog.isShowing()) {
+            versionDialog.dismiss();
+            versionDialog = null;
+        }
+
+        // Get current version from PackageInfo
+        final String currentVersionName = VupUtility.getCurrentVersion(this);
+        
+        // Show current version information dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.title_version_info);
+        String msg = getString(R.string.msg_current_version, currentVersionName);
+        if (latest) msg += "\n" + getString(R.string.msg_latest_version);
+        builder.setMessage(msg);
+        builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        versionDialog = builder.create();
+        versionDialog.show();
+
+        if (latest) return;
+        
+        // Download latest version information asynchronously
+        String versionCheckUrl = VupUtility.GetVupUrl(currentVersionName);
+        File tempVersionFile = new File(getCacheDir(), "latest_version.xml");
+        
+        AsyncFileDownload downloader = new AsyncFileDownload(new IAsyncFileDownloadNotify() {
+            @Override
+            public void finished(boolean result, String errMsg) {
+                if (result) {
+                    // Parse version information from downloaded file
+                    handleVersionCheckComplete(currentVersionName, tempVersionFile);
+                } else {
+                    Log.w("MainActivity", "Version check failed: " + errMsg);
+                    // Optionally show a toast or log warning
+                }
+            }
+        }, versionCheckUrl, tempVersionFile);
+        downloader.execute();
+    }
+    
+    private void handleVersionCheckComplete(String currentVersion, File versionFile) {
+        Log.d("MainActivity", "Version check completed. Current: " + currentVersion);
+        
+        VupUtility.VupInfo vupinfo = VupUtility.parseVupInfoFile(versionFile);
+
+        if (vupinfo != null) {
+            latestVersionName = vupinfo.Version;
+            String latestDownloadUrl = vupinfo.Location;
+            if ((config.isRestrictedMode || VupUtility.compareVersion(currentVersion, vupinfo.Version) < 0)) {
+                if (vupinfo.Location != null){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showUpdateDialog(latestDownloadUrl);
+                        }
+                    });
+                }
+            } else {
+                // !isRestrictedMode && <latest version>
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showVersionInfo(true);
+                        }
+                    });
+            }
+        }
+        // cleanup
+        if (versionFile.exists()) {
+            versionFile.delete();
+        }
+    }
+    
+    private void showUpdateDialog(String downloadUrl) {
+        // close version dialog if still visible
+        if (versionDialog != null && versionDialog.isShowing()) {
+            versionDialog.dismiss();
+            versionDialog = null;
+        }
+        final String currentVersionName = VupUtility.getCurrentVersion(this);
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if (config.isRestrictedMode){
+            builder.setTitle(R.string.title_update_available_saf);
+            builder.setMessage(R.string.msg_upgrade_prompt);
+        } else {
+            builder.setTitle(R.string.title_update_available);
+            builder.setMessage(getString(R.string.msg_update_prompt, currentVersionName, latestVersionName));
+        }
+        builder.setPositiveButton(R.string.button_yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Open browser to download URL
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(downloadUrl));
+                startActivity(intent);
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(R.string.button_no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    
 
     @Override
     protected void onPause() {
@@ -365,6 +493,12 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+    
+    @Override
+    public void finished(boolean result, String errMsg) {
+        // This method is called when AsyncFileDownload completes
+        // Implementation is handled through the anonymous class in showVersionInfo()
     }
 
     //TODO: これいる？

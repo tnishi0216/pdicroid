@@ -118,6 +118,19 @@
     <string name="title_touch_srch">タッチ検索</string>
     <string name="title_settings">設定</string>
     <string name="title_dictionary_setting">辞書設定</string>
+    <string name="title_check_version">バージョン確認</string>
+    <string name="title_version_info">バージョン情報</string>
+    <string name="msg_current_version">現在のバージョン: %1$s</string>
+    <string name="msg_latest_version">最新版です</string>
+    <string name="title_update_available">アップデートがあります</string>
+    <string name="title_update_available_saf">フル機能版のお知らせ</string>
+    <string name="msg_update_prompt">現在のバージョン: %1$s\n最新のバージョン: %2$s\n新しいバージョンが利用可能です。ダウンロードしますか？</string>
+    <string name="msg_upgrade_prompt">Google PlayからインストールしたPDICには、次の制限があります。\n- 辞書ファイル、音声ファイル(mp3)は無駄なファイルコピーが発生する
+\n- タッチ検索での音声ファイルの再生が動作しない場合がある\n\nフル機能版のダウンロードサイトへ移動しますか？</string>
+    <string name="button_ok">OK</string>
+    <string name="button_yes">はい</string>
+    <string name="button_no">いいえ</string>
+    <string name="title_open_dictionary">辞書を開く</string>
     <string name="navigation_drawer_open">Navigation Drawerを開く</string>
     <string name="navigation_drawer_close">Navigation Drawerを閉じる</string>
     <string name="title_clip_srch">クリップ検索</string>
