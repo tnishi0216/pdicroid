@@ -25,6 +25,9 @@ android {
         }
     }
     namespace 'com.reliefoffice.pdic'
+    buildFeatures {
+        buildConfig = true
+    }
     lint {
         disable 'MissingTranslation'
     }
