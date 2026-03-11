@@ -433,7 +433,7 @@ public class SAFUtility {
         return lastModified; // File.lastModified() と同じミリ秒単位
     }
 
-    //TODO: by GitHub Copilot, Please check.
+    // by GitHub Copilot
     public static String getFileEncodingFromUri(Uri uri, Context context) {
         InputStream is = null;
         try {
@@ -455,15 +455,8 @@ public class SAFUtility {
                     return "utf-8";
                 }
             }
-            // BOMがなければ、UTF-8かShift_JISかを簡易判定
-            // 先頭数KBだけ読む
-            int size = 4096;
-            byte[] buf = new byte[size];
-            System.arraycopy(bom, 0, buf, 0, read);
-            int n = is.read(buf, read, size - read);
-            int total = (n > 0 ? n : 0) + read;
-            String encoding = detectEncoding(buf, total);
-            return encoding;
+            // BOMがなければ、nullを返す。
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
