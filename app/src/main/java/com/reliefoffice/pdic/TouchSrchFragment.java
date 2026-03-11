@@ -2090,7 +2090,8 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             if (resultCode == Activity.RESULT_OK) {
                 Uri uri = data.getData();
                 if (uri != null) {
-                    fileEncoding = SAFUtility.getFileEncodingFromUri(uri, getContext());
+//                    fileEncoding = SAFUtility.getFileEncodingFromUri(uri, getContext());
+                    fileEncoding = null;    // auto
                     // URIオブジェクトに永続的アクセス権を設定（URIを文字列で保存したあとでも使用するため）
                     SAFUtility.setPersistableUriPermission(uri, data.getFlags(), getContext());
                     loadFile(uri.toString(), null);
