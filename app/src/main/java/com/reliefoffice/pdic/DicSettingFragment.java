@@ -267,7 +267,7 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
                 Uri uri = data.getData();
                 if (uri != null) {
                     String fileName = getFileNameFromUri(uri);
-                    if (fileName != null && fileName.endsWith(".dic")) {
+                    if (fileName != null && ((fileName.endsWith(".dic") || fileName.endsWith(".txt")))) {
                         // Determine the temp file path that would be used for this SAF URI
                         File targetTemp = SAFUtility.getTemporaryFileForSAF(uri, getContext());
                         String fullpath = null;
@@ -291,7 +291,7 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
                             SAFUtility.setPersistableUriPermission(uri, data.getFlags(), getActivity());
                         }
                     } else {
-                        Toast.makeText(getContext(), "拡張子 .dic のファイルを選んでください", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.msg_select_dic_or_txt_file, Toast.LENGTH_SHORT).show();
                     }
                 }
             } else {

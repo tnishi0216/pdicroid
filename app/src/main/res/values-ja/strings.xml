@@ -150,4 +150,5 @@
     <string name="dialog_request_directory_access_title">フォルダへのアクセスを許可してください</string>
     <string name="dialog_request_directory_access_message">同じフォルダ内の音声ファイルを自動検出するため、フォルダへのアクセスを一度だけ許可してください。</string>
     <string name="button_allow">許可する</string>
+    <string name="msg_select_dic_or_txt_file">拡張子 .dic または .txt のファイルを選んでください</string>
 </resources>
