@@ -11,7 +11,7 @@ public class config {
     public static final boolean defaultShowPronExp = false; // change R.xml.preference also.
     public static final int swipeMoveMargin = 120;
     public static final int MaxFileHistoryNum = 100;
-    public static final String[] DicTextExtensions = {".dic", ".txt", ".md"};
+    public static final String[] DicTextExtensions = {".dic", ".txt", ".csv", ".md"};
     public static final String[] TextExtensions = {".txt", ".md", ".llm"};
     public static final int AudioStepRewindTime = 5000; // [msec]
     public static final int AudioStepRewindTimeLong = 20000; // [msec]
