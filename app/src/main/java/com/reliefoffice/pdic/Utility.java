@@ -127,6 +127,14 @@ public class Utility {
         return altAudioFolder;
     }
 
+    public static final boolean isSupportedFormatDictionary(String filename){
+        if (isEmpty(filename)){
+            return false;
+        }
+        String ext = getFileExtension(filename).toLowerCase();
+        return ext.equals("dic") || ext.equals("txt") || ext.equals("csv");
+    }
+
     // filenameに対するmp3ファイルが存在するか？
     public static boolean mp3Exists(String filename, String altAudioFolder){
         String audioFileName = changeExtension(filename, "mp3");

@@ -156,5 +156,5 @@
     <string name="dialog_request_directory_access_title">Please allow access to the folder</string>
     <string name="dialog_request_directory_access_message">To automatically detect audio files in the same folder, please grant access to the folder just once.</string>
     <string name="button_allow">Allow</string>
-    <string name="msg_select_dic_or_txt_file">Please select a file with the extension .dic or .txt.</string>
+    <string name="msg_select_dic_or_txt_file">Please select a file with the extension .dic .txt or .csv.</string>
 </resources>

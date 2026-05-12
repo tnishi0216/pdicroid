@@ -267,7 +267,7 @@ public class DicSettingFragment extends Fragment implements FileSelectionDialog.
                 Uri uri = data.getData();
                 if (uri != null) {
                     String fileName = getFileNameFromUri(uri);
-                    if (fileName != null && ((fileName.endsWith(".dic") || fileName.endsWith(".txt")))) {
+                    if (Utility.isSupportedFormatDictionary(fileName)) {
                         // Determine the temp file path that would be used for this SAF URI
                         File targetTemp = SAFUtility.getTemporaryFileForSAF(uri, getContext());
                         String fullpath = null;
