@@ -8,6 +8,7 @@ import android.util.Log;
 import java.io.File;
 
 public class VupUtility {
+	final static String APP_NAME = "pdicroid";
     static public class VupInfo {
         public String Version;
         public String Location;
@@ -34,7 +35,7 @@ public class VupUtility {
     }
     public static final String GetVupUrl(String currentVersionName)
     {
-        return GetVupBaseUrl() + "?server=verinfo&app=pdicroid&version=" + currentVersionName;
+        return GetVupBaseUrl() + "?server=verinfo&app="+APP_NAME+"&version=" + currentVersionName;
     }
     public static final VupInfo parseVupInfoFile(File filename)
     {
