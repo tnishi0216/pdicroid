@@ -1534,18 +1534,22 @@ public class TouchSrchFragment extends Fragment implements FileSelectionDialog.O
             }
 
             // Try to find mp3 using SAF/MediaStore instead of simple string replacement
-            Uri mp3Uri = null;
-            if (!triedTreeUri) {
-                mp3Uri = findSiblingMp3ByDisplayName(baseFilename);
-                if (mp3Uri != null) {
-                    audioOk = openAudioPlayer(mp3Uri.toString());
-                }
-            }
             String audioFileName = "";
-            if (!audioOk) {
-                // Fallback to original method if new method failed
-                audioFileName = Utility.changeExtension(baseFilename, "mp3");
-                audioOk = openAudioPlayer(audioFileName);
+            {
+                Uri mp3Uri = null;
+                if (!triedTreeUri) {
+                    // SAF→non SAFにupgradeした場合、古いSAF用ファイルが残っている可能性があるため、まずnon SAF用のファイル名で試す
+                    if (!audioOk) {
+                        audioFileName = Utility.changeExtension(baseFilename, "mp3");
+                        audioOk = openAudioPlayer(audioFileName);
+                    }
+                    if (!audioOk) {
+                        mp3Uri = findSiblingMp3ByDisplayName(baseFilename);
+                        if (mp3Uri != null) {
+                            audioOk = openAudioPlayer(mp3Uri.toString());
+                        }
+                    }
+                }
             }
             if (!audioOk){
                 String altAudioFolder = pref.getString(pfs.AUDIOFILEFOLDER, config.getDefaultAudioFolder());
