@@ -19,6 +19,19 @@
 -keepclassmembers class com.reliefoffice.pdic.PdicJni {
 	public *;
 }
+
+# Preserve Fragment classes that are instantiated dynamically via navigation
+-keep class com.reliefoffice.pdic.SettingsFragmentCompat { *; }
+-keep class com.reliefoffice.pdic.SettingsFragmentCompat$* { *; }
+-keep class com.reliefoffice.pdic.DicSettingFragment { *; }
+-keep class com.reliefoffice.pdic.IncrSrchFragment { *; }
+-keep class com.reliefoffice.pdic.TouchSrchFragment { *; }
+-keep class com.reliefoffice.pdic.PlaceholderFragment { *; }
+
+# Preserve dialog-related classes
+-keep class com.reliefoffice.pdic.*Dialog* { *; }
+-keep class com.reliefoffice.pdic.*Dialog*$* { *; }
+
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:

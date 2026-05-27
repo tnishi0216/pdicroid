@@ -180,6 +180,8 @@ public class MainActivity extends AppCompatActivity implements IncrSrchFragment.
                     fragment = new IncrSrchFragment();
                 } else if (fragmentClass == DicSettingFragment.class) {
                     fragment = new DicSettingFragment();
+                } else if (fragmentClass == SettingsFragmentCompat.class) {
+                    fragment = new SettingsFragmentCompat();
                 } else if (fragmentClass != null) {
                     // Fallback to reflection only for unknown classes
                     fragment = (Fragment) fragmentClass.newInstance();

@@ -41,6 +41,12 @@ public class SettingsFragmentCompat extends PreferenceFragmentCompat implements 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Preference initialization is done in onCreatePreferences
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        // Load preferences and initialize controls here to follow PreferenceFragmentCompat lifecycle
         This = this;
 
         addPreferencesFromResource(R.xml.preference);
@@ -86,27 +92,22 @@ public class SettingsFragmentCompat extends PreferenceFragmentCompat implements 
                 psbmFM.deleteInstance();
             }
         } else {
-            psbmSharing.setVisible(false);
+            if (psbmSharing != null) psbmSharing.setVisible(false);
         }
 
         AudioFileFolder = (EditTextPreference) findPreference("AudioFileFolder");
-        if (Utility.isEmpty(AudioFileFolder.getText())){
-            String DefaultAudioFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-            // DefaultAudioFolder = "/storage/emulated/0/Download";
-            // DefaultAudioFolder = "/storage/sdcard0/Download";
-            AudioFileFolder.setText(DefaultAudioFolder);
+        if (AudioFileFolder != null) {
+            if (Utility.isEmpty(AudioFileFolder.getText())){
+                String DefaultAudioFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+                AudioFileFolder.setText(DefaultAudioFolder);
+            }
+            AudioFileFolder.setSummary(AudioFileFolder.getText());
         }
-        AudioFileFolder.setSummary(AudioFileFolder.getText());
 
         psbmDefCharset = (CheckBoxPreference) findPreference("DefCharset");
 
         GoogleTransApiKey = (EditTextPreference)findPreference("GoogleTransApiKey");
-        GoogleTransApiKey.setSummary(GoogleTransApiKey.getText());
-    }
-
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-
+        if (GoogleTransApiKey != null) GoogleTransApiKey.setSummary(GoogleTransApiKey.getText());
     }
 
     // summaryの動的変更
